@@ -1,0 +1,729 @@
+Building configuration...
+
+
+Current configuration : 19337 bytes
+!
+! Last configuration change at 12:43:01 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 12:43:33 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.5
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname PADCRA1
+!
+boot-start-marker
+boot system flash0:/c2951-universalk9-mz.SPA.155-3.M6a.bin
+boot-end-marker
+!
+!
+card type t1 0 3
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group tacacs+ none 
+aaa authorization network flexvpn local 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+aaa session-id common
+ethernet lmi ce
+network-clock-participate wic 3 
+network-clock-select 1 T1 0/3/0
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+!
+!
+!
+ip flow-cache timeout inactive 10
+ip flow-cache timeout active 1
+ip domain lookup source-interface Loopback0
+ip domain name PADC.chevrontexaco.net
+ip name-server 146.36.80.34
+ip multicast-routing 
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+ip cef
+no ipv6 cef
+!
+flow record FLOW4
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ collect ipv4 dscp
+ collect interface output
+ collect counter bytes
+ collect counter packets
+!
+!
+flow record FLOW6
+ match ipv6 protocol
+ match ipv6 source address
+ match ipv6 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ collect ipv6 dscp
+ collect interface output
+ collect counter bytes
+ collect counter packets
+!
+!
+flow monitor FLOW4-LAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-WAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-WAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW6-LAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW6-WAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW6-WAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW4-LAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW6-LAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+isdn switch-type primary-4ess
+!
+!
+crypto pki trustpoint TP-self-signed-1960346692
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1960346692
+ revocation-check none
+ rsakeypair TP-self-signed-1960346692
+!
+!
+crypto pki certificate chain TP-self-signed-1960346692
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31393630 33343636 3932301E 170D3132 30333230 31393037 
+  32355A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 39363033 
+  34363639 3230819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  8100A159 36138C90 D67E9F38 134A2F51 E168D08B 63F5372B B7CC85A0 5D844904 
+  61602663 ACE3FA81 173015E6 3B24551C 4339F410 21C00817 FD6BC0C0 162FCF24 
+  D0389789 7B324444 F355280B CE60FFC6 82828AE9 3190C811 66360376 BBF330D1 
+  F5BADF26 BBDEF7B2 CE5624E5 5027BB19 A8C533F1 41521B9C C64B8843 25957AB6 
+  40350203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 145AD0C3 290F3F44 64A9C8CF E2C309BC 71F53E0F 85301D06 
+  03551D0E 04160414 5AD0C329 0F3F4464 A9C8CFE2 C309BC71 F53E0F85 300D0609 
+  2A864886 F70D0101 05050003 8181001C 70BAE5E5 C0701025 BA78AF0C BE9DE87F 
+  1B4FBD4B D0DB4194 F86AC60C 7B58F3BF 1D898C8E 1B8AD41D A65F48A9 0B79F424 
+  04019637 0E48D4DB 17893EA7 2BCBAB5C 52953F2E F13DD3B6 B34645E8 66299D08 
+  F3D5CEA5 BF11E339 F0FBFF28 6C268580 74232606 2E7AF23F 52059F26 01201E33 
+  3D0EC04E D85C252A D6781ED3 1699C5
+  	quit
+voice-card 0
+ dspfarm
+ dsp services dspfarm
+!
+!
+!
+voice service voip
+ allow-connections h323 to h323
+ allow-connections h323 to sip
+ fax protocol t38 nse force version 0 ls-redundancy 5 hs-redundancy 2 fallback none
+ modem passthrough nse codec g711ulaw redundancy
+!
+!
+!
+!
+voice translation-rule 1
+ rule 1 /^8985/ /985/
+!
+voice translation-rule 2
+ rule 2 /^409985/ /8985/
+!
+!
+voice translation-profile 7-digit-CID-outbound
+translate calling 1
+translate redirect-called 1
+!
+voice translation-profile pstn-to-ext
+translate called 2
+!
+!
+!
+license udi pid CISCO2951/K9 sn FTX1612AJ9T
+hw-module pvdm 0/0
+!
+hw-module pvdm 0/1
+!
+!
+!
+archive
+ log config
+  hidekeys
+ path flash0:cvx_134039
+ maximum 5
+ write-memory
+file prompt quiet
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+!
+!
+controller T1 0/3/0
+ cablelength long 0db
+ pri-group timeslots 1-24 service mgcp
+ description ATT  102 T1ZFN PTARTXBOWCP PTARTXYUDS0
+!
+controller T1 0/3/1
+ shutdown
+ cablelength long 0db
+ description Sprint   29HCGS605194
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+!
+class-map match-all WAN-Traffic-L3CVX-CORP
+ match vlan  2000
+class-map match-any DSCP-CS3-AF3
+ match dscp cs3 
+ match dscp cs6 
+ match dscp af31  af32  af33 
+class-map match-any DSCP-AF4
+ match dscp af41  af42  af43 
+class-map match-any DSCP-AF2
+ match dscp af21  af22  af23 
+class-map match-any DSCP-AF1
+ match dscp af11  af12  af13 
+class-map match-all LAN-Traffic-L3CVX-CORP
+ match vlan  2001
+ match vlan  2002
+class-map match-any DSCP-EF
+ match ip dscp ef 
+ match dscp ef 
+class-map match-all NETWORK-CONTROL
+ match access-group name NETWORK-CONTROL
+class-map match-any L3CVX-CORP-LAN-MARK-CS3
+ match access-group name L3CVX-CORP-MARK-DSCP-CS3-CS6-AF3x
+class-map match-any L3CVX-CORP-LAN-MARK-AF4
+ match access-group name L3CVX-CORP-MARK-DSCP-AF4x
+class-map match-any L3CVX-CORP-LAN-MARK-AF1
+ match access-group name L3CVX-CORP-MARK-DSCP-AF1x-AND-LOCAL
+class-map match-any L3CVX-CORP-LAN-MARK-AF2
+ match access-group name L3CVX-CORP-MARK-DSCP-AF2x-AND-LOCAL
+class-map match-any L3CVX-CORP-LAN-MARK-EF
+ match access-group name L3CVX-CORP-MARK-DSCP-EF
+!
+policy-map L3CVX-CORP-SETDSCP
+ class L3CVX-CORP-LAN-MARK-EF
+  set dscp ef
+ class L3CVX-CORP-LAN-MARK-AF4
+  set dscp af41
+ class L3CVX-CORP-LAN-MARK-CS3
+  set dscp cs3
+ class L3CVX-CORP-LAN-MARK-AF2
+  set dscp af21
+ class L3CVX-CORP-LAN-MARK-AF1
+  set dscp af11
+ class class-default
+  set dscp default
+policy-map SETDSCP-MULTI-VRF-IN
+ class LAN-Traffic-L3CVX-CORP
+   service-policy L3CVX-CORP-SETDSCP
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 146.33.103.248 255.255.255.255
+ no ip proxy-arp
+ ip flow ingress
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+ ip ospf 65001 area 0
+!
+interface Multilink1
+ no ip address
+ shutdown
+ ppp multilink
+ ppp multilink group 1
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ description *** PADCRL1-VSS  Te2/2/7***
+ no ip address
+ ip nbar protocol-discovery
+ duplex auto
+ speed auto
+ service-policy input SETDSCP-MULTI-VRF-IN
+!
+interface GigabitEthernet0/1.2001
+ encapsulation dot1Q 2001
+ ip address 146.33.103.224 255.255.255.254
+ no ip proxy-arp
+ ip flow monitor FLOW4-LAN-IN input
+ ip flow monitor FLOW6-LAN-IN input
+ ip flow monitor FLOW4-LAN-OUT output
+ ip flow monitor FLOW6-LAN-OUT output
+ ip pim sparse-mode
+ ip ospf 65001 area 0
+!
+interface GigabitEthernet0/2
+ description *** PADCRL1-VSS  Te1/2/7 ***
+ no ip address
+ ip nbar protocol-discovery
+ duplex auto
+ speed auto
+ service-policy input SETDSCP-MULTI-VRF-IN
+!
+interface GigabitEthernet0/2.2002
+ encapsulation dot1Q 2002
+ ip address 146.33.103.226 255.255.255.254
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip ospf 65001 area 0
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ duplex auto
+ speed auto
+!
+interface Serial0/3/0:23
+ description ATT  102 T1ZFN PTARTXBOWCP PTARTXYUDS0            
+ no ip address
+ encapsulation hdlc
+ isdn switch-type primary-ni
+ isdn incoming-voice voice
+ isdn bind-l3 ccm-manager
+ no cdp enable
+!
+router ospf 65001
+ redistribute connected subnets
+ redistribute static subnets
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+ip bgp-community new-format
+no ip http server
+no ip http secure-server
+ip flow-export source Loopback0
+ip flow-export version 9
+ip flow-export destination 139.65.140.12 9995
+!
+ip tftp source-interface Loopback0
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+ip route 0.0.0.0 0.0.0.0 139.65.253.177 250 name Verizon-VSAT-Backup
+ip ssh logging events
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-boundary-site-campus
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ deny   any log
+ip access-list standard mcast-boundary-site-campus-high
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark High-Speed WAN
+ deny   239.194.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ deny   any log
+ip access-list standard mcast-limit-hi-gt1Mbps
+ permit 239.194.193.0 0.0.0.255
+ deny   any log
+ip access-list standard mcast-limit-hi-max1mbps
+ permit 239.194.192.0 0.0.0.255
+ deny   any log
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+ permit 224.0.0.0 7.255.255.255
+ deny   any log
+!
+logging history size 10
+logging source-interface Loopback0
+logging host 146.27.95.122
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+!
+nls resp-timeout 1
+cpd cr-id 1
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location PADC / WEST 7TH STREET, Gate 1, Port Arthur, TX  / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Medium
+snmp-server contact global.netops@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps transceiver all
+snmp-server enable traps envmon
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp-server host 139.65.140.25 public  ipmulticast
+snmp ifmib ifalias long
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 23 permit 10.10.10.0 0.0.0.7
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 139.65.140.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1333 permit 206.113.119.128 0.0.0.63
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/3/0:23
+ !
+ !
+ !
+ !
+!
+mgcp
+mgcp call-agent hou150nxcm2.hou150.chevrontexaco.net 2427 service-type mgcp version 0.1
+mgcp dtmf-relay voip codec all mode nte-ca
+mgcp rtp unreachable timeout 1000 action notify
+mgcp modem passthrough voip mode nse
+mgcp package-capability rtp-package
+mgcp package-capability sst-package
+mgcp package-capability pre-package
+no mgcp package-capability res-package
+no mgcp package-capability fxr-package
+no mgcp timer receive-rtcp
+mgcp sdp simple
+mgcp fax t38 ls_redundancy 5
+mgcp fax t38 hs_redundancy 2
+mgcp fax t38 nsf 000000
+mgcp fax t38 gateway force
+mgcp rtp payload-type g726r16 static
+mgcp bind control source-interface Loopback0
+mgcp bind media source-interface Loopback0
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local Loopback0
+sccp ccm 146.34.5.163 identifier 2 version 5.0.1 
+sccp ccm 146.34.4.163 identifier 1 version 5.0.1 
+sccp
+!
+sccp ccm group 1
+ bind interface Loopback0
+ associate ccm 1 priority 1
+ associate ccm 2 priority 2
+ associate profile 1 register CFBPADC-ip
+!
+ccm-manager music-on-hold
+!
+ccm-manager fallback-mgcp 
+ccm-manager redundant-host bocnxcm2.gdc0.chevron.net san520nxhouc0.san520.chevrontexaco.net
+ccm-manager mgcp
+no ccm-manager fax protocol cisco
+ccm-manager config server 146.34.4.164 146.34.5.164 
+ccm-manager config
+!
+dspfarm profile 1 conference  
+ codec g711ulaw
+ codec g711alaw
+ codec g729ar8
+ codec g729abr8
+ codec g729r8
+ codec g729br8
+ maximum sessions 4
+ associate application SCCP
+!
+dial-peer voice 1000 pots
+ description Inbound Dial-Peer used by SRST
+ translation-profile incoming pstn-to-ext
+ incoming called-number .
+ direct-inward-dial
+ port 0/3/0:23
+!
+dial-peer voice 1001 pots
+ description PSTN SRST Access
+ translation-profile outgoing 7-digit-CID-outbound
+ destination-pattern 9T
+ port 0/3/0:23
+!
+dial-peer voice 1002 pots
+ description outbound CTN
+ destination-pattern 8T
+!
+!
+num-exp 30.. 898530..
+num-exp 60.. 898560..
+!
+!
+gatekeeper
+ shutdown
+!
+!
+telephony-service
+ srst mode auto-provision none
+ srst dn line-mode dual
+ max-ephones 165
+ max-dn 200
+ ip source-address 146.33.103.248 port 2000
+ timeouts interdigit 5
+ system message Fallback Mode: Active
+ voicemail 82091799
+ max-conferences 8 gain -6
+ transfer-system full-consult
+!
+!
+no vstack
+banner exec ^C
+*******************************************************************************************									
+WARNING - this router forms part of the Regional WAN network.									
+Changes to the configuration may result in loss of connectivity.									
+STOP if you are unsure what you are doing and email global.netops@chevron.com for guidance!									
+*******************************************************************************************									
+^C
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ modem InOut
+ transport preferred none
+ transport input telnet
+ stopbits 1
+ flowcontrol hardware
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output telnet ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output telnet ssh
+!
+scheduler allocate 20000 1000
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

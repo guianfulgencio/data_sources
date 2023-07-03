@@ -1,0 +1,962 @@
+Building configuration...
+
+
+Current configuration : 23766 bytes
+!
+! Last configuration change at 07:42:51 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 07:43:29 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.4
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname CLBrd3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+card type e1 0 0
+card type e1 0 1
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authentication ppp default none
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group tacacs+ if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone UTC -5 0
+!
+network-clock-participate wic 0 
+network-clock-participate wic 1 
+network-clock-select 1 E1 0/0/0
+network-clock-select 2 E1 0/0/1
+network-clock-select 3 E1 0/1/0
+network-clock-select 4 E1 0/1/1
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+!
+!
+ip dhcp excluded-address 146.41.228.1 146.41.228.3
+ip dhcp excluded-address 146.41.228.253
+ip dhcp excluded-address 146.41.229.253
+ip dhcp excluded-address 146.41.229.251
+ip dhcp excluded-address 146.41.229.252
+ip dhcp ping packets 5
+!
+ip dhcp pool IPT2-CLB
+ network 146.41.228.0 255.255.254.0
+ default-router 146.41.228.1 
+ option 150 ip 146.34.15.84 146.39.33.232 
+ dns-server 146.36.80.34 146.23.2.2 146.23.2.1 
+!
+!
+!
+ip flow-cache timeout active 1
+ip domain lookup source-interface Loopback0
+ip domain name clb.chevrontexaco.net
+ip name-server 146.36.80.34
+ip name-server 146.39.35.17
+ip name-server 146.39.35.5
+ip name-server 146.23.2.2
+ip name-server 146.23.2.1
+ip accounting-threshold 100
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+isdn switch-type primary-net5
+!
+cts logging verbose
+!
+!
+voice-card 0
+ dspfarm
+ dsp services dspfarm
+!
+!
+!
+voice service voip
+ allow-connections h323 to h323
+ allow-connections h323 to sip
+ allow-connections sip to h323
+ supplementary-service h450.12
+ fax protocol t38 version 0 ls-redundancy 0 hs-redundancy 0 fallback none
+ h323
+!
+voice class codec 1
+ codec preference 1 g711ulaw
+ codec preference 2 g711alaw
+ codec preference 3 g729r8
+ codec preference 4 g729br8
+!
+voice class h323 1
+  h225 timeout tcp establish 3
+!
+!
+!
+!
+!
+!
+license udi pid C3900-SPE200/K9 sn FOC19165NZJ
+!
+!
+hw-module pvdm 0/0
+!
+archive
+ log config
+  hidekeys
+ path flash0:cvx_134019
+ maximum 5
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+!
+!
+controller E1 0/0/0
+ framing NO-CRC4 
+ line-termination 75-ohm
+ ds0-group 0 timeslots 1-15,17-31 type r2-digital r2-compelled ani
+ cas-custom 0
+  country easteurope use-defaults
+  timer interdigit incoming 3000
+ description 44XX
+!
+controller E1 0/0/1
+ framing NO-CRC4 
+ line-termination 75-ohm
+ ds0-group 0 timeslots 1-15,17-31 type r2-digital r2-compelled ani
+ cas-custom 0
+  country easteurope use-defaults
+  timer interdigit incoming 3000
+ description 45XX
+!
+controller E1 0/1/0
+ framing NO-CRC4 
+ line-termination 75-ohm
+ ds0-group 0 timeslots 1-15,17-31 type r2-digital r2-compelled ani
+ cas-custom 0
+  country easteurope use-defaults
+  timer interdigit incoming 3000
+ description 47XX
+!
+controller E1 0/1/1
+ framing NO-CRC4 
+ line-termination 75-ohm
+ ds0-group 0 timeslots 1-15,17-31 type r2-digital r2-compelled ani
+ cas-custom 0
+  country easteurope use-defaults
+  timer interdigit incoming 3000
+ description 42XX
+lldp run
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+ip tftp source-interface Loopback0
+ip ssh time-out 90
+ip ssh authentication-retries 2
+ip ssh source-interface Loopback0
+ip ssh version 2
+ip scp server enable
+!
+translation-rule 81
+ Rule 0 ^4622... 2
+!
+!
+!
+!
+!
+interface Loopback0
+ description Management
+ ip address 146.39.34.251 255.255.255.255
+ no ip proxy-arp
+ h323-gateway voip interface
+ h323-gateway voip bind srcaddr 146.39.34.251
+!
+interface GigabitEthernet0/0
+ description *** Connection to CLBasw-ppal-1 ***
+ no ip address
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ no ip route-cache
+ load-interval 30
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0.2
+ description *** description Users_2 ***
+ encapsulation dot1Q 2
+ ip address 146.39.32.2 255.255.255.0
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 2 ip 146.39.32.1
+ standby 2 priority 200
+ standby 2 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.3
+ description *** description Users_3 ***
+ encapsulation dot1Q 3
+ ip address 146.39.33.2 255.255.255.128
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 3 ip 146.39.33.1
+ standby 3 priority 200
+ standby 3 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.4
+ description *** description Users_4 ***
+ encapsulation dot1Q 4
+ ip address 146.39.33.130 255.255.255.192
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 4 ip 146.39.33.129
+ standby 4 priority 200
+ standby 4 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.5
+ description *** description Users_5 ***
+ encapsulation dot1Q 5
+ ip address 146.39.34.130 255.255.255.192
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 5 ip 146.39.34.129
+ standby 5 priority 200
+ standby 5 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.9
+ description *** description Users_9 ***
+ encapsulation dot1Q 9
+ ip address 146.39.33.242 255.255.255.240
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 6 ip 146.39.33.241
+ standby 6 priority 200
+ standby 6 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.10
+ description *** description Users_10 ***
+ encapsulation dot1Q 10
+ ip address 146.39.33.194 255.255.255.224
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 7 ip 146.39.33.193
+ standby 7 priority 200
+ standby 7 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.15
+ description UK_Claro_Rio_Sogamoso
+ encapsulation dot1Q 15
+ ip address 146.39.38.101 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ no ip route-cache
+!
+interface GigabitEthernet0/0.16
+ description *** description Voice ***
+ encapsulation dot1Q 16
+ ip address 146.41.228.2 255.255.254.0
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 8 ip 146.41.228.1
+ standby 8 priority 200
+ standby 8 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.19
+ description *** CCTV_Vlan_Ecotower ***
+ encapsulation dot1Q 19
+ ip address 146.39.35.130 255.255.255.192
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 9 ip 146.39.35.129
+ standby 9 priority 200
+ standby 9 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.20
+ description *** ILO_VMware_IPT ***
+ encapsulation dot1Q 20
+ ip address 146.39.34.193 255.255.255.240
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 10 ip 146.39.34.195
+ standby 10 priority 200
+ standby 10 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.30
+ description *** Wireless_Ecotower_Users ***
+ encapsulation dot1Q 30
+ ip address 146.39.44.2 255.255.255.128
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 11 ip 146.39.44.1
+ standby 11 priority 200
+ standby 11 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.31
+ description *** Wireless_Eco_Manage ***
+ encapsulation dot1Q 31
+ ip address 146.39.44.130 255.255.255.240
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 12 ip 146.39.44.129
+ standby 12 priority 200
+ standby 12 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.40
+ description *** Videoconference_Vlan ***
+ encapsulation dot1Q 40
+ ip address 146.39.35.194 255.255.255.240
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ standby 14 ip 146.39.35.193
+ standby 14 priority 200
+ standby 14 preempt
+ no ip route-cache
+!
+interface GigabitEthernet0/0.41
+ description *** VC_2 ***
+ encapsulation dot1Q 41
+ ip address 146.39.35.210 255.255.255.240
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ standby 15 ip 146.39.35.209
+ standby 15 priority 200
+ standby 15 preempt
+ no ip route-cache
+!
+interface GigabitEthernet0/0.50
+ description *** description SERVERS&PRINTERS ***
+ encapsulation dot1Q 50
+ ip address 146.39.34.4 255.255.255.128
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 16 ip 146.39.34.1
+ standby 16 priority 200
+ standby 16 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.200
+ description *** Publishers_IPT ***
+ encapsulation dot1Q 200
+ ip address 146.34.15.85 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 18 ip 146.34.15.81
+ standby 18 priority 200
+ standby 18 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/0.201
+ description *** Subscribers_IPT ***
+ encapsulation dot1Q 201
+ ip address 146.39.33.226 255.255.255.240
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ ip pim sparse-mode
+ standby 17 ip 146.39.33.225
+ standby 17 priority 200
+ standby 17 preempt
+ no ip route-cache
+ ntp disable
+!
+interface GigabitEthernet0/1
+ description *** Connection to TEL1 ***
+ no ip address
+ no ip redirects
+ no ip proxy-arp
+ duplex auto
+ speed auto
+ no cdp enable
+!
+interface GigabitEthernet0/1.100
+ description TEL1-DOM-CORE
+ encapsulation dot1Q 100
+ ip address 146.39.37.243 255.255.255.240
+ no ip proxy-arp
+!
+interface GigabitEthernet0/2
+ description ***** INTERFACE NOT IN USE, ADMINISTRATIVELY DOWN *****
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/3
+ description ***** INTERFACE NOT IN USE, ADMINISTRATIVELY DOWN *****
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+!
+router eigrp 109
+ default-metric 100000 1 255 1 1500
+ network 146.34.15.0 0.0.0.127
+ network 146.39.32.0 0.0.15.255
+ network 146.39.33.224 0.0.0.15
+ network 146.39.34.0 0.0.0.255
+ network 146.39.35.192 0.0.0.15
+ network 146.39.37.240 0.0.0.15
+ network 146.39.47.64 0.0.0.63
+ network 146.41.224.0 0.0.3.255
+ network 146.41.228.0 0.0.1.255
+ redistribute static
+ passive-interface default
+ no passive-interface GigabitEthernet0/0
+ no passive-interface GigabitEthernet0/0.50
+ no passive-interface GigabitEthernet0/1.100
+ no passive-interface GigabitEthernet0/0.2
+ no passive-interface GigabitEthernet0/0.3
+ no passive-interface GigabitEthernet0/0.4
+ no passive-interface GigabitEthernet0/0.5
+ no passive-interface GigabitEthernet0/0.9
+ no passive-interface GigabitEthernet0/0.10
+ no passive-interface GigabitEthernet0/0.16
+ no passive-interface GigabitEthernet0/0.19
+ no passive-interface GigabitEthernet0/0.20
+ no passive-interface GigabitEthernet0/0.30
+ no passive-interface GigabitEthernet0/0.31
+ no passive-interface GigabitEthernet0/0.40
+ no passive-interface GigabitEthernet0/0.41
+ no passive-interface GigabitEthernet0/0.200
+ no passive-interface GigabitEthernet0/0.201
+ no eigrp log-neighbor-changes
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.42.255.132
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.140.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+logging source-interface Loopback0
+logging host 146.39.34.197
+logging host 146.39.34.199
+logging host 199.103.13.209
+logging host 146.27.95.122
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.141.24
+!
+nls resp-timeout 1
+cpd cr-id 1
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location CLB / Calle 100 No. 7A-81, Bogota / Colombia / Americas /CO-NA-Utility-Wan-Remotes/Criticality-Medium
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps frame-relay multilink bundle-mismatch
+snmp-server enable traps frame-relay
+snmp-server enable traps frame-relay subif
+snmp-server host 139.65.136.12 version 3 priv cvx2021  config
+snmp-server host 139.65.136.12 version 3 priv cvx2022  config
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+access-list 10 permit 146.22.71.201
+access-list 10 permit 146.23.102.220
+access-list 10 permit 146.22.9.201
+access-list 10 permit 199.103.13.209
+access-list 10 permit 199.103.13.208
+access-list 10 permit 146.27.124.18
+access-list 10 deny   any log
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 30 permit 146.22.71.201
+access-list 30 permit 146.27.82.194
+access-list 30 permit 146.22.9.201
+access-list 30 permit 146.36.80.131
+access-list 30 permit 146.36.80.142
+access-list 30 permit 146.39.37.251 log
+access-list 30 permit 146.39.37.252 log
+access-list 30 permit 146.36.80.139
+access-list 30 permit 146.36.80.149
+access-list 30 permit 199.103.13.219
+access-list 30 permit 199.103.13.209
+access-list 30 permit 199.103.13.208
+access-list 30 permit 146.36.92.124
+access-list 30 permit 146.36.80.124
+access-list 30 permit 146.36.80.81
+access-list 30 permit 146.27.124.21
+access-list 30 permit 146.27.124.18
+access-list 30 permit 146.36.112.50
+access-list 30 permit 146.27.26.0 0.0.1.255
+access-list 30 permit 146.36.193.0 0.0.0.255
+access-list 30 permit 146.39.34.192 0.0.0.31
+access-list 30 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 50 permit 146.39.32.0 0.0.7.255 log
+access-list 50 permit 146.39.34.0 0.0.0.240 log
+access-list 50 permit 146.39.34.0 0.0.0.128 log
+access-list 50 permit 146.39.40.0 0.0.0.255 log
+access-list 50 permit 146.39.41.0 0.0.0.255 log
+access-list 50 deny   any log
+access-list 1310 permit 146.22.71.201
+access-list 1310 permit 146.22.9.201
+access-list 1310 permit 139.65.136.196
+access-list 1310 permit 139.65.136.197
+access-list 1310 deny   any log
+access-list 1330 permit 146.34.7.179
+access-list 1330 permit 146.34.6.179
+access-list 1330 permit 146.34.5.179
+access-list 1330 permit 146.34.4.179
+access-list 1330 permit 146.34.11.179
+access-list 1330 permit 146.34.10.179
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.34.13.179
+access-list 1330 permit 146.34.12.179
+access-list 1330 permit 146.27.82.195
+access-list 1330 permit 146.27.166.11
+access-list 1330 permit 146.27.166.10
+access-list 1330 permit 146.23.102.220
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.36.80.134
+access-list 1330 permit 146.36.80.135
+access-list 1330 permit 146.36.80.131
+access-list 1330 permit 146.27.166.70
+access-list 1330 permit 146.39.37.252
+access-list 1330 permit 146.36.80.139
+access-list 1330 permit 146.36.80.159
+access-list 1330 permit 146.36.91.111
+access-list 1330 permit 146.39.34.30
+access-list 1330 permit 146.36.80.125
+access-list 1330 permit 146.36.80.81
+access-list 1330 permit 146.36.85.36
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.33.129.0 0.0.0.255
+access-list 1330 permit 146.36.193.0 0.0.0.255
+access-list 1330 permit 146.24.101.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 139.65.228.0 0.0.1.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.27.97.224 0.0.0.31
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1530 permit 199.103.13.0 0.0.0.255
+access-list 1530 permit 199.103.14.0 0.0.0.255
+access-list 1530 deny   any log
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/0/0:0
+!
+voice-port 0/1/0:0
+!
+voice-port 0/0/1:0
+!
+voice-port 0/1/1:0
+!
+voice-port 0/2/0
+ supervisory disconnect dualtone mid-call
+ timeouts initial 2
+ timeouts interdigit 4
+ timeouts call-disconnect 1
+ timeouts wait-release 1
+ timing hookflash-out 50
+ description tempo
+!
+voice-port 0/2/1
+ supervisory disconnect dualtone mid-call
+ timeouts initial 2
+ timeouts interdigit 4
+ timeouts call-disconnect 1
+ timeouts wait-release 1
+ timing hookflash-out 50
+ description tempo
+!
+voice-port 0/2/2
+ supervisory disconnect dualtone mid-call
+ timeouts initial 2
+ timeouts interdigit 4
+ timeouts call-disconnect 1
+ timeouts wait-release 1
+ timing hookflash-out 50
+ description 3168780475
+!
+voice-port 0/2/3
+ supervisory disconnect dualtone mid-call
+ timeouts initial 2
+ timeouts interdigit 4
+ timeouts call-disconnect 1
+ timeouts wait-release 1
+ timing hookflash-out 50
+ description 3168780488
+ !
+ !
+ !
+ !
+!
+no mgcp timer receive-rtcp
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local Loopback0
+sccp ccm 146.34.15.84 identifier 1 version 6.0 
+sccp ccm 146.39.33.232 identifier 2 version 6.0 
+sccp
+!
+sccp ccm group 1
+ description COMUNICA_CCM_CLB
+ bind interface Loopback0
+ associate ccm 2 priority 1
+ associate ccm 1 priority 2
+ associate profile 2 register MTP-CLBrd3-C
+ associate profile 1 register MTP-CLBrd3-T
+ keepalive retries 5
+!
+!
+!
+dspfarm profile 1 transcode  
+ codec g729abr8
+ codec g729ar8
+ codec g711alaw
+ codec g711ulaw
+ codec g729br8
+ codec g729r8
+ maximum sessions 16
+ associate application SCCP
+!
+dspfarm profile 2 conference  
+ codec g729br8
+ codec g729r8
+ codec g729abr8
+ codec g729ar8
+ codec g711alaw
+ codec g711ulaw
+ maximum sessions 10
+ associate application SCCP
+!
+dial-peer voice 9 pots
+ preference 1
+ destination-pattern 9033.........$
+ port 0/2/2
+ forward-digits 10
+!
+dial-peer voice 10 pots
+ destination-pattern 9033.........$
+ port 0/2/3
+ forward-digits 10
+!
+dial-peer voice 11 pots
+ preference 1
+ incoming called-number .
+ direct-inward-dial
+!
+dial-peer voice 12 pots
+ preference 1
+ shutdown
+ destination-pattern 9T
+ port 0/0/0:0
+!
+dial-peer voice 13 pots
+ preference 1
+ shutdown
+ destination-pattern 9T
+ port 0/0/1:0
+!
+dial-peer voice 14 pots
+ preference 1
+ shutdown
+ destination-pattern 9T
+ port 0/1/0:0
+!
+dial-peer voice 15 pots
+ preference 1
+ destination-pattern 9T
+ port 0/1/1:0
+!
+dial-peer voice 4000 voip
+ preference 1
+ destination-pattern 4...
+ session target ipv4:146.34.15.84
+ voice-class codec 1  
+ voice-class h323 1
+ dtmf-relay h245-alphanumeric
+ ip qos dscp cs5 media
+!
+dial-peer voice 4001 voip
+ preference 2
+ destination-pattern 4...
+ session target ipv4:146.39.33.232
+ voice-class codec 1  
+ voice-class h323 1
+ dtmf-relay h245-alphanumeric
+ ip qos dscp cs5 media
+!
+dial-peer voice 8 pots
+ destination-pattern 9033.........$
+ port 0/2/1
+ forward-digits 10
+!
+dial-peer voice 7 pots
+ destination-pattern 9033.........$
+ port 0/2/0
+ forward-digits 10
+!
+dial-peer voice 4010 voip
+ description *** Inbound Leg from CUCM - hou150nxcm2 ***
+ preference 1
+ destination-pattern 4...
+ session target ipv4:146.34.4.163
+ incoming called-number .
+ voice-class codec 1  
+ voice-class h323 1
+ dtmf-relay h245-alphanumeric
+ ip qos dscp cs5 media
+ no vad
+!
+!
+gateway 
+ timer receive-rtp 600
+!
+!
+!
+gatekeeper
+ shutdown
+!
+!
+call-manager-fallback
+ secondary-dialtone 9
+ max-conferences 8 gain 6
+ transfer-system full-consult
+ timeouts interdigit 3
+ ip source-address 146.39.34.251 port 2000
+ max-ephones 336
+ system message primary Sistema en Contingencia
+ transfer-pattern 4...
+ keepalive 15
+ time-format 24
+!
+!
+no vstack
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+line aux 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input ssh
+line vty 5 20
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input telnet ssh
+!
+scheduler allocate 20000 1000
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

@@ -1,0 +1,46 @@
+! VTY and Console template
+!
+ip access-list standard 20
+ 10 permit 10.0.0.0 0.63.255.255
+ 20 permit 10.128.0.0 0.7.255.255
+ 30 permit 10.254.0.0 0.0.255.255
+ 40 permit 146.22.0.0 0.1.255.255
+ 50 permit 146.24.0.0 0.7.255.255
+ 60 permit 146.32.0.0 0.7.255.255
+ 70 permit 146.40.0.0 0.3.255.255
+ 80 permit 146.44.0.0 0.1.255.255
+ 90 permit 146.46.0.0 0.0.255.255
+ 100 permit 136.171.0.0 0.0.255.255
+ 110 permit 139.65.140.0 0.0.3.255
+ 120 permit 139.65.136.0 0.0.3.255
+ 130 permit 139.65.0.0 0.0.255.255
+ 140 permit 134.248.0.0 0.0.255.255
+ 150 deny   any log
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ logging synchronous
+ transport preferred none
+ transport output none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ no exec
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output none
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ logging synchronous
+ transport preferred none
+ transport input ssh

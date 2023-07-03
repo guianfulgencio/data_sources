@@ -1,0 +1,20 @@
+! Dot1x interface config
+! Variables
+! {{ downlink.ifname }} = interface name of an access port (downlink interface)
+! {{ vlan.data }} = vlan number of the data vlan
+!
+interface {{ downlink.ifname }}
+  device-tracking attach-policy sisf_policy
+  authentication control-direction in
+  authentication event server dead action authorize vlan {{ vlan.data }}
+  authentication event server dead action authorize voice
+  authentication event server alive action reinitialize 
+  authentication host-mode multi-auth
+  authentication order dot1x mab
+  authentication priority dot1x mab
+  authentication port-control auto
+  authentication periodic
+  authentication timer reauthenticate server
+  dot1x timeout tx-period 1
+  mab
+  dot1x pae authenticator

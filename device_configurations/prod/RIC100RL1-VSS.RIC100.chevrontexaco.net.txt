@@ -1,0 +1,3762 @@
+Building configuration...
+
+Current configuration : 95021 bytes
+!
+! Last configuration change at 12:53:07 UTC Fri Jun 2 2023
+! NVRAM config last updated at 00:01:33 UTC Fri May 5 2023 by cbhy
+!
+version 15.5
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service internal
+service counters max age 5
+!
+hostname RIC100RL1-VSS
+!
+boot-start-marker
+boot system bootdisk:/s6t64-adventerprisek9-mz.SPA.155-1.SY2.bin
+boot system tftp flash 255.255.255.255
+boot-end-marker
+!
+!
+vrf definition CVXGUEST
+ rd 64634:1
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-DEVICES
+ rd 64634:65017
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-GUEST
+ rd 64634:65006
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-IND
+ rd 64634:65007
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-USER
+ rd 64634:65016
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging buffered 128000
+no logging console
+enable secret 5 $1$WZjb$E2OdRntcPRQtl.dTSTcoa/
+!
+username admin privilege 15 secret 5 $1$fQcq$XgqXCFCMDF8zUVOkwG54F1
+aaa new-model
+!
+!
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization config-commands
+aaa authorization exec default group tacacs+ if-authenticated 
+aaa authorization commands 0 default group tacacs+ if-authenticated 
+aaa authorization commands 1 default group tacacs+ if-authenticated 
+aaa authorization commands 15 default group tacacs+ if-authenticated 
+aaa authorization reverse-access default group tacacs+ if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 1 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group tacacs+
+aaa accounting system default start-stop group tacacs+
+!
+!
+!
+!
+!
+!
+aaa session-id common
+platform ip cef load-sharing ip-only
+!
+!
+!
+!
+!
+no ip source-route
+!
+ip vrf management
+!
+ip dhcp relay information trust-all
+ip dhcp excluded-address 10.210.62.128 10.210.62.137
+!
+ip dhcp pool RIC100LAN.GUEST
+   network 10.210.62.128 255.255.255.128
+   default-router 10.210.62.129 
+   dns-server 146.23.1.1 146.23.2.2 
+   domain-name ggn1.chevron.net
+   lease 0 4
+!
+ip domain-name RIC100.chevrontexaco.net
+ip name-server 146.36.80.34
+
+ip multicast-routing 
+ip multicast heartbeat 239.194.128.31 5 10 180
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+ip wccp 10 redirect-list SH-CIFS-WAN
+ip wccp 11 redirect-list SH-CIFS-SERVER
+vtp domain Richmond
+vtp mode transparent
+!
+switch virtual domain 10
+ switch mode virtual
+ switch 1 priority 200
+ switch 2 priority 50
+ mac-address use-virtual
+!
+!
+flow record NETQOS-NDE
+ match ipv4 tos
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ match interface output
+ collect routing source as
+ collect routing destination as
+ collect routing next-hop address ipv4
+ collect transport tcp flags
+ collect counter bytes
+ collect counter packets
+ collect timestamp sys-uptime first
+ collect timestamp sys-uptime last
+!
+!
+flow exporter NETQOS-EXPORTER
+ destination 139.65.140.12
+ source Loopback0
+ transport udp 2055
+ template data timeout 300
+ option exporter-stats timeout 60
+!
+!
+flow exporter 139.65.245.228
+ destination 139.65.245.228
+ transport udp 6007
+!
+flow platform cache timeout inactive 64
+flow platform cache timeout active 64
+flow platform cache timeout fast threshold 1 time 8
+!
+flow monitor NETQOS-MONITOR
+ exporter NETQOS-EXPORTER
+ record NETQOS-NDE
+!
+!
+table-map cos-discard-class-map
+ map from  0 to 0
+ map from  1 to 8
+ map from  2 to 16
+ map from  3 to 24
+ map from  4 to 32
+ map from  5 to 40
+ map from  6 to 48
+ map from  7 to 56
+!
+!
+crypto pki trustpoint DNAC-CA
+ enrollment mode ra
+ enrollment terminal
+ usage ssl-client
+ revocation-check crl none
+!
+!
+crypto pki certificate chain DNAC-CA
+ certificate ca 05037CB9E46D8DB395BE226CA224135C
+  30820544 3082032C A0030201 02021005 037CB9E4 6D8DB395 BE226CA2 24135C30 
+  0D06092A 864886F7 0D01010B 0500303C 310B3009 06035504 06130255 53311030 
+  0E060355 040A1307 43686576 726F6E31 1B301906 03550403 13124368 6576726F 
+  6E20526F 6F742043 41204732 301E170D 31383033 32323132 30383134 5A170D34 
+  38303332 32313230 3831345A 303C310B 30090603 55040613 02555331 10300E06 
+  0355040A 13074368 6576726F 6E311B30 19060355 04031312 43686576 726F6E20 
+  526F6F74 20434120 47323082 0222300D 06092A86 4886F70D 01010105 00038202 
+  0F003082 020A0282 020100BE 48514E81 5CA80152 CAE43016 17CF1FA1 D4ACCABD 
+  0A6F2F92 B453AA50 96DB4162 E6BC7812 9E7C7AFB 5B15F306 04036EE9 B5FAEF48 
+  BAC87CBF 33D2BFF7 38ECF6B4 43B9EFE4 1F793E35 35C14026 500EF28A 3AB10560 
+  6941C0CB 474CF7B9 CF4186B4 3909A42E EAEDB520 8412BCD8 CE4FCCCD C65753DB 
+  D4E321FF 2B342905 461AB3FE 2AFD74B0 527E9FF9 956F8F8A 90136B60 8CFE1987 
+  594693FD B03166CD 6F1B13FA 02E09FB8 A24DC849 CC4C0581 11D24E35 E398CB52 
+  45C70859 F256C337 977943A9 6A57C40B 0853FC21 292BD3AE 5E6904A9 437962CD 
+  0050E148 9ADACB3B FE68A154 5A36602F C750A4D5 D768126E CE167246 D8E0F101 
+  83E4B4D5 45937342 A1E03BEB C589D783 B201FE39 1F24431D 21074D49 24BB66D2 
+  D9C4ED4D 1B1EA31B 88732947 09C1B2E7 6A2C14B8 FB90D0FC 0EFE11A4 6F44078F 
+  66DA8322 DF0BA9CE A20FC9DB FE8D860C 69AABE3A 62BBBA32 275CEDC7 81F78991 
+  9BC0C5EA 42664BBB CA604EE3 4B81F8B1 9BB5DF6C 56B21BB9 B2931F94 8B7367E1 
+  F64FBC5B 978E2198 8D021382 0BA391F7 AF15D42B F69767C1 103B5701 E98A9356 
+  C5CBFE2D AC5BCFC8 56FAB118 5E99FD3F 04E9F59F 727E0BE5 F7BB9A0D E14AF134 
+  22A6D717 119399B6 928B4FA8 7F9E1CA7 B413DA95 D654BB08 9FCB3CC1 3E10B406 
+  41391BE7 633D3D43 F0460E2C 6A9FBFDF EB05B412 7DB739C3 1B4F26E8 0296A749 
+  74A6E3E7 F7F675E0 345F6D02 03010001 A3423040 301D0603 551D0E04 1604147C 
+  328206BF 60B234B5 0082A343 B13E89C1 C11EE730 0E060355 1D0F0101 FF040403 
+  02018630 0F060355 1D130101 FF040530 030101FF 300D0609 2A864886 F70D0101 
+  0B050003 82020100 51A2523C 122B7E24 056D9292 DA881D2E 5C26497A 187B4E6F 
+  A135360A 8F05614C 5BF4B03C 9208F1B5 37796D43 CD3689F0 EEFA4681 D36D9F8E 
+  B67522DF A5433825 93CB7322 C82CCBAD BAEBF8EB E35EB003 3071AC8E 4059E480 
+  9A9F2445 82CD157D F0BA2179 727138BD 4033F570 15EC2958 F7EB87E1 1D7CBB88 
+  241054D6 A60435A0 D49BD602 EB21603E 1A9B9A28 487C4B28 A5FF5B4C 50626F5E 
+  C1AF44D0 3BAE988C 0E3F7A46 E3D43B48 2266154E 3DCAB4BC 11B9C2FA 1B9C966A 
+  C2517EC7 535FDA0D 60809098 EA53A5A8 59852BC0 20AE871C B27E348B C4C1A60A 
+  FB7B1DD8 BEF7FE43 5006B2F1 C6A1EE61 BA1A0D2B 8705CB23 99D5E7C4 190DD84B 
+  38363FCC 6A559D7F A97388C3 BA804FB5 5581E131 2EE01B3C EEE7035E 197C88E9 
+  93389F8C CD3A6E72 9DA56937 2686C112 52DDCA6E 63A4963C E83C1BFA 31F34772 
+  71048681 5E39ACF4 2686EB31 4765AED6 0AEE91D2 B649AA67 5C401F2E CBC11B40 
+  68C14366 4A1A5274 92DF6B86 61782776 BFDD7C6D 5275605D D7514B7F 4FF8FC6F 
+  43CB3E89 93DB7AEB 9827278C 9DE68007 0D5D92D0 AF738513 F35BC5F4 89BC6E7E 
+  A1C906CA 321F9718 1E859684 C84D8E89 DB11E110 55A9ED94 C7E48B27 9579AEDC 
+  721032D1 A04EAE5F 27829D4F 05F95BB7 33D9C4C3 32AFC54E CF1EB879 3CE2AB19 
+  6C0EE21B 4F426994 A02FD96C 6705FD36 C40A773B 937A6E13 23D1D97B 7E2CC0FE 
+  350E1C4F 9B09112D
+  	quit
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+power redundancy-mode combined switch 1
+power redundancy-mode combined switch 2
+logging event link-status default
+!
+!
+archive
+ path bootdisk:
+ maximum 5
+object-group ip port CIFS 
+ eq 445
+ eq 139
+!
+object-group ip address CMS 
+ host-info 146.36.96.122
+ host-info 146.36.96.35
+ host-info 136.171.197.238
+ host-info 146.36.97.12
+!
+object-group ip address RIC-VLANS 
+ 146.28.142.0 255.255.254.0
+ 146.28.144.0 255.255.248.0
+ 146.28.152.0 255.255.254.0
+ 146.28.160.0 255.255.255.0
+ 146.28.162.0 255.255.255.0
+ 146.28.164.0 255.255.254.0
+ 146.28.166.0 255.255.254.0
+ 146.28.171.0 255.255.255.0
+ 146.28.138.0 255.255.255.0
+ 146.28.150.0 255.255.254.0
+ 146.28.161.0 255.255.255.0
+ 146.28.163.0 255.255.255.0
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge bpduguard default
+spanning-tree extend system-id
+spanning-tree vlan 1-4094 priority 4096
+!
+redundancy
+ main-cpu
+  auto-sync running-config
+ mode sso
+!
+vlan internal allocation policy ascending
+vlan access-log ratelimit 2000
+!
+vlan 61
+ name 146.34.61.1/25.RIC100_IPT
+!
+vlan 83
+ name Steelhead-WCCP
+!
+vlan 88
+ name remote-span_PCN_LAB
+!
+vlan 138
+ name 146.28.138.0/24.RIC100_DATA
+!
+vlan 142
+ name 146.28.142.0/23.RIC100_DATA
+!
+vlan 144
+ name 146.28.144.0/23.RIC100_DATA
+!
+vlan 146
+ name 146.28.146.0/23.RIC100_DATA
+!
+vlan 148
+ name 146.28.148.0/23.RIC100_RLP_DATA
+!
+vlan 150
+ name 146.28.150.0/23.RIC100_DATA
+!
+vlan 152
+ name 146.28.152.0/23.RIC100_DATA
+!
+vlan 154
+ name 146.28.154.0/25.RIC100_Security_
+!
+vlan 155
+ name 146.28.155.0/24.RIC100FA7_DMZ
+!
+vlan 158
+ name 146.28.158.0/24.GIL-Network
+!
+vlan 160
+ name 146.28.160.0/24.RIC100_DATA
+!
+vlan 161
+ name 146.28.161.0/24.RIC100_DATA
+!
+vlan 162
+ name 146.28.162.0/24.RIC100_DATA
+!
+vlan 163
+ name 146.28.163.0/24.RIC100_DATA
+!
+vlan 164
+ name 146.28.164.0/23.RIC100_71_DATA
+!
+vlan 166
+ name 146.28.166.0/23.RIC100WLAN.Busin
+!
+vlan 167
+ name Wireless_LAN
+!
+vlan 168
+ name prime_APs
+!
+vlan 170
+ name 146.28.170.0/24.RIC940_DATA
+!
+vlan 171
+ name 146.28.171.0/24.RIC100_LONGWARF_
+!
+vlan 174
+ name 146.28.174.0/25.RIC100_REF(ADM)_
+!
+vlan 175
+ name 146.28.175.128/29.RIC100WLAN.Mgm
+!
+vlan 176
+ name RIC100WLAN.Mgmt
+!
+vlan 177
+ name WLC:RP_port
+!
+vlan 249
+ name 146.34.49.0/24.RIC100_IPT
+!
+vlan 250
+ name 146.34.50.0/24.Bld50.IPT
+!
+vlan 251
+ name 146.34.51.0/24.Bld51.IPT
+!
+vlan 252
+ name 146.34.52.0/24.BLd10_Tower3_IPT
+!
+vlan 253
+ name 146.34.53.0/24.Bld10_Tower2_IPT
+!
+vlan 254
+ name 146.34.54.0/24.Bld10_Tower1_IPT
+!
+vlan 258
+ name 146.34.58.192/26.RIC100_RefAdmn_
+!
+vlan 259
+ name 146.34.59.0/24.RIC100_IPT
+!
+vlan 262
+ name 146.34.62.0/24.RIC100_71_IPT
+!
+vlan 263
+ name 146.34.63.0/24.RIC100_Bld43_IPT
+!
+vlan 264
+ name 146.34.39.64/27.DrumStorage_IPT
+!
+vlan 265
+ name 146.34.48.0/25_IPT_RLP
+!
+vlan 296
+ name 146.34.39.96/28.RIC981_IPT
+!
+vlan 300
+ name 146.28.174.128/26.RIC100_PBX_DAT
+!
+vlan 700
+ name 146.28.175.160/32.RIC100FA10
+!
+vlan 720
+ name 146.28.175.153/28.RIC100FA8
+!
+vlan 800
+ name CBRES-METASYS
+!
+vlan 820
+ name Fire_Detection_System
+!
+vlan 850
+ name ***Management_for_PCN_Switches**
+!
+vlan 888
+ name 10.210.62.128/25.Internet_Anywhe
+!
+vlan 889
+ name Guest-Internet.Test
+!
+vlan 999
+ name NULL.Native.vlan
+!
+vlan 3006
+ name 172.30.6.0/24.RIC100WLAN.GUEST
+!
+vlan 3106
+ name RIC100_Mobility_Access
+!
+vlan 4060
+ name WLAN-L3CVX-GUEST
+!
+vlan 4070
+ name WLAN-L3CVX-IND
+!
+vlan 4080
+ name WLAN-L3CVX-USER
+!
+vlan 4090
+ name WLAN-L3CVX-DEVICES
+lldp run
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+!
+class-map type lan-queuing match-any pq
+ match cos  4  5 
+class-map match-any class-copp-icmp-redirect-unreachable
+class-map match-all class-copp-glean
+class-map match-all class-copp-receive
+class-map match-all class-copp-options
+class-map match-all class-copp-broadcast
+class-map match-all class-copp-mcast-acl-bridged
+class-map match-all class-copp-slb
+class-map match-all class-copp-mtu-fail
+class-map match-all class-copp-ttl-fail
+class-map match-all class-copp-arp-snooping
+class-map match-any class-copp-mcast-copy
+class-map match-any class-copp-ip-connected
+class-map match-any class-copp-match-igmp
+ match access-group name acl-copp-match-igmp
+class-map match-all class-copp-unknown-protocol
+class-map match-any class-copp-vacl-log
+class-map match-all class-copp-mcast-ipv6-control
+class-map match-any class-copp-match-pimv6-data
+ match access-group name acl-copp-match-pimv6-data
+class-map match-any class-copp-mcast-punt
+class-map match-all class-copp-unsupp-rewrite
+class-map match-all class-copp-ucast-egress-acl-bridged
+class-map match-all class-copp-ip-admission
+class-map match-any class-copp-dpss-divert
+class-map type lan-queuing match-any cos3
+ match cos  3  6  7 
+class-map match-all class-copp-service-insertion
+class-map type lan-queuing match-any cos2
+ match cos  2 
+class-map match-any voice_control
+ match ip dscp cs3 
+class-map match-all class-copp-mac-pbf
+class-map match-any class-copp-match-mld
+ match access-group name acl-copp-match-mld
+class-map match-all class-copp-ucast-ingress-acl-bridged
+class-map match-all class-copp-dhcp-snooping
+class-map match-all class-copp-wccp
+class-map match-all class-copp-nd
+class-map match-any class-copp-ipv6-connected
+class-map match-all class-copp-mcast-rpf-fail
+class-map match-any class-copp-match-ndv6hl
+ match access-group name acl-copp-match-ndv6hl
+class-map match-any class-copp-ucast-rpf-fail
+class-map match-all class-copp-mcast-ip-control
+class-map match-any class-copp-match-pim-data
+ match access-group name acl-copp-match-pim-data
+class-map match-any class-copp-match-ndv6
+ match access-group name acl-copp-match-ndv6
+class-map match-all voice
+ match ip dscp ef 
+class-map match-any class-copp-mcast-v4-data-on-routedPort
+class-map match-any class-copp-mcast-v6-data-on-routedPort
+!
+policy-map policy-default-autocopp
+ class class-copp-mcast-v4-data-on-routedPort
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-mcast-v6-data-on-routedPort
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-dpss-divert
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-mld
+   police rate 5000 pps burst 5000 packets    conform-action set-discard-class-transmit 48    exceed-action drop 
+ class class-copp-match-igmp
+   police rate 5000 pps burst 5000 packets    conform-action set-discard-class-transmit 48    exceed-action drop 
+ class class-copp-icmp-redirect-unreachable
+   police rate 100 pps burst 10 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ucast-rpf-fail
+   police rate 100 pps burst 10 packets    conform-action transmit     exceed-action drop 
+ class class-copp-vacl-log
+   police rate 2000 pps burst 1 packets    conform-action transmit     exceed-action drop 
+ class class-copp-mcast-punt
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-mcast-copy
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ip-connected
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ipv6-connected
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-pim-data
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-pimv6-data
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-ndv6hl
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-match-ndv6
+   police rate 1000 pps burst 1000 packets    conform-action set-discard-class-transmit 48    exceed-action drop 
+ class class-default
+policy-map POLICE-400MEG
+ class class-default
+    police 400000000    conform-action transmit     exceed-action drop 
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+ auto qos default
+!
+!
+!
+!
+interface Loopback0
+ ip address 146.28.175.243 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+ ip igmp join-group 239.194.128.31
+!
+interface Port-channel1
+ description VSS System Port Channel - DO NOT DELETE OR AMMEND
+ no switchport
+ no ip address
+ no platform qos channel-consistency
+ switch virtual link 1
+!
+interface Port-channel2
+ description VSS System Port Channel - DO NOT DELETE OR AMEND
+ no switchport
+ no ip address
+ no platform qos channel-consistency
+ switch virtual link 2
+!
+interface Port-channel3
+ description RIC100WC-01
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+!
+interface Port-channel4
+ description RIC100WC-01HA
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+!
+interface Port-channel7
+ description RIC100WC-03 PO1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ load-interval 30
+!
+interface Port-channel8
+ description RIC100WC-03HA PO1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ load-interval 30
+!
+interface Port-channel40
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+!
+interface Port-channel201
+ description RIC100SL-71-7459 Po2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 164,262
+!
+interface Port-channel202
+ description RIC100SL-71-7321-A Po2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,164,262,800
+!
+interface Port-channel203
+ description RIC100SL-71-7321-B Po2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 160,164,262
+!
+interface Port-channel204
+ description RIC100SL-14-1180 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 146,154,259,800
+!
+interface Port-channel205
+ description RIC100SL-24-1223
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 146,154,259
+!
+interface Port-channel207
+ description RIC100SL-43-6249
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,154,263,800,820,888
+!
+interface Port-channel208
+ description RIC100SL-44-1143a
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,259,888
+!
+interface Port-channel209
+ description RIC100SL-45-3167a 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,154,259,800,888
+!
+interface Port-channel210
+ description RIC100SL-33-2601 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,259
+!
+interface Port-channel211
+ description RIC100SL-51-1245 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,251,800
+!
+interface Port-channel212
+ description RIC100SL-50-1272 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,250,251,800
+!
+interface Port-channel213
+ description RIC100SL-50-1290 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,250,251,800,888
+!
+interface Port-channel215
+ switchport
+!
+interface Port-channel216
+ description RIC100SL-31-3505
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,154,160,259,800,850
+ spanning-tree portfast disable
+ spanning-tree link-type point-to-point
+!
+interface Port-channel218
+ description RIC100SL-50-1100L
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,161,250
+!
+interface Port-channel219
+ description RIC100SL-10-3181
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 138,154,249
+!
+interface Port-channel301
+ description RIC100SL-60-1132
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,163,249,800
+!
+interface Port-channel302
+ description RIC100SL-61-4232
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,154,160,249,800
+!
+interface Port-channel303
+ description RIC100SL-31-3501 T2/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,259,850
+!
+interface Port-channel304
+ description RIC100SL-61-4400
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,160,249
+!
+interface Port-channel305
+ description RIC100SL-63-4800
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,249,888
+!
+interface Port-channel306
+ description RIC100SL-72-3136 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,259
+!
+interface Port-channel307
+ description RIC100SL-10-1281 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,160,254,800
+!
+interface Port-channel308
+ description RIC100SL-10-1581  
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 160,254,800
+!
+interface Port-channel309
+ description RIC100SL-10-2281  
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,161,253,820
+!
+interface Port-channel310
+ description RIC100SL-10-2581 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 161,253,296,888
+!
+interface Port-channel311
+ description RIC100SL-10-3280 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,162,252,888
+!
+interface Port-channel312
+ description RIC100SL-10-3580 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 138,154,252
+!
+interface Port-channel313
+ description RIC100SL-63-4826
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,888
+!
+interface Port-channel314
+ description RIC100SL-10-5102(Auditorum)
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 162
+ logging event link-status
+!
+interface Port-channel315
+ description RIC100SS-24-1208 (ETC LAN Network)
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,850
+!
+interface Port-channel316
+ description RIC100SL-32-2921
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,160,259
+!
+interface Port-channel317
+ description RIC100SL-35-2205
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,154,259,800,850
+!
+interface Port-channel318
+ description RIC100SL1-61-4142
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,150,152,164,168,249,259,262,263,265,888,889
+ logging event link-status
+!
+interface Port-channel320
+ description RIC1GSW1SR101-51-1215
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 720
+!
+interface Port-channel321
+ description RIC100SS-50-1100L
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,158
+ logging event link-status
+!
+interface TenGigabitEthernet1/1/1
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/2
+ description RIC100SL-10-3181 Int T1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 138,154,249
+ channel-group 219 mode active
+!
+interface TenGigabitEthernet1/1/3
+ description RIC100SL-31-3505 Ten1/1/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 152,154,160,259,800,850
+ channel-group 216 mode active
+!
+interface TenGigabitEthernet1/1/4
+ description RIC100SL-32-2921 Ten1/1/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,160,259
+ channel-group 316 mode active
+!
+interface TenGigabitEthernet1/1/5
+ description RIC100SL-24-1223 Ten1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 146,154,259
+ channel-group 205 mode active
+!
+interface TenGigabitEthernet1/1/6
+ description RIC100SL-71-7459 Ten1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 164,262
+ channel-group 201 mode active
+!
+interface TenGigabitEthernet1/1/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/8
+ description RIC100SL-60-1132 T1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,163,249,800
+ channel-group 301 mode active
+!
+interface TenGigabitEthernet1/1/9
+ description RIC100SL-31-3501 T1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,259,850
+ channel-group 303 mode active
+!
+interface TenGigabitEthernet1/1/10
+ description RIC100SL-61-4232 T1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,154,160,249,800
+ channel-group 302 mode active
+!
+interface TenGigabitEthernet1/1/11
+ description RIC100SL-14-1180 Te1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 146,154,259,800
+ channel-group 204 mode active
+!
+interface TenGigabitEthernet1/1/12
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet1/1/13
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/15
+ description RIC100SS-50-1100L T1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,158
+ channel-group 321 mode active
+!
+interface TenGigabitEthernet1/1/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/17
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/18
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/19
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/20
+ description RIC100WC-03HA Te** 
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ shutdown
+ udld port
+!
+interface TenGigabitEthernet1/1/21
+ description RIC100WC-03 Te** 
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ shutdown
+ udld port
+!
+interface TenGigabitEthernet1/1/22
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet1/1/23
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/24
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/25
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/26
+ description RIC100SL-45-3167a Te1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,154,259,800,888
+ channel-group 209 mode active
+!
+interface TenGigabitEthernet1/1/27
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/28
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/29
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/30
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/1/31
+ description VSL Interface *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 1 mode on
+!
+interface TenGigabitEthernet1/1/32
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet1/2/1
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/2
+ description RIC100SL-71-7321-A Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,164,262,800
+ channel-group 202 mode active
+!
+interface TenGigabitEthernet1/2/3
+ description RIC100SL-71-7321-B Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 160,164,262
+ channel-group 203 mode active
+!
+interface TenGigabitEthernet1/2/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/7
+ description RIC100SL-43-6249 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,154,263,800,820,888
+ channel-group 207 mode active
+!
+interface TenGigabitEthernet1/2/8
+ description RIC100SL-44-1143a Te 1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,259,888
+ channel-group 208 mode active
+!
+interface TenGigabitEthernet1/2/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/10
+ description RIC100SL-33-2601 Int t1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,259
+ channel-group 210 mode active
+!
+interface TenGigabitEthernet1/2/11
+ description RIC100SL-51-1245 Te 1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,251,800
+ channel-group 211 mode active
+!
+interface TenGigabitEthernet1/2/12
+ description RIC100SL-50-1272 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,250,251,800
+ channel-group 212 mode active
+!
+interface TenGigabitEthernet1/2/13
+ description RIC100SL-50-1290 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,250,251,800,888
+ channel-group 213 mode active
+!
+interface TenGigabitEthernet1/2/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/15
+ description RIC100SL-54-1170 Te 1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,259,888
+ channel-group 215 mode active
+!
+interface TenGigabitEthernet1/2/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/17
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/18
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/19
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/20
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/21
+ description RIC100WC-03 TE0/0/0
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 7 mode on
+!
+interface TenGigabitEthernet1/2/22
+ description RIC100WC-03 TE0/0/2
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 7 mode on
+!
+interface TenGigabitEthernet1/2/23
+ description RIC100WC-03HA TE0/0/0
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 8 mode on
+!
+interface TenGigabitEthernet1/2/24
+ description RIC100WC-03HA TE0/0/2
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 8 mode on
+!
+interface TenGigabitEthernet1/2/25
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/26
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/27
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/28
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/29
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 176
+!
+interface TenGigabitEthernet1/2/30
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/31
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/2/32
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/1
+ description RIC100RM01 TEN1/1
+ no switchport
+ ip address 146.28.175.201 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 10 redirect in
+ ip pim sparse-mode
+ logging event link-status
+ udld port
+ udld port enable bi-directional
+!
+interface TenGigabitEthernet1/3/1.981
+ description RIC100RM01
+ encapsulation dot1Q 981
+ vrf forwarding CVXGUEST
+ ip address 146.28.175.31 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ shutdown
+!
+interface TenGigabitEthernet1/3/1.3409
+ description RIC100RM01 For 1/0/1.3409 [VRF L3CVX-GUEST]
+ encapsulation dot1Q 3409
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.2.11 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet1/3/1.3410
+ description RIC100RM01 For 1/0/1.3410 [VRF L3CVX-IND]
+ encapsulation dot1Q 3410
+ vrf forwarding L3CVX-IND
+ ip address 10.190.2.11 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet1/3/1.3411
+ description RIC100RM01 For 1/0/1.3411 [VRF L3CVX-USER]
+ encapsulation dot1Q 3411
+ vrf forwarding L3CVX-USER
+ ip address 10.186.2.11 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet1/3/1.3412
+ description RIC100RM01 For 1/0/1.3412 [VRF L3CVX-DEVICES]
+ encapsulation dot1Q 3412
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.2.11 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet1/3/2
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/7
+ description VSL Interface *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 1 mode on
+!
+interface TenGigabitEthernet1/3/8
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ channel-group 40 mode active
+!
+interface FortyGigabitEthernet1/3/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet1/3/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/1
+ description RIC100SL-50-1100L Int G0/11
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,161,250
+ channel-group 218 mode active
+!
+interface TenGigabitEthernet1/5/2
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/4
+ description RIC100SL-61-4400 G0/11
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,160,249
+ channel-group 304 mode active
+!
+interface TenGigabitEthernet1/5/5
+ description RIC100SL-63-4800 G0/11
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,249,888
+ channel-group 305 mode active
+!
+interface TenGigabitEthernet1/5/6
+ description RIC100SL-72-3136 G0/11
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,259
+ channel-group 306 mode active
+!
+interface TenGigabitEthernet1/5/7
+ description RIC100SL-10-1281 Te 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,160,254,800
+ channel-group 307 mode active
+!
+interface TenGigabitEthernet1/5/8
+ description RIC100SL-10-1581 Te 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 160,254,800
+ channel-group 308 mode active
+!
+interface TenGigabitEthernet1/5/9
+ description RIC100SL-10-2281 Te 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,161,253,820
+ channel-group 309 mode active
+!
+interface TenGigabitEthernet1/5/10
+ description RIC100SL-10-2581 Te 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 161,253,296,888
+ channel-group 310 mode active
+!
+interface TenGigabitEthernet1/5/11
+ description RIC100SL-10-3280 Te 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,162,252,888
+ channel-group 311 mode active
+!
+interface TenGigabitEthernet1/5/12
+ description RIC100SL-10-3580 Te 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 138,154,252
+ channel-group 312 mode active
+!
+interface TenGigabitEthernet1/5/13
+ description RIC100SL-63-4826 Te 1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,888
+ channel-group 313 mode active
+!
+interface TenGigabitEthernet1/5/14
+ description RIC100SL-10-5102(Auditorum) G0/9
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 162
+ channel-group 314 mode active
+!
+interface TenGigabitEthernet1/5/15
+ description RIC100SS-24-1208 (ETC LAN Network) G1/3 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,850
+ channel-group 315 mode active
+!
+interface TenGigabitEthernet1/5/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/17
+ description RIC100SL-35-2205 Te 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,154,259,800,850
+ channel-group 317 mode active
+!
+interface TenGigabitEthernet1/5/18
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/19
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/20
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/21
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/22
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/23
+ description RIC100SL-61-1652
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,249
+!
+interface TenGigabitEthernet1/5/24
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/25
+ description RIC100SL1-61-4142 Te 1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,150,152,164,168,249,259,262,263,265,888,889
+ channel-group 318 mode active
+!
+interface TenGigabitEthernet1/5/26
+ description RIC100SL-REFADM Te 1/1/1
+ switchport
+ switchport trunk native vlan 174
+ switchport mode trunk
+ switchport trunk allowed vlan 174,258,262,300,800,888
+!
+interface TenGigabitEthernet1/5/27
+ description UPLINK-RIC100FP5 E0/0(Building 51-1233)
+ no switchport
+ ip address 146.28.175.17 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface TenGigabitEthernet1/5/28
+ description RIC1GSW1SR101-51-1215(Gi1/1/4)
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 720
+ channel-group 320 mode active
+!
+interface TenGigabitEthernet1/5/29
+ description RIC100RV1 G0/0/0
+ no switchport
+ ip address 146.28.175.181 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ shutdown
+!
+interface TenGigabitEthernet1/5/30
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/31
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet1/5/32
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/6/1
+ description VSS Dual-Active Detection *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ dual-active fast-hello
+!
+interface GigabitEthernet1/6/2
+ description Internet Anywhere Firewall WAN Connection
+ switchport
+ switchport mode access
+ switchport access vlan 142
+ no cdp enable
+!
+interface GigabitEthernet1/6/3
+ description Internet Anywhere Firewall LAN Connection
+ switchport
+ switchport mode access
+ switchport access vlan 888
+ shutdown
+ no cdp enable
+!
+interface GigabitEthernet1/6/4
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/5
+ description stancil
+ switchport
+ switchport mode access
+ switchport access vlan 142
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/6/6
+ description stancil
+ switchport
+ switchport mode access
+ switchport access vlan 142
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/6/7
+ description stancil
+ switchport
+ switchport mode access
+ switchport access vlan 142
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/6/8
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/9
+ description RIC100WC-01 Gig 0/0/1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 3 mode on
+!
+interface GigabitEthernet1/6/10
+ description RIC100WC-01 Gig 0/0/3
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 3 mode on
+!
+interface GigabitEthernet1/6/11
+ description RIC100WC-01 Gig 0/0/5
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 3 mode on
+!
+interface GigabitEthernet1/6/12
+ description RIC100WC-01 Gig 0/0/7
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 3 mode on
+!
+interface GigabitEthernet1/6/13
+ description RIC100WC-01HA Gig 0/0/1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 4 mode on
+!
+interface GigabitEthernet1/6/14
+ description RIC100WC-01HA Gig 0/0/3
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 4 mode on
+!
+interface GigabitEthernet1/6/15
+ description RIC100WC-01HA Gig 0/0/5
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 4 mode on
+!
+interface GigabitEthernet1/6/16
+ description RIC100WC-01HA Gig 0/0/7
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 4 mode on
+!
+interface GigabitEthernet1/6/17
+ description RIC100NTAD1 ILO
+ switchport
+ switchport mode access
+ switchport access vlan 158
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/6/18
+ description RIC100NTAD1 
+ switchport
+ switchport mode access
+ switchport access vlan 158
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/6/19
+ description RIC100NTNS1 ILO
+ switchport
+ switchport mode access
+ switchport access vlan 158
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/6/20
+ description RIC100NTNS1
+ switchport
+ switchport mode access
+ switchport access vlan 158
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/6/21
+ description Security Camera Server
+ switchport
+ switchport access vlan 154
+!
+interface GigabitEthernet1/6/22
+ description Security Camera Server
+ switchport
+ switchport access vlan 154
+!
+interface GigabitEthernet1/6/23
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/24
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/25
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/26
+ description RIC940-BLD227 Gig 1/0/48
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 61,170
+!
+interface GigabitEthernet1/6/27
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/6/28
+ description RIC100SL-98-2100 G0/25
+ switchport
+ switchport trunk native vlan 150
+ switchport mode trunk
+ switchport trunk allowed vlan 1,150,264,820
+!
+interface GigabitEthernet1/6/29
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/30
+ description RIC100SH1 WAN0_1  Interface 146.28.175.139
+ switchport
+ switchport mode access
+ switchport access vlan 83
+!
+interface GigabitEthernet1/6/31
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/32
+ description WLC:RP
+ switchport
+ switchport access vlan 177
+!
+interface GigabitEthernet1/6/33
+ description RLP-WLC-Aruba-MGT
+ switchport
+ switchport access vlan 176
+!
+interface GigabitEthernet1/6/34
+ description RLP-WLC-Aruba-Trunk
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,176,4060,4070,4080,4090
+!
+interface GigabitEthernet1/6/35
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/36
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/37
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/38
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/39
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/40
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/41
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/42
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/43
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/44
+ no switchport
+ no ip address
+!
+interface GigabitEthernet1/6/45
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/6/46
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/6/47
+ description RIC100WC-02 RP4HA
+ switchport
+ switchport access vlan 176
+!
+interface GigabitEthernet1/6/48
+ switchport
+ switchport mode access
+ switchport access vlan 176
+!
+interface TenGigabitEthernet2/1/1
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/2
+ description RIC100SL-10-3181 Int T1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 138,154,249
+ channel-group 219 mode active
+!
+interface TenGigabitEthernet2/1/3
+ description RIC100SL-31-3505 Ten2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,154,160,259,800,850
+ channel-group 216 mode active
+!
+interface TenGigabitEthernet2/1/4
+ description RIC100SL-32-2921 Ten1/1/2 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,160,259
+ channel-group 316 mode active
+!
+interface TenGigabitEthernet2/1/5
+ description RIC100SL-24-1223 Ten1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 146,154,259
+ channel-group 205 mode active
+!
+interface TenGigabitEthernet2/1/6
+ description RIC100SL-71-7459 Ten1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 164,262
+ channel-group 201 mode active
+!
+interface TenGigabitEthernet2/1/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/8
+ description RIC100SL-60-1132 T2/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,163,249,800
+ channel-group 301 mode active
+!
+interface TenGigabitEthernet2/1/9
+ description RIC100SL-31-3501 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,259,850
+ channel-group 303 mode active
+!
+interface TenGigabitEthernet2/1/10
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet2/1/11
+ description RIC100SL-14-1180 Te2/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 146,154,259,800
+ channel-group 204 mode active
+!
+interface TenGigabitEthernet2/1/12
+ description "May be bad port. No LED light"
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet2/1/13
+ description RIC100SL-31-3501 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,259,850
+ shutdown
+ channel-group 303 mode active
+!
+interface TenGigabitEthernet2/1/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/15
+ description RIC100SS-50-1100L T2/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,158
+ channel-group 321 mode active
+!
+interface TenGigabitEthernet2/1/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/17
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/18
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/19
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/20
+ description RIC100WC-03HA Te** 
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ shutdown
+ udld port
+!
+interface TenGigabitEthernet2/1/21
+ description RIC100WC-03 Te** 
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ shutdown
+ udld port
+!
+interface TenGigabitEthernet2/1/22
+ description RIC100WC-01 Te***
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176
+ logging event link-status
+ udld port
+!
+interface TenGigabitEthernet2/1/23
+ description RIC100WC-01 Te***
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176
+ logging event link-status
+ udld port
+!
+interface TenGigabitEthernet2/1/24
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/25
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/26
+ description RIC100SL-45-3167a Te1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,154,259,800,888
+ channel-group 209 mode active
+!
+interface TenGigabitEthernet2/1/27
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/28
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/29
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/30
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/1/31
+ description VSL Interface *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 2 mode on
+!
+interface TenGigabitEthernet2/1/32
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet2/2/1
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/2
+ description RIC100SL-71-7321-A Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,164,262,800
+ channel-group 202 mode active
+!
+interface TenGigabitEthernet2/2/3
+ description RIC100SL-71-7321-B Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 160,164,262
+ channel-group 203 mode active
+!
+interface TenGigabitEthernet2/2/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/7
+ description RIC100SL-43-6249 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,154,263,800,820,888
+ channel-group 207 mode active
+!
+interface TenGigabitEthernet2/2/8
+ description RIC100SL-44-1143a Te1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,259,888
+ channel-group 208 mode active
+!
+interface TenGigabitEthernet2/2/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/10
+ description RIC100SL-33-2601 Int t1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,259
+ channel-group 210 mode active
+!
+interface TenGigabitEthernet2/2/11
+ description RIC100SL-51-1245 Te1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,251,800
+ channel-group 211 mode active
+!
+interface TenGigabitEthernet2/2/12
+ description RIC100SL-50-1272 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,250,251,800
+ channel-group 212 mode active
+!
+interface TenGigabitEthernet2/2/13
+ description RIC100SL-50-1290 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 142,154,250,251,800,888
+ channel-group 213 mode active
+!
+interface TenGigabitEthernet2/2/14
+ description RIC100SL-32-6304
+ switchport
+ switchport trunk native vlan 144
+ switchport mode trunk
+ switchport trunk allowed vlan 144,259
+!
+interface TenGigabitEthernet2/2/15
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet2/2/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/17
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/18
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/19
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/20
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/21
+ description RIC100WC-03 TE0/0/1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 7 mode on
+!
+interface TenGigabitEthernet2/2/22
+ description RIC100WC-03 TE0/0/3
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 7 mode on
+!
+interface TenGigabitEthernet2/2/23
+ description RIC100WC-03HA TE0/0/1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 8 mode on
+!
+interface TenGigabitEthernet2/2/24
+ description RIC100WC-03HA TE0/0/3
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 167,176,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 8 mode on
+!
+interface TenGigabitEthernet2/2/25
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/26
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/27
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/28
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/29
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 176
+!
+interface TenGigabitEthernet2/2/30
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/31
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/2/32
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/1
+ description RIC100RM02 TEN1/1
+ no switchport
+ ip address 146.28.175.197 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 10 redirect in
+ ip pim sparse-mode
+ logging event link-status
+ udld port
+ udld port enable bi-directional
+!
+interface TenGigabitEthernet2/3/1.981
+ description RIC100RM02 CVXGUEST
+ encapsulation dot1Q 981
+ vrf forwarding CVXGUEST
+ ip address 146.28.175.35 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ shutdown
+!
+interface TenGigabitEthernet2/3/1.3509
+ description RIC100RM02 For 1/0/1.3509 [VRF L3CVX-GUEST]
+ encapsulation dot1Q 3509
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.2.13 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet2/3/1.3510
+ description RIC100RM02 For 1/0/1.3510 [VRF L3CVX-IND]
+ encapsulation dot1Q 3510
+ vrf forwarding L3CVX-IND
+ ip address 10.190.2.13 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet2/3/1.3511
+ description RIC100RM02 For 1/0/1.3511 [VRF L3CVX-USER]
+ encapsulation dot1Q 3511
+ vrf forwarding L3CVX-USER
+ ip address 10.186.2.13 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet2/3/1.3512
+ description RIC100RM02 For 1/0/1.3512 [VRF L3CVX-DEVICES]
+ encapsulation dot1Q 3512
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.2.13 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet2/3/2
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/7
+ description VSL Interface *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 2 mode on
+!
+interface TenGigabitEthernet2/3/8
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ channel-group 40 mode active
+!
+interface FortyGigabitEthernet2/3/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet2/3/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface mgmt0
+ ip address 146.28.158.4 255.255.255.0
+ no ip proxy-arp
+ shutdown
+!
+interface TenGigabitEthernet2/5/1
+ description RIC100SL-50-1100L int G0/12
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,161,250
+ channel-group 218 mode active
+!
+interface TenGigabitEthernet2/5/2
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/5
+ description RIC100SL-63-4800 G0/12
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,249,888
+ channel-group 305 mode active
+!
+interface TenGigabitEthernet2/5/6
+ description RIC100SL-72-3136 G0/12
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,259
+ channel-group 306 mode active
+!
+interface TenGigabitEthernet2/5/7
+ description RIC100SL-10-1281 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,160,254,800
+ channel-group 307 mode active
+!
+interface TenGigabitEthernet2/5/8
+ description RIC100SL-10-1581 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 160,254,800
+ channel-group 308 mode active
+!
+interface TenGigabitEthernet2/5/9
+ description RIC100SL-10-2281 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,161,253,820
+ channel-group 309 mode active
+!
+interface TenGigabitEthernet2/5/10
+ description RIC100SL-10-2581 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 161,253,296,888
+ channel-group 310 mode active
+!
+interface TenGigabitEthernet2/5/11
+ description RIC100SL-10-3280 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 154,162,252,888
+ channel-group 311 mode active
+!
+interface TenGigabitEthernet2/5/12
+ description RIC100SL-10-3580 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 138,154,252
+ channel-group 312 mode active
+!
+interface TenGigabitEthernet2/5/13
+ description RIC100SL-63-4826 Te 1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 150,888
+ channel-group 313 mode active
+!
+interface TenGigabitEthernet2/5/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/15
+ description RIC100SS-24-1208 (ETC LAN Network) G1/4
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,850
+ channel-group 315 mode active
+!
+interface TenGigabitEthernet2/5/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/17
+ description RIC100SL-35-2205 Te 3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 152,154,259,800,850
+ channel-group 317 mode active
+!
+interface TenGigabitEthernet2/5/18
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/19
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/20
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/21
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/22
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/23
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/24
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/25
+ description RIC100SL1-61-4142 Te 1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 144,150,152,164,168,249,259,262,263,265,888,889
+ channel-group 318 mode active
+!
+interface TenGigabitEthernet2/5/26
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/27
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/28
+ description RIC1GSW1SR101-51-1215(Gi2/1/4)
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 720
+ channel-group 320 mode active
+!
+interface TenGigabitEthernet2/5/29
+ description ric100rv1 G0/3
+ no switchport
+ ip address 146.28.175.185 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ shutdown
+!
+interface TenGigabitEthernet2/5/30
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/31
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/32
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/6/1
+ description VSS Dual-Active Detection *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ dual-active fast-hello
+!
+interface GigabitEthernet2/6/2
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/3
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/4
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/5
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/6
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/7
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/8
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/9
+ description RIC100WC-01 Gig 0/0/2
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 3 mode on
+!
+interface GigabitEthernet2/6/10
+ description RIC100WC-01 Gig 0/0/4
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 3 mode on
+!
+interface GigabitEthernet2/6/11
+ description RIC100WC-01 Gig 0/0/6
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 3 mode on
+!
+interface GigabitEthernet2/6/12
+ description RIC100WC-01 Gig 0/0/8
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 3 mode on
+!
+interface GigabitEthernet2/6/13
+ description RIC100WC-01HA Gig 0/0/2
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 4 mode on
+!
+interface GigabitEthernet2/6/14
+ description RIC100WC-01HA Gig 0/0/4
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 4 mode on
+!
+interface GigabitEthernet2/6/15
+ description RIC100WC-01HA Gig 0/0/6
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 4 mode on
+!
+interface GigabitEthernet2/6/16
+ description RIC100WC-01HA Gig 0/0/8
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,175,4060,4070,4080,4090
+ logging event link-status
+ udld port
+ channel-group 4 mode on
+!
+interface GigabitEthernet2/6/17
+ description RIC100NTAD2 ILO
+ switchport
+ switchport mode access
+ switchport access vlan 158
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast edge
+!
+interface GigabitEthernet2/6/18
+ description RIC100NTAD2
+ switchport
+ switchport mode access
+ switchport access vlan 158
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast edge
+!
+interface GigabitEthernet2/6/19
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/20
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/21
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/22
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/23
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/24
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/25
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/26
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/27
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/28
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/29
+ description RIC100SH1 Primary mgmt interface 146.28.175.140
+ switchport
+ switchport mode access
+ switchport access vlan 83
+ spanning-tree portfast edge
+!
+interface GigabitEthernet2/6/30
+ description RIC100SH1 WAN0_0  Interface 146.28.175.139
+ switchport
+ switchport mode access
+ switchport access vlan 83
+!
+interface GigabitEthernet2/6/31
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/32
+ description WLC:RP
+ switchport
+ switchport access vlan 177
+!
+interface GigabitEthernet2/6/33
+ description RLP-WLC-Aruba-MGT
+ switchport
+ switchport access vlan 176
+!
+interface GigabitEthernet2/6/34
+ description RLP-WLC-Aruba-Trunk
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 166,176,4060,4070,4080,4090
+!
+interface GigabitEthernet2/6/35
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/36
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/37
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/38
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/39
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/40
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/41
+ no switchport
+ no ip address
+!
+interface GigabitEthernet2/6/42
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/6/43
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/6/44
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/6/45
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/6/46
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/6/47
+ description RIC100WC-02HA RP4HA
+ switchport
+ switchport access vlan 176
+!
+interface GigabitEthernet2/6/48
+ switchport
+ switchport mode access
+ switchport access vlan 176
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan61
+ description RIC940_IPT
+ ip address 146.34.61.1 255.255.255.128
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan83
+ description Steelhead VLAN
+ ip address 146.28.175.137 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan138
+ description *******Building 10/Tower3 Floors 4,5,6********
+ ip address 146.28.138.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 146.28.194.40
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan142
+ description *** Building 50 & 51 segment ***
+ ip address 146.28.142.1 255.255.254.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.40
+ ip helper-address 146.28.194.43
+ ip helper-address 146.28.194.34
+ ip helper-address 146.28.190.177
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan144
+ description *** Building 41,43,44,45,33 ***
+ ip address 146.28.144.1 255.255.254.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan146
+ description *** Building 24 & 14  ***
+ ip address 146.28.146.1 255.255.254.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan150
+ description *** Building  54, 61, 63, 72 & 98 ***
+ ip address 146.28.150.1 255.255.254.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan152
+ description *** Buildings 24,31, 32 & 35  ***
+ ip address 146.28.152.1 255.255.254.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan154
+ description *** Security Camera Network (Building 10-3280) 
+ ip address 146.28.154.1 255.255.255.128
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan158
+ description GIL-SERVER NETWORK
+ ip address 146.28.158.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 146.28.194.40
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan160
+ description *** Building 10 Tower 1  ***
+ ip address 146.28.160.1 255.255.255.0
+ ip helper-address 146.28.194.34
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.40
+ ip helper-address 146.28.194.43
+ ip helper-address 146.28.190.177
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan161
+ description *** Building 10 Tower 2 ***
+ ip address 146.28.161.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan162
+ description *******Building 10/Tower3 Floors 1,2,3********
+ ip address 146.28.162.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.40
+ ip helper-address 146.28.194.43
+ ip helper-address 146.28.194.34
+ ip helper-address 146.28.190.177
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan163
+ description *** Building 60 ***
+ ip address 146.28.163.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan164
+ description 146.28.164.0/23.RIC100_71_DATA
+ ip address 146.28.164.1 255.255.254.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.28.194.34
+ ip helper-address 146.28.158.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan166
+ description Wireless LAN
+ ip address 146.28.166.1 255.255.254.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan167
+ description Wireless LAN
+ ip address 146.28.168.1 255.255.254.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan168
+ ip address 146.28.136.225 255.255.255.240
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan170
+ description RIC940-BLD227_Data
+ ip address 146.28.170.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan174
+ description *** Admin Building LAN for Verizon ***
+ ip address 146.28.174.1 255.255.255.128
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan175
+ description RIC100WLAN.Mgmt
+ ip address 146.28.175.129 255.255.255.248
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan176
+ description RIC100WLAN.Mgmt
+ ip address 146.28.174.241 255.255.255.240
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan249
+ description RIC100-Bld60&61_IPT
+ ip address 146.34.49.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan250
+ description RIC100-Bld10_Tower1_IPT
+ ip address 146.34.50.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan251
+ description RIC100-Bld43_IPT
+ ip address 146.34.51.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan252
+ description RIC100-BLd10_Tower3_IPT
+ ip address 146.34.52.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan253
+ description RIC100-Bld10_Tower2_IPT
+ ip address 146.34.53.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan254
+ description RIC100-Bld10_Tower1_IPT
+ ip address 146.34.54.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan258
+ description 146.34.58.192/26.RIC100_RefAdmn_IPT
+ ip address 146.34.58.193 255.255.255.192
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan259
+ description IPT subnet for RIC100
+ ip address 146.34.59.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan262
+ description 146.34.62.0/24.RIC100_71_IPT
+ ip address 146.34.62.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.28.194.34
+ ip helper-address 146.28.158.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan263
+ description RIC100-Bld43_IPT
+ ip address 146.34.63.1 255.255.255.0
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan264
+ description IPT subnet for Drum Storage
+ ip address 146.34.39.65 255.255.255.224
+ ip helper-address 146.28.158.34
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan296
+ description IPT subnet for RIC981 (Hensley ST)
+ ip address 146.34.39.97 255.255.255.240
+ ip helper-address 146.27.66.36
+ ip helper-address 146.28.194.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan300
+ description PBX- ELAN
+ ip address 146.28.174.129 255.255.255.192
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan720
+ description RIC1GSW1SR101-51-1215(TASC Network Building 51)
+ ip address 146.28.175.153 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan800
+ description *** CBRES-METASYS ***
+ ip address 172.31.45.129 255.255.255.192
+ ip access-group CBRES-METASYS out
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan850
+ description *** Management for PCN Switches ***
+ ip address 146.28.157.225 255.255.255.224
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan888
+ description Guest Wired Internet 
+ vrf forwarding L3CVX-GUEST
+ ip address 10.210.62.129 255.255.255.128
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4060
+ description WLAN-L3CVX-GUEST
+ vrf forwarding L3CVX-GUEST
+ ip address 10.160.64.1 255.255.248.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4070
+ description WLAN-L3CVX-IND
+ vrf forwarding L3CVX-IND
+ ip address 10.178.32.1 255.255.248.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4080
+ description WLAN-L3CVX-USER
+ vrf forwarding L3CVX-USER
+ ip address 10.168.96.1 255.255.240.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4090
+ description WLAN-L3CVX-DEVICES
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.176.32.1 255.255.248.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+!
+router eigrp 109
+ !
+ address-family ipv4 vrf L3CVX-GUEST autonomous-system 888
+  default-metric 10000 10 255 1 1500
+  network 10.160.64.0 0.0.7.255
+  network 10.184.2.0 0.0.0.63
+  network 10.210.62.128 0.0.0.127
+  passive-interface default
+  no passive-interface TenGigabitEthernet1/3/1.3409
+  no passive-interface TenGigabitEthernet2/3/1.3509
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-IND autonomous-system 884
+  default-metric 10000 10 255 1 1500
+  network 10.178.32.0 0.0.7.255
+  network 10.190.2.0 0.0.0.63
+  passive-interface default
+  no passive-interface TenGigabitEthernet1/3/1.3410
+  no passive-interface TenGigabitEthernet2/3/1.3510
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-USER autonomous-system 882
+  default-metric 10000 10 255 1 1500
+  network 10.168.96.0 0.0.7.255
+  network 10.186.2.0 0.0.0.63
+  passive-interface default
+  no passive-interface TenGigabitEthernet1/3/1.3411
+  no passive-interface TenGigabitEthernet2/3/1.3511
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-DEVICES autonomous-system 886
+  default-metric 10000 10 255 1 1500
+  network 10.176.32.0 0.0.7.255
+  network 10.188.2.0 0.0.0.63
+  passive-interface default
+  no passive-interface TenGigabitEthernet1/3/1.3412
+  no passive-interface TenGigabitEthernet2/3/1.3512
+ exit-address-family
+ network 146.28.0.0
+ network 146.34.0.0
+ network 172.31.0.0
+ redistribute static
+ passive-interface default
+ no passive-interface TenGigabitEthernet1/5/29
+ no passive-interface TenGigabitEthernet2/5/29
+ no passive-interface TenGigabitEthernet1/3/1
+ no passive-interface TenGigabitEthernet2/3/1
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+no ip http server
+no ip http secure-server
+ip http client source-interface Vlan167
+!
+ip tftp source-interface Loopback0
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+ip route 146.28.137.128 255.255.255.192 146.28.152.14 name ETC-35-2205(RIC100FA4)
+ip route 146.28.141.128 255.255.255.224 146.28.152.78 name ETC-24-1208(RIC100FA7)
+ip route 146.28.141.192 255.255.255.192 146.28.175.18 name RIC100FA5(51-1233)
+ip route 146.28.144.10 255.255.255.255 146.28.143.27 name ric100w8dutil
+ip route 146.28.144.22 255.255.255.255 146.28.143.27 name ric100w8ddc1
+ip route 146.28.155.0 255.255.255.0 146.28.152.78 name ETC-24-1208(RIC100FA7)
+ip route 146.28.156.0 255.255.255.0 146.28.175.157 name RIC1GSW1SR101-51-1215
+ip route 146.28.157.0 255.255.255.128 146.28.175.18 name RIC100FA5(51-1233)
+ip route 146.28.157.128 255.255.255.192 146.28.175.157 name RIC1GSW1SR101-51-1215
+ip route 146.28.157.192 255.255.255.224 146.28.175.18 name RIC100FA5(51-1233)
+ip route 146.28.174.192 255.255.255.224 146.28.150.11 name RIC101FA1(61-4232)
+ip route 146.28.174.224 255.255.255.240 146.28.143.27 name RIC100FP3(51-1245)
+ip route 146.28.176.188 255.255.255.252 146.28.144.3 name ric100fpc52
+ip route 172.19.131.224 255.255.255.240 146.28.143.27 name RIC100FP3(51-1245)
+ip route 172.31.19.0 255.255.255.0 146.28.152.78 name ETC-24-1208(RIC100FA7)
+ip route 172.31.20.64 255.255.255.192 146.28.152.78 name ETC-24-1208(RIC100FA7)
+ip route 172.31.20.128 255.255.255.192 146.28.152.78 name ETC-24-1208(RIC100FA7)
+ip route vrf management 0.0.0.0 0.0.0.0 146.28.158.1
+ip tacacs source-interface Loopback0
+ip ssh source-interface Vlan167
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-limit-hi-max1mbps
+ permit 239.195.128.0 0.0.0.255
+ permit 239.194.128.0 0.0.0.255
+ permit 239.195.192.0 0.0.0.255
+ permit 239.194.192.0 0.0.0.255
+ deny   any log
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+ permit 224.0.0.0 7.255.255.255
+ deny   any log
+!
+ip access-list extended CBRES-METASYS
+ permit ip host 146.36.80.240 172.31.40.0 0.0.7.255
+ permit ip host 134.248.29.7 172.31.40.0 0.0.7.255
+ permit ip host 134.248.80.138 172.31.40.0 0.0.7.255
+ permit ip host 146.46.130.145 172.31.40.0 0.0.7.255
+ permit ip host 146.46.132.55 172.31.40.0 0.0.7.255
+ permit ip host 146.46.132.53 172.31.40.0 0.0.7.255
+ permit ip 136.171.124.0 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 146.27.3.160 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 172.31.40.0 0.0.3.255 172.31.40.0 0.0.7.255
+ permit ip 172.31.44.0 0.0.3.255 172.31.40.0 0.0.7.255
+ deny   ip any any
+ deny   ip any any log
+ip access-list extended SH-CIFS-SERVER
+ deny   tcp any 146.28.158.0 0.0.1.255
+ permit tcp any addrgroup CMS
+ permit tcp addrgroup RIC-VLANS any portgroup CIFS
+ permit tcp addrgroup RIC-VLANS portgroup CIFS any
+ deny   tcp addrgroup RIC-VLANS addrgroup RIC-VLANS
+ deny   ip any any log
+ip access-list extended SH-CIFS-WAN
+ permit tcp any addrgroup RIC-VLANS portgroup CIFS
+ permit tcp any portgroup CIFS addrgroup RIC-VLANS
+ permit tcp addrgroup CMS any
+ deny   ip any any log
+ip access-list extended acl-copp-match-igmp
+ permit igmp any any
+ deny   ip any any log
+ip access-list extended acl-copp-match-pim-data
+ deny   pim any host 224.0.0.13
+ permit pim any any
+ deny   ip any any log
+!
+logging source-interface Vlan167
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 139.65.140.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server group default v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source Vlan167
+snmp-server location HOU150 / 1500 Lousiana Street  / Houston,TX  / USA  / Americas  / US-NA-Utility-Campus-Metro/Criticality-high
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps flowmon
+snmp-server enable traps chassis
+snmp-server enable traps module
+snmp-server enable traps transceiver all
+snmp-server enable traps call-home message-send-fail server-fail
+snmp-server enable traps tty
+snmp-server enable traps eigrp
+snmp-server enable traps casa
+snmp-server enable traps ospf state-change
+snmp-server enable traps ospf errors
+snmp-server enable traps ospf retransmit
+snmp-server enable traps ospf lsa
+snmp-server enable traps ospf cisco-specific state-change nssa-trans-change
+snmp-server enable traps ospf cisco-specific state-change shamlink interface
+snmp-server enable traps ospf cisco-specific state-change shamlink neighbor
+snmp-server enable traps ospf cisco-specific errors
+snmp-server enable traps ospf cisco-specific retransmit
+snmp-server enable traps ospf cisco-specific lsa
+snmp-server enable traps auth-framework sec-violation
+snmp-server enable traps ether-oam
+snmp-server enable traps memory bufferpeak
+snmp-server enable traps flex-links status
+snmp-server enable traps sonet
+snmp-server enable traps dial
+snmp-server enable traps ethernet cfm cc mep-up mep-down cross-connect loop config
+snmp-server enable traps ethernet cfm crosscheck mep-missing mep-unknown service-up
+snmp-server enable traps energywise
+snmp-server enable traps fru-ctrl ps-output-change status
+snmp-server enable traps entity
+snmp-server enable traps l2tc threshold sys-threshold
+snmp-server enable traps module-auto-shutdown auto-shutdown sys-action
+snmp-server enable traps cpu threshold
+snmp-server enable traps rsvp
+snmp-server enable traps vstack
+snmp-server enable traps srp
+snmp-server enable traps switch-netflow thresh-exceeded
+snmp-server enable traps udld link-fail-rpt
+snmp-server enable traps udld status-change
+snmp-server enable traps vtp
+snmp-server enable traps vlancreate
+snmp-server enable traps vlandelete
+snmp-server enable traps flash insertion removal
+snmp-server enable traps c6kxbar intbus-crcexcd intbus-crcrcvrd swbus tm-channel tm-swbus
+snmp-server enable traps entity-diag boot-up-fail hm-test-recover hm-thresh-reached scheduled-test-fail
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps port-security
+snmp-server enable traps vswitch dual-active vsl
+snmp-server enable traps lisp
+snmp-server enable traps trustsec-sxp conn-srcaddr-err msg-parse-err conn-config-err binding-err conn-up conn-down binding-expn-fail oper-nodeid-change binding-conflict
+snmp-server enable traps trustsec-server radius-server provision-secret
+snmp-server enable traps trustsec authz-file-error cache-file-error keystore-file-error keystore-sync-fail random-number-fail src-entropy-fail
+snmp-server enable traps trustsec-interface unauthorized sap-fail authc-fail supplicant-fail authz-fail
+snmp-server enable traps trustsec-policy peer-policy-updated authz-sgacl-fail
+snmp-server enable traps cef resource-failure peer-state-change peer-fib-state-change inconsistency
+snmp-server enable traps aaa_server
+snmp-server enable traps atm subif
+snmp-server enable traps bfd
+snmp-server enable traps bgp cbgp2
+snmp-server enable traps bulkstat collection transfer
+snmp-server enable traps config-copy
+snmp-server enable traps config
+snmp-server enable traps config-ctid
+snmp-server enable traps dhcp-snooping bindings
+snmp-server enable traps dlsw
+snmp-server enable traps event-manager
+snmp-server enable traps frame-relay
+snmp-server enable traps frame-relay subif
+snmp-server enable traps hsrp
+snmp-server enable traps ipmulticast
+snmp-server enable traps isis
+snmp-server enable traps mac-notification move threshold change
+snmp-server enable traps msdp
+snmp-server enable traps ospfv3 state-change
+snmp-server enable traps ospfv3 errors
+snmp-server enable traps pim neighbor-change rp-mapping-change invalid-pim-message
+snmp-server enable traps ipsla
+snmp-server enable traps slb real virtual csrp
+snmp-server enable traps bridge newroot topologychange
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps syslog
+snmp-server enable traps pki
+snmp-server enable traps mvpn
+snmp-server enable traps mpls rfc ldp
+snmp-server enable traps mpls ldp
+snmp-server enable traps mpls rfc traffic-eng
+snmp-server enable traps mpls traffic-eng
+snmp-server enable traps mpls fast-reroute protected
+snmp-server enable traps pw vc
+snmp-server enable traps ike policy add
+snmp-server enable traps ike policy delete
+snmp-server enable traps ike tunnel start
+snmp-server enable traps ike tunnel stop
+snmp-server enable traps ipsec cryptomap add
+snmp-server enable traps ipsec cryptomap delete
+snmp-server enable traps ipsec cryptomap attach
+snmp-server enable traps ipsec cryptomap detach
+snmp-server enable traps ipsec tunnel start
+snmp-server enable traps ipsec tunnel stop
+snmp-server enable traps ipsec too-many-sas
+snmp-server enable traps ethernet evc status create delete
+snmp-server enable traps errdisable
+snmp-server enable traps voice poor-qov
+snmp-server enable traps alarms informational
+snmp-server enable traps vlan-mac-limit
+snmp-server enable traps rf
+snmp-server enable traps vrfmib vrf-up vrf-down vnet-trunk-up vnet-trunk-down
+snmp-server enable traps mpls vpn
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs-server host 139.65.136.58
+tacacs-server host 139.65.143.4
+tacacs-server timeout 10
+tacacs-server key 7 110C0B101417180307392227
+!
+!
+!
+!
+ipv6 access-list acl-copp-match-mld
+ permit icmp any any mld-report
+ permit icmp any any mld-query
+ permit icmp any any mld-reduction
+ permit icmp any any 143
+!
+ipv6 access-list acl-copp-match-ndv6
+ permit icmp any any nd-na
+ permit icmp any any nd-ns
+ permit icmp any any router-advertisement
+ permit icmp any any router-solicitation
+ permit icmp any any redirect
+!
+ipv6 access-list acl-copp-match-ndv6hl
+ permit icmp any any nd-na hoplimit
+ permit icmp any any nd-ns hoplimit
+ permit icmp any any router-advertisement hoplimit
+ permit icmp any any router-solicitation hoplimit
+ permit icmp any any redirect hoplimit
+!
+ipv6 access-list acl-copp-match-pimv6-data
+ deny 103 any host FF02::D
+ permit 103 any any
+!
+control-plane
+ service-policy input policy-default-autocopp
+!
+!
+vstack
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport input ssh
+ transport output none
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport input ssh
+ transport output none
+!
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+diagnostic bootup level minimal
+no event manager policy Mandatory.go_switchbus.tcl type system
+!
+!
+module provision switch 1
+ slot 1 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 17
+ slot 2 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 18
+ slot 3 slot-type 400 port-type 60 number 8 port-type 113 number 2 port-type 60 number 8 port-type 113 number 2  virtual-slot 19
+ slot 5 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 21
+ slot 6 slot-type 147 port-type 61 number 48  virtual-slot 22
+ !
+module provision switch 2
+ slot 1 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 33
+ slot 2 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 34
+ slot 3 slot-type 400 port-type 60 number 8 port-type 113 number 2 port-type 60 number 8 port-type 113 number 2  virtual-slot 35
+ slot 5 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 37
+ slot 6 slot-type 147 port-type 61 number 48  virtual-slot 38
+ 
+!
+
+end

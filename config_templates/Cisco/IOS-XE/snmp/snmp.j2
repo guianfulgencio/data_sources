@@ -1,0 +1,14 @@
+{# consider changing the format for location and contact to be more structured #}
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+!
+snmp-server source-interface {{ host.mgmt_ifname }}
+snmp-server location {{site.facility }} / {{ site.street }}  / {{ site.city }}, {{ site.province }}  / {{ site.country }}  / {{ site.region }}  / .dHub Datacenter - US
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+!
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+!
+snmp-server group {{ snmpv3.group }} v3 priv read V3Read write V3Write access cvx-snmpv3-acl
+!

@@ -1,0 +1,501 @@
+Building configuration...
+
+
+  
+  
+Current configuration : 12038 bytes
+!
+! Last configuration change at 12:54:09 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 12:54:44 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.7
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname HOU150GS3
+!
+boot-start-marker
+boot system flash0:c2900-universalk9-mz.SPA.157-3.M5.bin
+boot-end-marker
+!
+!
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+!
+ipc zone default
+ association 1
+  no shutdown
+  protocol sctp
+   local-port 5000
+    local-ip 144.5.75.21
+   remote-port 5000
+    remote-ip 144.5.75.22
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface GigabitEthernet0/0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip domain name HOU150.chevrontexaco.net
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+voice-card 0
+ dspfarm
+ dsp services dspfarm
+!
+!
+!
+voice service voip
+ ip address trusted list
+  ipv4 144.5.195.27 255.255.255.255
+  ipv4 144.5.195.30 255.255.255.255
+  ipv4 146.34.4.163 255.255.255.255
+  ipv4 144.5.82.107 255.255.255.255
+  ipv4 144.5.82.110 255.255.255.255
+  ipv4 146.34.5.163 255.255.255.255
+  ipv4 146.34.9.163 255.255.255.255
+  ipv4 146.34.4.167 255.255.255.255
+  ipv4 146.34.4.166 255.255.255.255
+  ipv4 146.34.5.166 255.255.255.255
+  ipv4 146.34.128.164 255.255.255.255
+  ipv4 146.34.128.163 255.255.255.255
+  ipv4 146.34.128.166 255.255.255.255
+  ipv4 146.34.128.196 255.255.255.255
+  ipv4 146.34.128.165 255.255.255.255
+  ipv4 146.34.1.22 255.255.255.255
+  ipv4 146.34.1.24 255.255.255.255
+  ipv4 146.34.1.88 255.255.255.255
+  ipv4 146.34.1.90 255.255.255.255
+  ipv4 146.44.11.167 255.255.255.255
+  ipv4 146.44.11.168 255.255.255.255
+  ipv4 146.34.143.163 255.255.255.255
+  ipv4 146.34.1.25 255.255.255.255
+  ipv4 146.34.1.26 255.255.255.255
+  ipv4 146.34.128.182 255.255.255.255
+  ipv4 146.34.143.182 255.255.255.255
+  ipv4 146.41.166.75 255.255.255.255
+ allow-connections sip to sip
+ redundancy
+ fax protocol t38 version 0 ls-redundancy 0 hs-redundancy 0 fallback none
+ sip
+  bind control source-interface GigabitEthernet0/0
+  bind media source-interface GigabitEthernet0/0
+  session transport tcp
+  midcall-signaling passthru media-change
+  early-offer forced
+!
+voice class codec 1
+ codec preference 2 g711ulaw
+ codec preference 4 g729r8
+!
+!
+voice class sip-profiles 10
+ request INVITE sip-header From modify "<sip:anonymous@" "<sip:8765@" 
+ request INVITE sip-header From modify "anonymous" "Global IT Service Desk" 
+ request INVITE sip-header Remote-Party-ID remove 
+!
+!
+!
+!
+!
+!
+!
+vxml logging-tag
+license udi pid CISCO2921/K9 sn FTX1730AMD9
+hw-module pvdm 0/0
+!
+!
+!
+archive
+ path flash0:cvx_135150
+ maximum 5
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy inter-device
+ scheme standby SB
+!
+!
+redundancy
+!
+!
+!
+!
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface GigabitEthernet0/0
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 144.5.75.21 255.255.255.192
+ no ip proxy-arp
+ standby delay minimum 30 reload 60
+ standby version 2
+ standby 0 ip 144.5.75.20
+ standby 0 priority 50
+ standby 0 preempt
+ standby 0 name SB
+ standby 0 track 1 decrement 10
+ duplex auto
+ speed auto
+ bfd interval 500 min_rx 500 multiplier 3
+!
+interface GigabitEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+!
+ip default-gateway 144.5.75.1
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ip tftp source-interface GigabitEthernet0/0
+ip rtcp report interval 3000 
+ip route 0.0.0.0 0.0.0.0 144.5.75.1
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+logging source-interface GigabitEthernet0/0
+logging host 146.36.114.214
+logging host 139.65.140.24
+ipv6 ioam timestamp
+!
+!
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source GigabitEthernet0/0
+snmp-server location HOU150 / 1500 LOUISIANA ST,  Houston,TX / USA / Americas /US-NA-Utility-Telephony/Criticality-High
+snmp-server contact network operations 1-866-313-3907
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+!
+!
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+!
+!
+!
+dspfarm profile 1 transcode  
+ description Transcoder Profile for CUBE
+ codec g729br8
+ codec g729r8
+ codec g711ulaw
+ codec g711alaw
+ codec g729ar8
+ codec g729abr8
+ maximum sessions 10
+ associate application CUBE
+!
+dial-peer voice 10 voip
+ destination-pattern 1812...
+ session protocol sipv2
+ session target ipv4:144.5.195.27
+ session transport udp
+ voice-class sip early-offer forced
+ voice-class sip options-keepalive up-interval 15 down-interval 5
+ dtmf-relay rtp-nte digit-drop
+ no vad
+!
+dial-peer voice 1 voip
+ session protocol sipv2
+ session transport udp
+ incoming called-number .
+ voice-class codec 1  
+ dtmf-relay rtp-nte sip-notify
+!
+dial-peer voice 20 voip
+ preference 1
+ destination-pattern 8.......
+ session protocol sipv2
+ session target ipv4:146.34.1.22
+ session transport tcp
+ voice-class sip profiles 10
+ dtmf-relay rtp-nte
+!
+dial-peer voice 11 voip
+ preference 2
+ destination-pattern 1812...
+ session protocol sipv2
+ session target ipv4:144.5.195.30
+ session transport udp
+ voice-class sip early-offer forced
+ voice-class sip options-keepalive up-interval 15 down-interval 5
+ dtmf-relay rtp-nte digit-drop
+ no vad
+!
+dial-peer voice 12 voip
+ preference 4
+ destination-pattern 1812...
+ session protocol sipv2
+ session target ipv4:144.5.82.107
+ session transport udp
+ voice-class sip early-offer forced
+ voice-class sip options-keepalive up-interval 15 down-interval 5
+ dtmf-relay rtp-nte digit-drop
+ no vad
+!
+dial-peer voice 13 voip
+ preference 3
+ destination-pattern 1812...
+ session protocol sipv2
+ session target ipv4:144.5.82.110
+ session transport udp
+ voice-class sip early-offer forced
+ voice-class sip options-keepalive up-interval 15 down-interval 5
+ dtmf-relay rtp-nte digit-drop
+ no vad
+!
+dial-peer voice 21 voip
+ preference 2
+ destination-pattern 8.......
+ session protocol sipv2
+ session target ipv4:146.34.1.88
+ session transport tcp
+ voice-class sip profiles 10
+ dtmf-relay rtp-nte
+!
+dial-peer voice 2 voip
+ session protocol sipv2
+ session transport tcp
+ incoming called-number .
+ voice-class codec 1  
+ dtmf-relay rtp-nte sip-notify
+!
+!
+gateway 
+ media-inactivity-criteria all
+ timer receive-rtcp 5
+ timer receive-rtp 1200
+!
+sip-ua 
+ retry invite 2
+ connection-reuse
+!
+!
+!
+gatekeeper
+ shutdown
+!
+banner exec ^C
+****************************************************
+WARNING:
+This is an External Access Router connecting Chevron
+to 3rd Party, Joint Venture or Partner networks. Any
+changes to Access Control Lists, or New connections
+to this router must be approved by the ITC Network
+Security Team.
+****************************************************^C
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output lat pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp source GigabitEthernet0/0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

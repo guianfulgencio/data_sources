@@ -1,0 +1,859 @@
+Building configuration...
+
+
+Current configuration : 22736 bytes
+!
+! Last configuration change at 15:45:13 UTC Sun Jun 18 2023
+! NVRAM config last updated at 15:45:10 UTC Sun Jun 18 2023
+!
+version 15.5
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname CAIrt1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$WZjb$E2OdRntcPRQtl.dTSTcoa/
+!
+aaa new-model
+!
+!
+aaa authentication login default group tacacs+ local
+aaa authentication login h323 local
+aaa authentication enable default group tacacs+ enable
+aaa authentication ppp default none
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group tacacs+ if-authenticated 
+aaa authorization exec h323 local 
+aaa authorization commands 0 default group tacacs+ if-authenticated 
+aaa authorization commands 1 default group tacacs+ if-authenticated 
+aaa authorization commands 15 default group tacacs+ if-authenticated 
+aaa authorization network h323 local 
+aaa authorization reverse-access default group tacacs+ if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 1 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group tacacs+
+aaa accounting system default start-stop group tacacs+
+!
+!
+!
+!
+!
+aaa session-id common
+ethernet lmi ce
+clock timezone UTC -5 0
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+no ip dhcp use vrf connected
+ip dhcp excluded-address 146.41.226.209
+ip dhcp excluded-address 146.41.226.223
+!
+ip dhcp pool CAI_VOZ
+ network 146.41.226.208 255.255.255.240
+ default-router 146.41.226.209 
+ option 150 ip 146.39.33.232 146.34.15.84 
+ dns-server 146.39.35.17 146.39.35.5 
+!
+!
+!
+ip domain lookup source-interface Loopback0
+ip domain name cai.chevrontexaco.net
+ip name-server 146.39.35.17
+ip name-server 146.39.35.5
+ip name-server 146.36.80.34
+ip accounting-threshold 100
+ip cef
+no ipv6 cef
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+voice-card 0
+ dspfarm
+ dsp services dspfarm
+!
+!
+voice call send-alert
+voice rtp send-recv
+!
+voice service voip
+ allow-connections h323 to h323
+ allow-connections h323 to sip
+ allow-connections sip to h323
+ allow-connections sip to sip
+ supplementary-service h450.12
+ fax protocol t38 version 0 ls-redundancy 0 hs-redundancy 0 fallback none
+ h323
+ sip
+  no silent-discard untrusted
+!
+voice class codec 1
+ codec preference 1 g711ulaw
+ codec preference 2 g711alaw
+ codec preference 3 g729r8
+ codec preference 4 g729br8
+!
+voice class h323 1
+  h225 timeout tcp establish 3
+!
+!
+!
+!
+!
+!
+voice translation-rule 1
+ rule 1 /^\(16.....\)9\(.+$\)/ /\19,\2/
+!
+!
+!
+license udi pid CISCO2911/K9 sn FTX1648ALV5
+hw-module ism 0
+!
+hw-module pvdm 0/0
+!
+!
+!
+archive
+ path flash:
+ maximum 5
+username admin privilege 15 secret 5 $1$fQcq$XgqXCFCMDF8zUVOkwG54F1
+!
+redundancy
+!
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+!
+class-map match-any Financial-App
+ match access-group name AS-400
+ match access-group name JDE
+ match access-group name eProcurement
+ match protocol icmp
+class-map match-any Mail-Services
+ match access-group name exchange
+class-map match-any Sys-App-Monitoring
+ match access-group name Sys-App-Monitoring
+class-map match-any Data-Transfer
+ match access-group name Data-Transfer
+ match protocol ftp
+class-map match-any Win-Control
+ match access-group name Win-Control
+class-map match-any Network-Mgmt
+ match access-group name Network-Mgmt
+class-map match-any Collaboration
+ match access-group name Collaboration
+class-map match-any Web-Services
+ match access-group name Web-Services
+class-map match-any MIMIX-AS400
+ match access-group name MIMIX-to-HOUSTON
+class-map match-any Voice
+ match ip precedence 5 
+ match access-group name VoIP
+!
+policy-map TELDOMESDSCP
+ class Voice
+  set ip precedence 5
+ class Financial-App
+  set ip precedence 4
+ class Win-Control
+  set ip precedence 4
+ class Network-Mgmt
+  set ip precedence 3
+ class Collaboration
+  set ip precedence 3
+ class Mail-Services
+  set ip precedence 3
+ class Web-Services
+  set ip precedence 2
+ class Data-Transfer
+  set ip precedence 2
+ class Sys-App-Monitoring
+  set ip precedence 2
+ class MIMIX-AS400
+  set ip precedence 4
+!
+!
+!
+!
+!
+interface Loopback0
+ description Management
+ ip address 146.39.39.125 255.255.255.255
+ h323-gateway voip interface
+ h323-gateway voip bind srcaddr 146.39.39.125
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ description Telefonica-MPLS
+ ip address 146.39.39.250 255.255.255.248
+ ip helper-address 146.39.35.17
+ no ip redirects
+ no ip proxy-arp
+ ip flow ingress
+ ip flow egress
+ load-interval 30
+ duplex auto
+ speed auto
+ no mop enabled
+!
+interface ISM0/0
+ description Unity-Express-Module
+ ip unnumbered GigabitEthernet0/1.20
+ no ip proxy-arp
+ service-module ip address 146.41.226.223 255.255.255.240
+ !Application: CUE Running on ISM
+ service-module ip default-gateway 146.41.226.209
+!
+interface GigabitEthernet0/1
+ description $ETH-LAN$$ETH-SW-LAUNCH$$INTF-INFO-FE 0$
+ no ip address
+ ip flow ingress
+ ip flow egress
+ duplex auto
+ speed auto
+ no mop enabled
+!
+interface GigabitEthernet0/1.10
+ description VLAN users data
+ encapsulation dot1Q 10
+ ip address 146.39.39.1 255.255.255.192
+ ip helper-address 146.36.80.34
+ no ip redirects
+ no ip proxy-arp
+!
+interface GigabitEthernet0/1.20
+ description voice VLAN
+ encapsulation dot1Q 20
+ ip address 146.41.226.209 255.255.255.240
+ ip helper-address 146.36.80.34
+ no ip proxy-arp
+!
+interface GigabitEthernet0/2
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2.40
+ description Firewall_Net
+ encapsulation dot1Q 40
+ ip address 146.39.37.33 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+!
+interface ISM0/1
+ no ip address
+ shutdown
+!
+interface Vlan1
+ no ip address
+!
+!
+router eigrp 109
+ default-metric 2048 10 255 255 1500
+ network 146.39.37.32 0.0.0.7
+ network 146.39.39.0 0.0.0.255
+ network 146.39.39.248 0.0.0.7
+ network 146.41.226.208 0.0.0.15
+ redistribute connected
+ redistribute static
+ auto-summary
+ passive-interface default
+ no passive-interface GigabitEthernet0/0
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+no ip http server
+no ip http secure-server
+ip flow-export destination 146.39.37.251 2055
+!
+ip tftp source-interface Loopback0
+ip route 146.39.47.0 255.255.255.192 146.39.37.34
+ip route 146.41.226.223 255.255.255.255 ISM0/0
+ip route 172.20.74.0 255.255.255.0 146.39.37.34
+ip tacacs source-interface Loopback0
+ip ssh version 2
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.0.0 0.0.255.255
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.140.0 0.0.3.255
+ deny   any log
+!
+ip access-list extended AS-400
+ permit ip any host 146.36.80.25
+ permit ip host 146.36.80.25 any
+ permit ip any host 146.39.34.23
+ permit ip host 146.39.34.23 any
+ip access-list extended Collaboration
+ permit tcp any any eq 522
+ permit tcp any eq 522 any
+ permit tcp any any eq 1503
+ permit tcp any eq 1503 any
+ permit tcp any any eq 1720
+ permit tcp any eq 1720 any
+ permit tcp any any eq 1731
+ permit tcp any eq 1731 any
+ permit tcp any any eq 1494
+ permit tcp any eq 1494 any
+ permit udp any any eq 1604
+ permit udp any eq 1604 any
+ permit tcp any any eq 3389
+ permit tcp any eq 3389 any
+ permit tcp any any range 6000 6003
+ permit tcp any range 6000 6003 any
+ip access-list extended Data-Transfer
+ permit tcp any any eq 445
+ permit tcp any eq 445 any
+ permit tcp any any range 137 139
+ permit tcp any range 137 139 any
+ permit udp any any range netbios-ns netbios-ss
+ permit udp any range netbios-ns netbios-ss any
+ permit tcp any any eq 2049
+ permit tcp any eq 2049 any
+ permit tcp any any eq ftp-data
+ip access-list extended JDE
+ permit ip any host 146.27.68.52
+ permit ip any host 146.27.68.63
+ permit ip any host 146.27.68.53
+ permit ip any host 146.27.68.61
+ permit ip any host 146.27.68.148
+ permit ip any host 146.27.68.47
+ permit ip any host 146.27.68.113
+ permit ip any host 146.27.68.48
+ permit ip host 146.27.68.52 any
+ permit ip host 146.27.68.63 any
+ permit ip host 146.27.68.53 any
+ permit ip host 146.27.68.61 any
+ permit ip host 146.27.68.148 any
+ permit ip host 146.27.68.47 any
+ permit ip host 146.27.68.113 any
+ permit ip host 146.27.68.48 any
+ permit ip any host 146.27.68.62
+ permit ip any host 146.27.68.171
+ permit ip any host 146.27.68.172
+ permit ip any host 146.27.68.173
+ permit ip any host 146.27.68.174
+ permit ip any host 146.27.68.175
+ permit ip any host 146.27.68.176
+ permit ip any host 146.27.68.177
+ permit ip any host 146.27.68.178
+ permit ip any 146.27.68.160 0.0.0.15
+ permit ip host 146.27.68.62 any
+ permit ip host 146.27.68.171 any
+ permit ip host 146.27.68.172 any
+ permit ip host 146.27.68.173 any
+ permit ip host 146.27.68.174 any
+ permit ip host 146.27.68.175 any
+ permit ip host 146.27.68.176 any
+ permit ip host 146.27.68.177 any
+ permit ip host 146.27.68.178 any
+ permit ip 146.27.68.160 0.0.0.15 any
+ permit ip any host 146.27.68.189
+ permit ip any host 146.27.68.188
+ permit ip host 146.27.68.189 any
+ permit ip host 146.27.68.188 any
+ip access-list extended Network-Mgmt
+ permit tcp any any eq tacacs
+ permit tcp any eq tacacs any
+ permit tcp any any eq telnet
+ permit tcp any eq telnet any
+ permit tcp any any eq 22
+ permit tcp any eq 22 any
+ permit udp any any eq domain
+ permit udp any eq domain any
+ permit tcp any any eq domain
+ permit tcp any eq domain any
+ip access-list extended Sys-App-Monitoring
+ permit tcp any any eq 66
+ permit tcp any eq 66 any
+ permit tcp any any eq 1521
+ permit tcp any eq 1521 any
+ permit tcp any any range 1433 1434
+ permit tcp any range 1433 1434 any
+ permit tcp any any eq 1498
+ permit tcp any eq 1498 any
+ permit udp any any eq snmp
+ permit udp any eq snmp any
+ permit udp any any eq snmptrap
+ permit udp any eq snmptrap any
+ permit udp any any eq 9995
+ permit udp any eq 9995 any
+ip access-list extended VoIP
+ permit udp any any range 16384 32767
+ip access-list extended Web-Services
+ permit tcp any any eq 443
+ permit tcp any eq 443 any
+ permit tcp any any eq www
+ permit tcp any eq www any
+ permit udp any any eq 8080
+ permit udp any eq 8080 any
+ip access-list extended Win-Control
+ permit tcp any any eq 88
+ permit tcp any eq 88 any
+ permit tcp any any eq 749
+ permit tcp any eq 749 any
+ permit tcp any any eq 389
+ permit tcp any eq 389 any
+ permit tcp any any eq 636
+ permit tcp any eq 636 any
+ permit udp any any eq 88
+ permit udp any eq 88 any
+ permit udp any any eq 749
+ permit udp any eq 749 any
+ permit tcp host 146.27.122.67 any
+ permit tcp host 146.27.122.68 any
+ permit tcp any host 146.27.122.80
+ permit tcp host 146.27.122.80 any
+ permit tcp any host 146.27.122.81
+ permit tcp host 146.27.122.81 any
+ permit tcp any host 146.27.122.122
+ permit tcp host 146.27.122.0 any
+ permit ip any host 146.27.122.81
+ permit ip host 146.27.126.39 any
+ permit ip any host 146.27.126.40
+ permit ip host 146.27.126.40 any
+ permit ip host 136.171.26.35 any
+ permit ip any host 136.171.26.35
+ permit ip any host 144.5.224.25
+ permit ip host 144.5.224.25 any
+ permit pim any any
+ permit tcp any host 146.27.126.39
+ permit tcp host 146.27.126.39 any
+ permit tcp any host 146.27.126.40
+ permit ip host 146.27.122.81 any
+ permit ip any host 146.27.122.122
+ permit ip host 146.27.122.122 any
+ permit ip any host 146.27.122.146
+ permit ip any host 146.36.88.43
+ permit ip host 146.39.34.24 any
+ permit ip host 146.36.88.43 any
+!
+logging source-interface Loopback0
+logging host 146.39.34.197
+logging host 146.39.34.199
+logging host 146.27.95.122
+logging host 199.103.13.209
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.141.24
+dialer-list 1 protocol ip permit
+!
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 auth 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group CVX2021 v3 auth 
+snmp-server group CVX2021 v3 priv 
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server group cvx2022 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server community CAnS33clry4U RO 1330
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location CAI / Calle 15 No. 6-501, Zona Petrolera Yum, Yumbo / Colombia / Americas /CO-NA-Utility-Wan-Remotes/Criticality-Medium
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server host 139.65.136.12 version 3 auth CVX  config
+snmp-server host 139.65.136.12 version 3 auth CVX2  config
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+tacacs-server host 139.65.136.58
+tacacs-server host 139.65.143.4
+tacacs-server timeout 10
+tacacs-server directed-request
+tacacs-server key 7 06031D344F4B1A1606041B08
+access-list 10 permit 146.22.71.201
+access-list 10 permit 146.23.102.220
+access-list 10 permit 146.22.9.201
+access-list 10 permit 199.103.13.209
+access-list 10 permit 199.103.13.208
+access-list 10 permit 146.27.124.18
+access-list 10 deny   any log
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 deny   any log
+access-list 30 permit 146.22.71.201
+access-list 30 permit 146.27.82.194
+access-list 30 permit 146.22.9.201
+access-list 30 permit 146.36.80.131
+access-list 30 permit 146.36.80.142
+access-list 30 permit 146.36.80.139
+access-list 30 permit 146.36.80.149
+access-list 30 permit 199.103.13.219
+access-list 30 permit 199.103.13.209
+access-list 30 permit 199.103.13.208
+access-list 30 permit 146.36.92.124
+access-list 30 permit 146.36.80.124
+access-list 30 permit 146.36.80.81
+access-list 30 permit 146.27.124.21
+access-list 30 permit 146.27.124.18
+access-list 30 permit 146.36.112.50
+access-list 30 permit 146.27.26.0 0.0.1.255
+access-list 30 permit 146.36.193.0 0.0.0.255
+access-list 30 permit 146.39.34.192 0.0.0.31
+access-list 30 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 50 permit 146.39.32.0 0.0.7.255 log
+access-list 50 permit 146.39.34.0 0.0.0.240 log
+access-list 50 permit 146.39.34.0 0.0.0.128 log
+access-list 50 permit 146.39.40.0 0.0.0.255 log
+access-list 50 permit 146.39.41.0 0.0.0.255 log
+access-list 50 deny   any log
+access-list 1300 remark GESTION
+access-list 1300 permit 146.39.34.192 0.0.0.31 log
+access-list 1300 deny   any log
+access-list 1310 permit 146.22.71.201
+access-list 1310 permit 146.22.9.201
+access-list 1310 permit 139.65.136.196
+access-list 1310 permit 139.65.136.197
+access-list 1310 deny   any log
+access-list 1330 permit 146.34.7.179
+access-list 1330 permit 146.34.6.179
+access-list 1330 permit 146.34.5.179
+access-list 1330 permit 146.34.4.179
+access-list 1330 permit 146.34.11.179
+access-list 1330 permit 146.34.10.179
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.34.13.179
+access-list 1330 permit 146.34.12.179
+access-list 1330 permit 146.27.82.195
+access-list 1330 permit 146.27.166.11
+access-list 1330 permit 146.27.166.10
+access-list 1330 permit 146.23.102.220
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.36.80.134
+access-list 1330 permit 146.36.80.135
+access-list 1330 permit 146.36.80.131
+access-list 1330 permit 146.27.166.70
+access-list 1330 permit 146.39.37.252
+access-list 1330 permit 146.36.80.139
+access-list 1330 permit 146.36.80.159
+access-list 1330 permit 146.36.91.111
+access-list 1330 permit 146.39.34.30
+access-list 1330 permit 146.36.80.125
+access-list 1330 permit 146.36.80.81
+access-list 1330 permit 146.36.85.36
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.33.129.0 0.0.0.255
+access-list 1330 permit 146.36.193.0 0.0.0.255
+access-list 1330 permit 146.24.101.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 139.65.228.0 0.0.1.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.27.97.224 0.0.0.31
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1530 permit 199.103.13.219
+access-list 1530 permit 199.103.13.209
+access-list 1530 permit 199.103.13.208
+access-list 1530 permit 199.103.14.0 0.0.0.255
+access-list 1530 deny   any log
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/1/0
+!
+voice-port 0/1/1
+!
+voice-port 0/2/0
+ supervisory disconnect dualtone mid-call
+ cptone CO
+ timeouts initial 2
+ timeouts call-disconnect 1
+ timeouts wait-release 1
+ timing hookflash-out 50
+ connection plar opx 6517
+ description (2)6693675
+ caller-id enable
+!
+voice-port 0/2/1
+ supervisory disconnect dualtone mid-call
+ cptone CO
+ timeouts initial 2
+ timeouts call-disconnect 1
+ timeouts wait-release 1
+ timing hookflash-out 50
+ connection plar opx 6517
+ description (2)6693646
+ caller-id enable
+!
+voice-port 0/2/2
+ supervisory disconnect dualtone mid-call
+ timeouts initial 2
+ timeouts interdigit 4
+ timeouts call-disconnect 1
+ timeouts wait-release 1
+ timing hookflash-out 50
+ connection plar opx 6500
+ shutdown
+ caller-id enable
+!
+voice-port 0/2/3
+ supervisory disconnect dualtone mid-call
+ timeouts initial 2
+ timeouts interdigit 4
+ timeouts call-disconnect 1
+ timeouts wait-release 1
+ timing hookflash-out 50
+ connection plar opx 6500
+ description 3168780453
+ caller-id enable
+ !
+ !
+ !
+ !
+!
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local Loopback0
+sccp ccm 146.34.15.84 identifier 1 version 4.1 
+sccp ccm 146.39.33.232 identifier 2 version 4.1 
+sccp
+!
+sccp ccm group 1
+ description COMUNICA_CAI
+ bind interface Loopback0
+ associate ccm 1 priority 1
+ associate ccm 2 priority 2
+ associate profile 1 register MTP-CAIrt2-T
+ associate profile 2 register MTP-CAIrt2-C
+ keepalive retries 5
+!
+!
+!
+dspfarm profile 1 transcode  
+ codec g729abr8
+ codec g729ar8
+ codec g711alaw
+ codec g711ulaw
+ codec g729r8
+ maximum sessions 16
+ associate application SCCP
+ shutdown
+!
+dspfarm profile 2 conference  
+ codec g729br8
+ codec g729r8
+ codec g729abr8
+ codec g729ar8
+ codec g711alaw
+ codec g711ulaw
+ maximum sessions 2
+ associate application SCCP
+ shutdown
+!
+dial-peer voice 6500 voip
+ preference 1
+ destination-pattern 65..
+ session target ipv4:146.34.15.84
+ voice-class codec 1  
+ dtmf-relay h245-alphanumeric h245-signal
+ ip qos dscp cs5 media
+ no vad
+!
+dial-peer voice 6501 voip
+ preference 2
+ destination-pattern 65..
+ session target ipv4:146.39.33.232
+ voice-class codec 1  
+ dtmf-relay h245-alphanumeric h245-signal
+ ip qos dscp cs5 media
+ no vad
+!
+dial-peer voice 1 pots
+ preference 1
+ destination-pattern 9T
+ port 0/2/0
+!
+dial-peer voice 2 pots
+ preference 2
+ destination-pattern 9T
+ port 0/2/1
+!
+dial-peer voice 3 pots
+ preference 1
+ destination-pattern 9033.........$
+ port 0/2/2
+ forward-digits 10
+!
+dial-peer voice 4 pots
+ preference 2
+ destination-pattern 9033.........$
+ port 0/2/3
+ forward-digits 10
+!
+dial-peer voice 9 pots
+ preference 1
+ destination-pattern 9[1-9]......
+ port 0/2/0
+!
+dial-peer voice 92 pots
+ preference 2
+ destination-pattern 9[1-9]......
+ port 0/2/1
+!
+dial-peer voice 102 pots
+ description Salida al Celufijo
+ preference 3
+ destination-pattern 903T
+ port 0/2/3
+ forward-digits 10
+!
+dial-peer voice 6510 voip
+ description *** Inbound Leg from CUCM - hou150nxcm2 ***
+ preference 1
+ destination-pattern 65..
+ session target ipv4:146.34.4.163
+ voice-class codec 1  
+ dtmf-relay h245-alphanumeric h245-signal
+ ip qos dscp cs5 media
+ no vad
+!
+!
+!
+!
+gatekeeper
+ shutdown
+!
+!
+ vstack
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line 131
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

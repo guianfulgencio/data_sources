@@ -1,0 +1,590 @@
+Building configuration...
+
+Current configuration : 13734 bytes
+!
+! Last configuration change at 07:19:56 CDT Fri Jun 16 2023 by admin
+! NVRAM config last updated at 07:20:36 CDT Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.0
+service nagle
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname CLBasw-ppal-1
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Vlan50
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authentication ppp default none
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group tacacs+ if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default
+ action-type start-stop
+ group tacacs+
+!
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CST -6 0
+clock summer-time CDT recurring
+switch 1 provision ws-c2960s-48fps-l
+no ip source-route
+!
+!
+ip domain-name clb.chevrontexaco.net
+ip name-server 146.39.35.17
+ip name-server 146.36.80.34
+vtp domain Calle100
+vtp mode off
+!
+!
+!
+archive
+ path flash:cvx_131633
+ maximum 5
+file verify auto
+!
+spanning-tree mode pvst
+spanning-tree loopguard default
+spanning-tree extend system-id
+spanning-tree uplinkfast
+spanning-tree backbonefast
+spanning-tree vlan 1-21 priority 16384
+spanning-tree vlan 4060,4070,4080,4090 priority 24576
+!
+!
+!
+!
+!
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause link-flap
+!
+!
+!
+!
+vlan internal allocation policy ascending
+!
+vlan 2
+ name Users32
+!
+vlan 3
+ name PISO5y6
+!
+vlan 4
+ name PISO7
+!
+vlan 5
+ name PISO9
+!
+vlan 9
+ name Equipos_Gestion
+!
+vlan 10
+ name Geologia
+!
+vlan 15
+ name UK_Rio_Sogamoso
+!
+vlan 16
+ name IPT_USERS
+!
+vlan 17
+ name Users17
+!
+vlan 19
+ name CCTV_Ecotower
+!
+vlan 20
+ name GESTION
+!
+vlan 21
+ name IPT
+!
+vlan 22
+ name IPT_SERVICES
+!
+vlan 23
+ name IPT_GATEWAY
+!
+vlan 30
+ name Wireless_Eco_Users
+!
+vlan 31
+ name Wireless_Eco_Manage
+!
+vlan 40
+ name VIDEOCONF
+!
+vlan 41
+ name Add-Profile
+!
+vlan 50
+ name SERVERS&PRINTERS
+!
+vlan 100
+ name TEL-DOM-CORE
+!
+vlan 200
+ name VLAN_SUBS_PUBLI
+!
+vlan 201
+ name VLAN_SUBS_PUBLI_UCS
+!
+vlan 300
+ name test
+!
+vlan 3100
+ name L3CVX-CORP
+!
+vlan 3101
+ name L3CVX-GUEST
+!
+vlan 3102
+ name L3CVX-IND
+!
+vlan 3103
+ name L3CVX-USER
+!
+vlan 3104
+ name L3CVX-DEVICES
+!
+vlan 3301
+ name INTRA.L3CVX-GUEST
+!
+vlan 3302
+ name INTRA.L3CVX-IND
+!
+vlan 3303
+ name INTRA.L3CVX-USER
+!
+vlan 3304
+ name INTRA.L3CVX-DEVICES
+!
+vlan 4060
+ name WLAN-L3CVX-GUEST
+!
+vlan 4070
+ name WLAN-L3CVX-IND
+!
+vlan 4080
+ name WLAN-L3CVX-USER
+!
+vlan 4090
+ name WLAN-L3CVX-DEVICES
+!
+ip tcp path-mtu-discovery age-timer 10
+ip tftp source-interface Vlan50
+ip ssh source-interface Vlan50
+ip ssh version 2
+ip scp server enable
+lldp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel2
+ description TO_CLBcswDC-2-4500_Po10
+ switchport trunk allowed vlan 1-5,9,10,15,16,19,20,30-32,40,41,49,50,100,200
+ switchport trunk allowed vlan add 201,3301-3304,4060,4070,4080,4090
+ switchport mode trunk
+!
+interface FastEthernet0
+ no ip address
+!
+interface GigabitEthernet1/0/1
+ description TO_CLBrd3_Gi0/0
+ switchport trunk allowed vlan 1-5,9,10,15,16,19,20,30-32,40,41,49,50,200,201
+ switchport trunk allowed vlan add 3301-3304,4060,4070,4080,4090
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/2
+!
+interface GigabitEthernet1/0/3
+ shutdown
+!
+interface GigabitEthernet1/0/4
+!
+interface GigabitEthernet1/0/5
+!
+interface GigabitEthernet1/0/6
+!
+interface GigabitEthernet1/0/7
+!
+interface GigabitEthernet1/0/8
+!
+interface GigabitEthernet1/0/9
+ description To_VG224-F0/0
+ switchport access vlan 16
+ switchport mode access
+ no logging event link-status
+ load-interval 30
+ duplex full
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/10
+ shutdown
+!
+interface GigabitEthernet1/0/11
+!
+interface GigabitEthernet1/0/12
+!
+interface GigabitEthernet1/0/13
+!
+interface GigabitEthernet1/0/14
+!
+interface GigabitEthernet1/0/15
+ description ROUTER-TEL1-DOMES
+ switchport access vlan 100
+ switchport mode access
+ no cdp enable
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/16
+ description CLBRT3_Gi0/1
+ switchport trunk allowed vlan 100
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/17
+!
+interface GigabitEthernet1/0/18
+!
+interface GigabitEthernet1/0/19
+!
+interface GigabitEthernet1/0/20
+!
+interface GigabitEthernet1/0/21
+!
+interface GigabitEthernet1/0/22
+!
+interface GigabitEthernet1/0/23
+!
+interface GigabitEthernet1/0/24
+!
+interface GigabitEthernet1/0/25
+ description TO_CLBcswDC-2-4500_G2/31
+ switchport trunk allowed vlan 1-5,9,10,15,16,19,20,30-32,40,41,49,50,100,200
+ switchport trunk allowed vlan add 201,3301-3304,4060,4070,4080,4090
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 2 mode active
+!
+interface GigabitEthernet1/0/26
+!
+interface GigabitEthernet1/0/27
+!
+interface GigabitEthernet1/0/28
+ shutdown
+!
+interface GigabitEthernet1/0/29
+!
+interface GigabitEthernet1/0/30
+ shutdown
+!
+interface GigabitEthernet1/0/31
+ description TO_CLBcswDC-2-4500_G1/31
+ switchport trunk allowed vlan 1-5,9,10,15,16,19,20,30-32,40,41,49,50,100,200
+ switchport trunk allowed vlan add 201,3301-3304,4060,4070,4080,4090
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 2 mode active
+!
+interface GigabitEthernet1/0/32
+!
+interface GigabitEthernet1/0/33
+!
+interface GigabitEthernet1/0/34
+!
+interface GigabitEthernet1/0/35
+!
+interface GigabitEthernet1/0/36
+!
+interface GigabitEthernet1/0/37
+ description Server_UCS_1_MGMT
+ switchport access vlan 20
+ switchport mode access
+!
+interface GigabitEthernet1/0/38
+ description Server_UCS_Virtual_IPT1
+ switchport trunk allowed vlan 20,200,201
+ switchport mode trunk
+ load-interval 30
+!
+interface GigabitEthernet1/0/39
+ description Server_UCS_Virtual_IPT1
+ switchport access vlan 20
+ switchport trunk allowed vlan 20,200,201
+ switchport mode trunk
+ load-interval 30
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/40
+ description Server_UCS_2_MGMT
+ switchport access vlan 20
+ switchport mode access
+!
+interface GigabitEthernet1/0/41
+ description Server_UCS_Virtual_IPT2
+ switchport trunk allowed vlan 20,200,201
+ switchport mode trunk
+ load-interval 30
+!
+interface GigabitEthernet1/0/42
+ description Server_UCS_Virtual_IPT2
+ switchport access vlan 20
+ switchport trunk allowed vlan 20,200,201
+ switchport mode trunk
+ load-interval 30
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/43
+!
+interface GigabitEthernet1/0/44
+!
+interface GigabitEthernet1/0/45
+!
+interface GigabitEthernet1/0/46
+ description --TempSrvCAITMS6_ILO--
+ switchport access vlan 5
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/47
+ description --TempSrvCAITMS6--
+ switchport access vlan 3
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/48
+ switchport trunk allowed vlan 3100-3104
+ switchport mode trunk
+ switchport priority extend trust
+!
+interface GigabitEthernet1/0/49
+ description To_CLBaswp8-2960-1-G1/0/49
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/50
+ description To_CLBaswp6-2960-1-G1/0/49
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/51
+!
+interface GigabitEthernet1/0/52
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan50
+ description Management
+ ip address 146.39.34.14 255.255.255.128
+ no ip redirects
+ no ip proxy-arp
+ no ip route-cache
+!
+ip default-gateway 146.39.34.1
+no ip http server
+no ip http secure-server
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.140.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+access-list 10 permit 146.22.71.201
+access-list 10 permit 146.23.102.220
+access-list 10 permit 146.22.9.201
+access-list 10 permit 199.103.13.209
+access-list 10 permit 199.103.13.208
+access-list 10 permit 146.27.124.18
+access-list 10 deny   any log
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 30 permit 146.22.71.201
+access-list 30 permit 146.27.82.194
+access-list 30 permit 146.22.9.201
+access-list 30 permit 146.36.80.131
+access-list 30 permit 146.36.80.142
+access-list 30 permit 146.39.37.251 log
+access-list 30 permit 146.39.37.252 log
+access-list 30 permit 146.36.80.139
+access-list 30 permit 146.36.80.149
+access-list 30 permit 199.103.13.219
+access-list 30 permit 199.103.13.209
+access-list 30 permit 199.103.13.208
+access-list 30 permit 146.36.92.124
+access-list 30 permit 146.36.80.124
+access-list 30 permit 146.36.80.81
+access-list 30 permit 146.27.124.21
+access-list 30 permit 146.27.26.0 0.0.1.255
+access-list 30 permit 146.36.193.0 0.0.0.255
+access-list 30 permit 146.39.34.192 0.0.0.31
+access-list 30 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 50 permit 146.39.32.0 0.0.7.255 log
+access-list 50 permit 146.39.34.0 0.0.0.240 log
+access-list 50 permit 146.39.34.0 0.0.0.128 log
+access-list 50 permit 146.39.40.0 0.0.0.255 log
+access-list 50 permit 146.39.41.0 0.0.0.255 log
+access-list 50 deny   any log
+access-list 1330 permit 146.34.12.179
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.36.80.134
+access-list 1330 permit 146.36.80.135
+access-list 1330 permit 146.36.80.131
+access-list 1330 permit 146.27.166.70
+access-list 1330 permit 146.39.37.252
+access-list 1330 permit 146.36.80.139
+access-list 1330 permit 146.36.80.159
+access-list 1330 permit 146.36.91.111
+access-list 1330 permit 146.39.34.30
+access-list 1330 permit 146.36.80.125
+access-list 1330 permit 146.36.80.81
+access-list 1330 permit 146.36.85.36
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1530 permit 199.103.13.0 0.0.0.255
+access-list 1530 permit 199.103.14.0 0.0.0.255
+access-list 1530 deny   any log
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 auth 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Vlan50
+snmp-server location CLB / Calle 100 No. 7A-81, Bogota / Colombia / Americas /CO-NA-Utility-Wan-Remotes/Criticality-Low
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport input ssh
+!
+ntp source Vlan50
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.40.10.21
+ntp server 146.22.70.251
+end

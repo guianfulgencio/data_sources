@@ -1,0 +1,4710 @@
+Building configuration...
+
+Current configuration : 119490 bytes
+!
+! Last configuration change at 12:42:49 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 12:43:25 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.5
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service counters max age 5
+!
+hostname CHVPKRL1
+!
+boot-start-marker
+boot system bootdisk:/s6t64-adventerprisek9-mz.SPA.155-1.SY.bin
+boot-end-marker
+!
+!
+vrf definition L3CVX-DEVICES
+ rd 65001:65017
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-GUEST
+ rd 65001:65006
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-IND
+ rd 65001:65007
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-USER
+ rd 65001:65016
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+platform ip cef load-sharing ip-only
+!
+!
+!
+!
+!
+no ip source-route
+!
+ip vrf cvxguest
+ rd 888:1
+!
+ip vrf management
+!
+ip dhcp relay information trust-all
+!
+ip domain-name chvpk.chevron.net
+ip name-server 146.36.80.34
+
+ip multicast-routing 
+ip multicast-routing vrf cvxguest 
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+vtp domain CHVPK
+vtp mode transparent
+!
+switch virtual domain 10
+ switch mode virtual
+ switch 1 priority 200
+ switch 2 priority 50
+ mac-address use-virtual
+!
+!
+flow record NETQOS-NDE
+ match ipv4 tos
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ match interface output
+ collect routing source as
+ collect routing destination as
+ collect routing next-hop address ipv4
+ collect transport tcp flags
+ collect counter bytes
+ collect counter packets
+ collect timestamp sys-uptime first
+ collect timestamp sys-uptime last
+!
+!
+flow exporter NETQOS-EXPORTER
+ destination 139.65.140.12
+ source Loopback0
+ transport udp 2055
+ template data timeout 300
+ option exporter-stats timeout 60
+!
+flow platform cache timeout inactive 64
+flow platform cache timeout active 64
+flow platform cache timeout fast threshold 1 time 8
+!
+flow monitor NETQOS-MONITOR
+ exporter NETQOS-EXPORTER
+ record NETQOS-NDE
+!
+!
+table-map cos-discard-class-map
+ map from  0 to 0
+ map from  1 to 8
+ map from  2 to 16
+ map from  3 to 24
+ map from  4 to 32
+ map from  5 to 40
+ map from  6 to 48
+ map from  7 to 56
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+logging event link-status default
+!
+!
+archive
+ path bootdisk:cvx_134018
+ maximum 5
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 1-4094 priority 24576
+!
+redundancy
+ main-cpu
+  auto-sync running-config
+ mode sso
+!
+vlan internal allocation policy ascending
+vlan access-log ratelimit 2000
+!
+vlan 48
+ name 146.27.48.0/23_X1_DATA
+!
+vlan 96
+ name 146.27.96.0/24-GilLab
+!
+vlan 98
+ name 144.5.132.184/29_U_Tower
+!
+vlan 101
+ name 146.27.2.0/24_A1_DATA
+!
+vlan 102
+ name 146.27.4.0/23_A2_DATA
+!
+vlan 103
+ name 146.27.6.0/24_A3_DATA
+!
+vlan 104
+ name 146.27.90.0/24_A4_DATA
+!
+vlan 106
+ name 146.27.136.0/24_B1_DATA
+!
+vlan 107
+ name 146.27.138.0/24_B2_DATA
+!
+vlan 110
+ name 146.27.47.0/24_C0_DATA
+!
+vlan 111
+ name 146.27.15.0/24_C1_DATA
+!
+vlan 112
+ name 146.27.139.0/24_C2_DATA
+!
+vlan 116
+ name 146.27.174.0/23_D1_DATA
+!
+vlan 117
+ name 146.27.21.0/24_D2_DATA
+!
+vlan 121
+ name 146.27.112.0/24_E1_DATA
+!
+vlan 122
+ name 146.27.113.0/24_E2_DATA
+!
+vlan 126
+ name 146.27.26.0/23_F1_DATA
+!
+vlan 127
+ name 146.27.86.0/23_F2_DATA
+!
+vlan 131
+ name 146.27.40.0/24_G1_DATA
+!
+vlan 132
+ name 146.27.42.0/24_G2_DATA
+!
+vlan 145
+ name 146.27.41.0/24_A1_NVR
+!
+vlan 146
+ name 146.27.80.0/23_F2_NST
+!
+vlan 148
+ name 146.27.116.0/24_A2_Treasury_DATA
+!
+vlan 149
+ name 146.27.3.192/26_A1_CBRES_DATA
+!
+vlan 176
+ name 146.27.141.176/29.CHVPKRL1WLAN.M
+!
+vlan 178
+ name 146.27.141.248/29.CHVPKRL1WLAN.H
+!
+vlan 186
+ name 146.27.3.128/27_Frontgate_DATA
+!
+vlan 198
+ name 146.27.198.0/24_BRZ4A_DATA
+!
+vlan 199
+ name 146.27.199.0/24_BRZ4B_DATA
+!
+vlan 200
+ name 146.27.200.0/24_BRZ5B_DATA
+!
+vlan 201
+ name 146.34.192.0/24_A1_VOICE
+!
+vlan 202
+ name 146.34.193.0/24_A2_VOICE
+!
+vlan 203
+ name 146.34.194.0/24_A3_VOICE
+!
+vlan 204
+ name 146.34.195.0/24_A4_VOICE
+!
+vlan 206
+ name 146.34.196.0/24_B1_VOICE
+!
+vlan 207
+ name 146.34.197.0/24_B2_VOICE
+!
+vlan 210
+ name 146.34.198.0/24_C0_VOICE
+!
+vlan 211
+ name 146.34.199.0/24_C1_VOICE
+!
+vlan 212
+ name 146.34.200.0/24_C2_VOICE
+!
+vlan 216
+ name 146.34.201.0/24_D1_VOICE
+!
+vlan 217
+ name 146.34.202.0/24_D2_VOICE
+!
+vlan 221
+ name 146.34.203.0/24_E1_VOICE
+!
+vlan 222
+ name 146.34.204.0/24_E2_VOICE
+!
+vlan 224
+ name 146.27.224.0/22.RL1WLAN.Business
+!
+vlan 226
+ name 146.34.176.0/24_F1_VOICE
+!
+vlan 227
+ name 146.34.177.0/24_F2_VOICE
+!
+vlan 228
+ name 146.27.228.0/22.RL1WLAN.Business
+!
+vlan 231
+ name 146.34.178.0/24_G1_VOICE
+!
+vlan 232
+ name 146.34.179.0/24_G2_VOICE
+!
+vlan 248
+ name E2_VOICE
+!
+vlan 249
+ name A1_CBRES_VOICE
+!
+vlan 286
+ name 146.34.187.224/28_Frontgate_voic
+!
+vlan 331
+ name 146.27.231.0/24_BRZ3B_DATA
+!
+vlan 501
+ name 146.27.8.0/24_CHVPK_CAMERAS
+!
+vlan 698
+ name 146.34.26.0/24_BRZ4A_VOICE
+!
+vlan 699
+ name 146.34.27.0/24_BRZ4B_VOICE
+!
+vlan 700
+ name 146.34.28.0/24_BRZ5B_VOICE
+!
+vlan 728
+ name 146.34.50.0/24_BRZ2A_VOICE
+!
+vlan 729
+ name 146.34.51.0/24_BRZ2B_VOICE
+!
+vlan 730
+ name 146.34.52.0/24_BRZ3B_VOICE
+!
+vlan 731
+ name 146.34.53.0/24_BRZ3B_VOICE
+!
+vlan 777
+ name 172.20.227.0/25_BRES_Wireless
+!
+vlan 800
+ name CBRES-METASYS
+!
+vlan 801 
+!
+vlan 802
+ name 146.27.182.224/27_Exec_AV
+!
+vlan 803
+ name 146.27.182.208/28_Exec_AV
+!
+vlan 804
+ name 146.27.182.96/28_Exec_AV
+!
+vlan 805
+ name 146.27.182.192/28_Exec_AV
+!
+vlan 807
+ name 146.27.182.112/28_Exec_AV
+!
+vlan 888
+ name 10.160.88.0/23_Temp_Wire_Guest
+!
+vlan 900
+ name 146.27.141.0/26_F1_FORENSICS
+!
+vlan 901
+ name 146.27.7.224/27_F1LAB
+!
+vlan 969
+ name 146.27.69.160/27_F1301_NA_LAB
+!
+vlan 999
+ name Unused_Native_VLAN
+!
+vlan 4060
+ name WLAN-L3CVX-GUEST
+!
+vlan 4070
+ name WLAN-L3CVX-IND
+!
+vlan 4080
+ name WLAN-L3CVX-USER
+!
+vlan 4090
+ name WLAN-L3CVX-DEVICES
+lldp run
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+!
+class-map type lan-queuing match-any pq
+ match cos  4  5 
+class-map match-any class-copp-icmp-redirect-unreachable
+class-map match-all class-copp-glean
+class-map match-all class-copp-receive
+class-map match-all class-copp-options
+class-map match-all class-copp-broadcast
+class-map match-all class-copp-mcast-acl-bridged
+class-map match-all class-copp-slb
+class-map match-all class-copp-mtu-fail
+class-map match-all class-copp-ttl-fail
+class-map match-all class-copp-arp-snooping
+class-map match-any class-copp-mcast-copy
+class-map match-any class-copp-ip-connected
+class-map match-any class-copp-match-igmp
+ match access-group name acl-copp-match-igmp
+class-map match-all class-copp-unknown-protocol
+class-map match-any class-copp-vacl-log
+class-map match-all class-copp-mcast-ipv6-control
+class-map match-any class-copp-match-pimv6-data
+ match access-group name acl-copp-match-pimv6-data
+class-map match-any class-copp-mcast-punt
+class-map match-all class-copp-unsupp-rewrite
+class-map match-all class-copp-ucast-egress-acl-bridged
+class-map match-all class-copp-ip-admission
+class-map match-any class-copp-dpss-divert
+class-map type lan-queuing match-any cos3
+ match cos  3  6  7 
+class-map match-all class-copp-service-insertion
+class-map type lan-queuing match-any cos2
+ match cos  2 
+class-map match-any voice_control
+ match ip dscp cs3 
+class-map match-all class-copp-mac-pbf
+class-map match-any class-copp-match-mld
+ match access-group name acl-copp-match-mld
+class-map match-all class-copp-ucast-ingress-acl-bridged
+class-map match-all class-copp-dhcp-snooping
+class-map match-all class-copp-wccp
+class-map match-all class-copp-nd
+class-map match-any class-copp-ipv6-connected
+class-map match-all class-copp-mcast-rpf-fail
+class-map match-any class-copp-match-ndv6hl
+ match access-group name acl-copp-match-ndv6hl
+class-map match-any class-copp-ucast-rpf-fail
+class-map match-all class-copp-mcast-ip-control
+class-map match-any class-copp-match-pim-data
+ match access-group name acl-copp-match-pim-data
+class-map match-any class-copp-match-ndv6
+ match access-group name acl-copp-match-ndv6
+class-map match-all voice
+ match ip dscp ef 
+class-map match-any class-copp-mcast-v4-data-on-routedPort
+class-map match-any class-copp-mcast-v6-data-on-routedPort
+!
+policy-map policy-default-autocopp
+ class class-copp-mcast-v4-data-on-routedPort
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-mcast-v6-data-on-routedPort
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-dpss-divert
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-mld
+   police rate 5000 pps burst 5000 packets    conform-action set-discard-class-transmit 48    exceed-action drop 
+ class class-copp-match-igmp
+   police rate 5000 pps burst 5000 packets    conform-action set-discard-class-transmit 48    exceed-action drop 
+ class class-copp-icmp-redirect-unreachable
+   police rate 100 pps burst 10 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ucast-rpf-fail
+   police rate 100 pps burst 10 packets    conform-action transmit     exceed-action drop 
+ class class-copp-vacl-log
+   police rate 2000 pps burst 1 packets    conform-action transmit     exceed-action drop 
+ class class-copp-mcast-punt
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-mcast-copy
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ip-connected
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ipv6-connected
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-pim-data
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-pimv6-data
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-ndv6hl
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-match-ndv6
+   police rate 1000 pps burst 1000 packets    conform-action set-discard-class-transmit 48    exceed-action drop 
+policy-map type lan-queuing cos-queueing
+ class type lan-queuing pq
+    priority
+ class type lan-queuing cos3
+    bandwidth remaining percent 5
+ class type lan-queuing cos2
+    bandwidth remaining percent 25
+ class class-default
+policy-map POLICE-400MEG
+ class class-default
+    police 400000000    conform-action transmit     exceed-action drop 
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+ auto qos default
+!
+!
+!
+!
+interface Null0
+ no ip unreachables
+!
+interface Loopback0
+ ip address 146.27.111.254 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+!
+interface Port-channel1
+ description VSL link
+ no switchport
+ no ip address
+ no platform qos channel-consistency
+ switch virtual link 1
+!
+interface Port-channel2
+ description VSL Link
+ no switchport
+ no ip address
+ no platform qos channel-consistency
+ switch virtual link 2
+!
+interface Port-channel5
+ description CHVPKWC-01 5520
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 176,224,228,777,4060,4070,4080,4090
+ logging event link-status
+!
+interface Port-channel6
+ description CHVPKWC-01HA 5520
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 176,224,228,777,4060,4070,4080,4090
+ logging event link-status
+!
+interface Port-channel11
+ description CHVPKRM1 Po11
+ no switchport
+ no ip address
+ no ip proxy-arp
+ ip pim dr-priority 0
+ ip pim sparse-mode
+!
+interface Port-channel11.910
+ description CHVPKRM1 Port-channel11.910 [VRF-L3CVX-USER]
+ encapsulation dot1Q 910
+ no ip redirects
+ no ip proxy-arp
+!
+interface Port-channel11.980
+ description CHVPKRM1 Po11.980
+ encapsulation dot1Q 980
+ ip address 146.27.111.89 255.255.255.252
+ no ip proxy-arp
+ ip pim dr-priority 0
+ ip pim sparse-mode
+ ip flow monitor NETQOS-MONITOR input
+ ip flow monitor NETQOS-MONITOR output
+!
+interface Port-channel11.981
+ description CHVPKRM1 Po11.981 [vrf cvxguest]
+ encapsulation dot1Q 981
+ ip vrf forwarding cvxguest
+ ip address 146.27.109.145 255.255.255.254
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Port-channel11.3401
+ description CHVPKRM1 Port-channel11.3401 [VRF L3CVX-GUEST]
+ encapsulation dot1Q 3401
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.1.3 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel11.3402
+ description CHVPKRM1 Port-channel11.3402 [VRF L3CVX-IND]
+ encapsulation dot1Q 3402
+ vrf forwarding L3CVX-IND
+ ip address 10.190.1.3 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel11.3403
+ description CHVPKRM1 Port-channel11.3403 [VRF L3CVX-USER]
+ encapsulation dot1Q 3403
+ vrf forwarding L3CVX-USER
+ ip address 10.186.1.3 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel11.3404
+ description CHVPKRM1 Port-channel11.3404 [VRF L3CVX-DEVICES]
+ encapsulation dot1Q 3404
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.1.3 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel12
+ description CHVPKRM2 Po12
+ no switchport
+ no ip address
+ no ip proxy-arp
+ ip pim dr-priority 0
+ ip pim sparse-mode
+!
+interface Port-channel12.982
+ description CHVPKRM2 po12.982
+ encapsulation dot1Q 982
+ ip address 146.27.111.93 255.255.255.252
+ no ip proxy-arp
+ ip pim dr-priority 0
+ ip pim sparse-mode
+ ip flow monitor NETQOS-MONITOR input
+ ip flow monitor NETQOS-MONITOR output
+!
+interface Port-channel12.983
+ description CHVPKRM2 po12.983 [vrf cvxguest]
+ encapsulation dot1Q 983
+ ip vrf forwarding cvxguest
+ ip address 146.27.109.149 255.255.255.254
+ no ip proxy-arp
+!
+interface Port-channel12.984
+ description CHVPKRM2 Port-channel12.984 [VRF-L3CVX-USER]
+ encapsulation dot1Q 984
+ no ip redirects
+ no ip proxy-arp
+!
+interface Port-channel12.3501
+ description CHVPKRM2 Port-channel12.3501 [VRF L3CVX-GUEST]
+ encapsulation dot1Q 3501
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.1.5 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel12.3502
+ description CHVPKRM2 Port-channel12.3502 [VRF L3CVX-IND]
+ encapsulation dot1Q 3502
+ vrf forwarding L3CVX-IND
+ ip address 10.190.1.5 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel12.3503
+ description CHVPKRM2 Port-channel12.3503 [VRF L3CVX-USER]
+ encapsulation dot1Q 3503
+ vrf forwarding L3CVX-USER
+ ip address 10.186.1.5 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel12.3504
+ description CHVPKRM2 Port-channel12.3504 [VRF L3CVX-DEVICES]
+ encapsulation dot1Q 3504
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.1.5 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel100
+ description CHVPKASL-A1003 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,501
+!
+interface Port-channel101
+ description CHVPKASL-A1005 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,777,888
+!
+interface Port-channel102
+ description CHVPKASL-A1155 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,888
+!
+interface Port-channel103
+ description CHVPKASL-A1261 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 145,149,249,501
+!
+interface Port-channel104
+ description CHVPKASL-A1261 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,800
+ shutdown
+!
+interface Port-channel105
+ description CHVPKASL-A2069 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202
+!
+interface Port-channel106
+ description CHVPKASL-A2133 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202,888
+!
+interface Port-channel107
+ description CHVPKASL-A2205 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202
+!
+interface Port-channel108
+ description CHVPKASL-A2299 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202,800
+!
+interface Port-channel109
+ description CHVPKASL-A3069 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,888
+!
+interface Port-channel110
+ description CHVPKASL-A3131 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,800
+!
+interface Port-channel111
+ description CHVPKASL-A3265 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,888
+!
+interface Port-channel112
+ description CHVPKASL-A3299 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,800
+!
+interface Port-channel113
+ description CHVPKASL-A4030 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 104,204
+!
+interface Port-channel114
+ description CHVPKASL-A4361 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 104,204,800,807,888
+!
+interface Port-channel115
+ description CHVPKBSL-B1005 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206,501
+!
+interface Port-channel116
+ description CHVPKBSL-B1085 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206,501,800
+!
+interface Port-channel117
+ description CHVPKBSL-B1223 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206
+!
+interface Port-channel118
+ description CHVPKBSL-B1165 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206
+!
+interface Port-channel119
+ description CHVPKBSL-B2007 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207
+!
+interface Port-channel121
+ description CHVPKBSL-B2085 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501,800,803-805
+!
+interface Port-channel122
+ description CHVPKBSL-B2223 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501,802
+!
+interface Port-channel123
+ description CHVPKBSL-B2357 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501
+!
+interface Port-channel124
+ description CHVPKCSL-C0073 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210
+!
+interface Port-channel125
+ description CHVPKCSL-C0217 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,888
+!
+interface Port-channel126
+ description CHVPKCSL-C0297 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,888
+!
+interface Port-channel127
+ description CHVPKCSL-C0357 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,800,888
+!
+interface Port-channel128
+ description CHVPKCSL-C1081 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211
+!
+interface Port-channel129
+ description CHVPKCSL-C1221 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,501
+!
+interface Port-channel130
+ description CHVPKCSL-C1297 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,501,800,888
+!
+interface Port-channel131
+ description CHVPKCSL-C1357 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,800
+!
+interface Port-channel132
+ description CHVPKCSL-C2081 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212
+!
+interface Port-channel133
+ description CHVPKCSL-C2221 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212
+!
+interface Port-channel134
+ description CHVPKCSL-C2297 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212,501,800
+!
+interface Port-channel135
+ description CHVPKCSL-C2357 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212,800
+!
+interface Port-channel136
+ description CHVPKDSL-D1079 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501
+!
+interface Port-channel137
+ description CHVPKDSL-D1219 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501
+!
+interface Port-channel138
+ description CHVPKDSL-D1297 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501,800
+!
+interface Port-channel139
+ description CHVPKDSL-D1359 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501,800
+!
+interface Port-channel140
+ description CHVPKDSL-D2083 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217
+!
+interface Port-channel141
+ description CHVPKDSL-D2221 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217,888
+!
+interface Port-channel142
+ description CHVPKDSL-D2297 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217
+!
+interface Port-channel143
+ description CHVPKDSL-D2359 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217,888
+!
+interface Port-channel144
+ description CHVPKESL-E1409-1 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,888
+!
+interface Port-channel145
+ description CHVPKESL-E1481-1 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,800
+!
+interface Port-channel146
+ description CHVPKESL-E1033-1 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221
+!
+interface Port-channel147
+ description CHVPKESL-E1145-1 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,800
+!
+interface Port-channel148
+ description CHVPKESL-E1409-2 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222,501
+!
+interface Port-channel149
+ description CHVPKESL-E1481-2 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222,501
+!
+interface Port-channel150
+ description CHVPKESL-E1033-2 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222
+!
+interface Port-channel151
+ description CHVPKESL-E1145-2 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222
+!
+interface Port-channel152
+ description CHVPKFSL-F1083 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,888,901
+!
+interface Port-channel153
+ description CHVPKFSL-F1217 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,888,900
+!
+interface Port-channel154
+ description CHVPKFSL-F1297 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,800,888,900
+!
+interface Port-channel155
+ description CHVPKFSL-F1364 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,800,888,900
+!
+interface Port-channel156
+ description CHVPKFSL-F2083 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,888
+!
+interface Port-channel157
+ description CHVPKFSL-F2219 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,888
+!
+interface Port-channel158
+ description CHVPKFSL-F2297 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,800
+!
+interface Port-channel159
+ description CHVPKFSL-F2361 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,800,888
+!
+interface Port-channel160
+ description CHVPKGSL-G1005 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501
+!
+interface Port-channel161
+ description CHVPKGSL-G1085 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501,800
+!
+interface Port-channel162
+ description CHVPKGSL-G1223 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501,800
+!
+interface Port-channel163
+ description CHVPKGSL-G1361 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501
+!
+interface Port-channel164
+ description CHVPKGSL-G2083 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232,800
+!
+interface Port-channel165
+ description CHVPKGSL-G2221 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232,800
+!
+interface Port-channel166
+ description CHVPKGSL-G2361 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232
+!
+interface Port-channel167
+ description CHVPKGSL-G2005 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232
+!
+interface Port-channel168
+ description Uplink to Old RL1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 96,98,101-104,106,107,110-112,116,117,121,122
+ switchport trunk allowed vlan add 126,127,131,132,145,146,148,149,176,186
+ switchport trunk allowed vlan add 201-204,206,207,210-212,216,217,221,222,224
+ switchport trunk allowed vlan add 226-228,231,232,246,248,249,286,777,802-805
+ switchport trunk allowed vlan add 807,888,900,901,969
+ shutdown
+!
+interface Port-channel169
+ description CHVPKASL-A1261 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,800
+!
+interface Port-channel179
+ description CHVPKFSL-F1301 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 96,969,970
+!
+interface Port-channel200
+ description CHVPKASL-FRONTGATE  Po1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 186,286
+!
+interface TenGigabitEthernet1/1/1
+ description CHVPKASL-A1003 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 100 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/2
+ description CHVPKASL-A1005 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,777,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 101 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/3
+ description CHVPKASL-A1155 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 102 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/4
+ description CHVPKASL-A1261 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 145,149,249,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-protocol lacp
+ channel-group 103 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/5
+ description CHVPKASL-A1261-B T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ shutdown
+ udld port enable bi-directional
+ channel-group 104 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/6
+ description CHVPKASL-A2069 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 105 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/7
+ description CHVPKASL-A2133 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 106 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/8
+ description CHVPKASL-A2205 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 107 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/9
+ description CHVPKASL-A2299 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 108 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/10
+ description CHVPKASL-A3069 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 109 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/11
+ description CHVPKASL-A3131 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 110 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/12
+ description CHVPKASL-A3265 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 111 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/13
+ description CHVPKASL-A3299 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 112 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/14
+ description CHVPKASL-A4030 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 104,204
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 113 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/15
+ description CHVPKASL-A4361 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 104,204,800,807,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 114 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/16
+ description CHVPKBSL-B1005 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 115 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/17
+ description CHVPKBSL-B1085 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 116 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/18
+ description CHVPKBSL-B1223 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 117 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/19
+ description CHVPKBSL-B1165 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 118 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/20
+ description CHVPKBSL-B2007-Te1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 119 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/21
+ description CHVPKBSL-B2085 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501,800,803-805
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 121 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/22
+ description CHVPKBSL-B2223 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501,802
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 122 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/23
+ description CHVPKBSL-B2357 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 123 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/24
+ description CHVPKCSL-C0073 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 124 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/25
+ description CHVPKCSL-C0217 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 125 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/26
+ description CHVPKCSL-C0297 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 126 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/27
+ description CHVPKCSL-C0357 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,800,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 127 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/28
+ description CHVPKCSL-C1081 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 128 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/29
+ description CHVPKCSL-C1221 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 129 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/30
+ description CHVPKCSL-C1297 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,501,800,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 130 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/31
+ description CHVPKCSL-C1357 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 131 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/1/32
+ description CHVPKRM1 Te3/5
+ no switchport
+ no ip address
+ ip pim dr-priority 0
+ ip pim sparse-mode
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port
+ udld port enable bi-directional
+ channel-group 11 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/1
+ description CHVPKCSL-C2081 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 132 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/2
+ description CHVPKCSL-C2221 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 133 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/3
+ description CHVPKCSL-C2297 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 134 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/4
+ description CHVPKCSL-C2357 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 135 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/5
+ description CHVPKDSL-D1079 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 136 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/6
+ description CHVPKDSL-D1219 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 137 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/7
+ description CHVPKDSL-D1297 Te1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 138 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/8
+ description CHVPKDSL-D1359 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 139 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/9
+ description CHVPKDSL-D2083 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 140 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/10
+ description CHVPKDSL-D2221 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 141 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/11
+ description CHVPKDSL-D2297 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 142 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/12
+ description CHVPKDSL-D2359 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 143 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/13
+ description CHVPKESL-E1409-1 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 144 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/14
+ description CHVPKESL-E1481-1 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 145 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/15
+ description CHVPKESL-E1033-1 Te1/0/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 146 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/16
+ description CHVPKESL-E1145-1 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 147 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/17
+ description CHVPKESL-E1409-2 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 148 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/18
+ description CHVPKESL-E1481-2 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 149 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/19
+ description CHVPKESL-E1033-2 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 150 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/20
+ description CHVPKESL-E1145-2 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 151 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/21
+ description CHVPKFSL-F1083
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,888,901
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 152 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/22
+ description CHVPKFSL-F1217 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,888,900
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 153 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/23
+ description CHVPKFSL-F1297
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,800,888,900
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 154 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/24
+ description CHVPKFSL-F1364
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,800,888,900
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 155 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/25
+ description CHVPKFSL-F2083
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 156 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/26
+ description CHVPKFSL-F2219
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 157 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/27
+ description CHVPKFSL-F2297
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 158 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/28
+ description CHVPKFSL-F2361 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,800,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 159 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/29
+ description CHVPKGSL-G1005 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 160 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/30
+ description CHVPKGSL-G1085 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 161 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/31
+ description CHVPKGSL-G1223 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 162 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/2/32
+ description CHVPKASL-A1261-B T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 169 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/3/1
+ description VSL Interface *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 1 mode on
+!
+interface TenGigabitEthernet1/3/2
+ description VSS Dual-Active Detection *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ dual-active fast-hello
+!
+interface TenGigabitEthernet1/3/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/8
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet1/3/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet1/3/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface mgmt0
+ ip address 146.27.65.55 255.255.255.0
+ no ip proxy-arp
+!
+interface TenGigabitEthernet1/5/1
+ description CHVPKGSL-G1361 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 163 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/5/2
+ description CHVPKGSL-G2083 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 164 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/5/3
+ description CHVPKGSL-G2221 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 165 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/5/4
+ description CHVPKGSL-G2361 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 166 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/5/5
+ description CHVPKGSL-G2005 T1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 167 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/5/6
+ description CHVPKFSL-F1301 Te1/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 96,969,970
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 179 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/5/7
+ description CHVPK-FRONTGATE  
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 186,286
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 200 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet1/5/8
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/11
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/12
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/13
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/15
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/17
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/18
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/19
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/20
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/21
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/5/22
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet1/5/23
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet1/5/24
+ description CHVPKWC-03 3504
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 178,224,228
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ shutdown
+!
+interface TenGigabitEthernet1/5/25
+ description umi possible bad port
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 178,224,228
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ shutdown
+!
+interface TenGigabitEthernet1/5/26
+ description CHVPKFA40 - Executive AV Infrastructure Inside
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 802-805,807
+!
+interface TenGigabitEthernet1/5/27
+ description CHVPKFA40 - Executive AV Network - Outside
+ no switchport
+ ip address 146.27.111.177 255.255.255.252
+ no ip proxy-arp
+ load-interval 30
+!
+interface TenGigabitEthernet1/5/28
+ description CHVPK-U-Tower
+ switchport
+ switchport mode access
+ switchport access vlan 98
+!
+interface TenGigabitEthernet1/5/29
+ description CHVPKWC-01 5520 P1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 176,224,228,777,4060,4070,4080,4090
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 5 mode on
+!
+interface TenGigabitEthernet1/5/30
+ description CHVPKWC-01HA 5520 P1
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 176,224,228,777,4060,4070,4080,4090
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 6 mode on
+!
+interface TenGigabitEthernet1/5/31
+ description VSL Interface *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 1 mode on
+!
+interface TenGigabitEthernet1/5/32
+ description CHVPKRM2 Te3/5
+ no switchport
+ no ip address
+ ip pim dr-priority 0
+ ip pim sparse-mode
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port
+ udld port enable bi-directional
+ channel-group 12 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/1
+ description CHVPKASL-A1003 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 100 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/2
+ description CHVPKASL-A1005 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,777,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 101 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/3
+ description CHVPKASL-A1155 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 102 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/4
+ description CHVPKASL-A1261 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 145,149,249,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 103 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/5
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet2/1/6
+ description CHVPKASL-A2069 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 105 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/7
+ description CHVPKASL-A2133 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-protocol lacp
+ channel-group 106 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/8
+ description CHVPKASL-A2205 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 107 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/9
+ description CHVPKASL-A2299 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 102,148,202,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 108 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/10
+ description CHVPKASL-A3069 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 109 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/11
+ description CHVPKASL-A3131 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 110 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/12
+ description CHVPKASL-A3265 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 111 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/13
+ description CHVPKASL-A3299 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 103,203,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 112 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/14
+ description CHVPKASL-A4030 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 104,204
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 113 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/15
+ description CHVPKASL-A4361 Te3/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 104,204,800,807,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 114 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/16
+ description CHVPKBSL-B1005 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 115 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/17
+ description CHVPKBSL-B1085 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 116 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/18
+ description CHVPKBSL-B1223 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 117 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/19
+ description CHVPKBSL-B1165 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 106,206
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 118 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/20
+ description CHVPKBSL-B2007 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 119 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/21
+ description CHVPKBSL-B2085 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501,800,803-805
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 121 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/22
+ description CHVPKBSL-B2223 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501,802
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 122 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/23
+ description CHVPKBSL-B2357 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 107,207,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 123 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/24
+ description CHVPKCSL-C0073 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 124 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/25
+ description CHVPKCSL-C0217 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 125 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/26
+ description CHVPKCSL-C0297 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 126 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/27
+ description CHVPKCSL-C0357 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 110,210,800,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 127 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/28
+ description CHVPKCSL-C1081 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 128 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/29
+ description CHVPKCSL-C1221 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 129 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/30
+ description CHVPKCSL-C1297 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,501,800,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 130 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/31
+ description CHVPKCSL-C1357 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 111,211,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 131 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/1/32
+ description CHVPKRM1 Te3/6
+ no switchport
+ no ip address
+ ip pim dr-priority 0
+ ip pim sparse-mode
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port
+ udld port enable bi-directional
+ channel-group 11 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/1
+ description CHVPKCSL-C2081 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 132 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/2
+ description CHVPKCSL-C2221 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 133 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/3
+ description CHVPKCSL-C2297 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 134 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/4
+ description CHVPKCSL-C2357 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 112,212,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 135 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/5
+ description CHVPKDSL-D1079 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 136 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/6
+ description CHVPKDSL-D1219 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 137 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/7
+ description CHVPKDSL-D1297 Te2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 138 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/8
+ description CHVPKDSL-D1359 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 116,216,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 139 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/9
+ description CHVPKDSL-D2083 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 140 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/10
+ description CHVPKDSL-D2221 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 141 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/11
+ description CHVPKDSL-D2297 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 142 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/12
+ description CHVPKDSL-D2359 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 117,217,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 143 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/13
+ description CHVPKESL-E1409-1 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 144 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/14
+ description CHVPKESL-E1481-1 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 145 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/15
+ description CHVPKESL-E1033-1 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 146 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/16
+ description CHVPKESL-E1145-1 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 121,221,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 147 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/17
+ description CHVPKESL-E1409-2 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 148 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/18
+ description CHVPKESL-E1481-2 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 149 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/19
+ description CHVPKESL-E1033-2 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 150 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/20
+ description CHVPKESL-E1145-2 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 122,222
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 151 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/21
+ description CHVPKFSL-F1083
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,888,901
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 152 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/22
+ description CHVPKFSL-F1217 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,888,900
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 153 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/23
+ description CHVPKFSL-F1297 Te2/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,800,888,900
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 154 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/24
+ description CHVPKFSL-F1364
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 126,226,501,800,888,900
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 155 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/25
+ description CHVPKFSL-F2083
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 156 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/26
+ description CHVPKFSL-F2219
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 157 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/27
+ description CHVPKFSL-F2297
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 158 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/28
+ description CHVPKFSL-F2361
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 127,146,227,246,800,888
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 159 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/29
+ description CHVPKGSL-G1005 T2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 160 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/30
+ description CHVPKGSL-G1085 T2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 161 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/31
+ description CHVPKGSL-G1223 T2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 162 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/2/32
+ description CHVPKASL-A1261-B T1/1/4
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 101,201,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 169 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/3/1
+ description VSS Dual-Active Detection *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 2 mode on
+!
+interface TenGigabitEthernet2/3/2
+ description VSS Dual-Active Detection *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ dual-active fast-hello
+!
+interface TenGigabitEthernet2/3/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/8
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet2/3/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet2/3/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/1
+ description CHVPKGSL-G1361 T2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 131,231,501
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 163 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/5/2
+ description CHVPKGSL-G2083 T2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 164 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/5/3
+ description CHVPKGSL-G2221 T2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232,800
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 165 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/5/4
+ description CHVPKGSL-G2361 T2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 166 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/5/5
+ description CHVPKGSL-G2005 T2/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 132,232
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 167 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/5/6
+ description CHVPKFSL-F1301 Te1/0/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 96,969,970
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 179 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/5/7
+ description CHVPK-FRONTGATE  
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 186,286
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 200 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface TenGigabitEthernet2/5/8
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/11
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/12
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/13
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/14
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/15
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/16
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/17
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/18
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/19
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/20
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/21
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/22
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet2/5/23
+ no switchport
+ no ip address
+!
+interface TenGigabitEthernet2/5/24
+ switchport
+ switchport mode access
+ switchport access vlan 888
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+!
+interface TenGigabitEthernet2/5/25
+ description CHVPKWC-03 3504
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 178,224,228
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ shutdown
+!
+interface TenGigabitEthernet2/5/26
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/27
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/28
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/5/29
+ description CHVPKWC-01 5520 P2
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 176,224,228,777,4060,4070,4080,4090
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 5 mode on
+!
+interface TenGigabitEthernet2/5/30
+ description CHVPKWC-01HA 5520 P2
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 176,224,228,777,4060,4070,4080,4090
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port enable bi-directional
+ channel-group 6 mode on
+!
+interface TenGigabitEthernet2/5/31
+ description VSS Dual-Active Detection *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 2 mode on
+!
+interface TenGigabitEthernet2/5/32
+ description CHVPKRM2 Te3/6
+ no switchport
+ no ip address
+ ip pim dr-priority 0
+ ip pim sparse-mode
+ logging event link-status
+ logging event bundle-status
+ load-interval 60
+ udld port
+ udld port enable bi-directional
+ channel-group 12 mode active
+ service-policy type lan-queuing output cos-queueing
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan48
+ description *** Bldg-X  1st floor ***
+ no ip address
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ shutdown
+!
+interface Vlan96
+ description 146.27.96.0/24.F1050.Lab
+ ip address 146.27.96.1 255.255.255.0
+ ip helper-address 146.36.175.232
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.66.35
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan98
+ description *** Bldg-U Tower ***
+ ip address 144.5.132.189 255.255.255.248
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan101
+ description *** Bldg-A 1st floor ***
+ ip address 146.27.2.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 146.27.69.212
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan102
+ description *** Bldg-A 2nd floor ***
+ ip address 146.27.4.1 255.255.254.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan103
+ description *** Bldg-A 3rd floor ***
+ ip address 146.27.6.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan104
+ description *** Bldg-A 4th floor ***
+ ip address 146.27.90.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan106
+ description *** Bldg-B 1st floor ***
+ ip dhcp relay information trusted
+ ip address 146.27.136.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan107
+ description *** Bldg-B 2nd floor ***
+ ip dhcp relay information trusted
+ ip address 146.27.138.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan110
+ description *** Bldg-C Basement floor ***
+ ip address 146.27.47.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan111
+ description *** Bldg-C 1st floor ***
+ ip address 146.27.15.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan112
+ description *** Bldg-C 2nd floor ***
+ ip address 146.27.139.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan116
+ description *** Bldg-D 1st floor ***
+ ip address 146.27.174.1 255.255.254.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan117
+ description Bldg-D 2nd floor
+ ip address 146.27.21.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan121
+ description *** Bldg-E  1st floor ***
+ ip address 146.27.112.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan122
+ description *** Bldg-E  2nd floor ***
+ ip address 146.27.113.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan126
+ description *** Bldg-F 1st floor ***
+ ip address 146.27.26.1 255.255.254.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan127
+ description *** Bldg-F 2nd floor ***
+ ip address 146.27.86.1 255.255.254.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan131
+ description *** Bldg-G 1st floor ***
+ ip address 146.27.40.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan132
+ description Bldg-G 2st floor
+ ip address 146.27.42.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan145
+ description *** Bldg-A NVR***
+ ip address 146.27.41.1 255.255.255.0
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan146
+ description NST IP subnet for F2083 
+ ip address 146.27.80.1 255.255.254.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan148
+ description *** Bldg-A 2nd floor Treasury ***
+ ip address 146.27.116.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan149
+ description *** Bldg-A 1st floor ***
+ ip address 146.27.3.193 255.255.255.192
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.93
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan176
+ description CHVPKRL1WLAN.MGMT
+ ip address 146.27.141.177 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan178
+ description CHVPKRL1WLAN.MGMT.HL
+ ip address 146.27.141.249 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ shutdown
+!
+interface Vlan186
+ description *** FRONTGATE ***
+ ip address 146.27.3.129 255.255.255.224
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan201
+ description *** VOIP Bldg-A 1st floor ***
+ ip address 146.34.192.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan202
+ description *** VOIP Bldg-A 2nd floor ***
+ ip address 146.34.193.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan203
+ description *** VOIP Bldg-A 3rd floor ***
+ ip address 146.34.194.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan204
+ description *** VOIP Bldg-A 4th floor ***
+ ip address 146.34.195.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan206
+ description *** VOIP Bldg-B 1st floor ***
+ ip address 146.34.196.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan207
+ description *** VOIP Bldg-B 2nd floor ***
+ ip address 146.34.197.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan210
+ description *** VOIP Bldg-C Basement ***
+ ip address 146.34.198.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan211
+ description *** VOIP Bldg-C 1st floor ***
+ ip address 146.34.199.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan212
+ description *** VOIP Bldg-C 2nd floor ***
+ ip address 146.34.200.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan216
+ description *** VOIP Bldg-D 1st floor ***
+ ip address 146.34.201.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan217
+ description VOIP Bldg-G 2nd floor
+ ip address 146.34.202.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan221
+ description *** VOIP Bldg-E 1st floor ***
+ ip address 146.34.203.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan222
+ description *** VOIP Bldg-E 2nd floor ***
+ ip address 146.34.204.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan224
+ description RL1WLAN.Business
+ ip address 146.27.224.1 255.255.252.0
+ ip helper-address 146.27.66.36
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan226
+ description *** VOIP Bldg-F 1st floor ***
+ ip address 146.34.176.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan227
+ description *** VOIP Bldg-F 2nd floor ***
+ ip address 146.34.177.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan228
+ description RL1WLAN.Business
+ ip address 146.27.228.1 255.255.252.0
+ ip helper-address 146.27.66.36
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan231
+ description *** VOIP Bldg-G 1st floor ***
+ ip address 146.34.178.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan232
+ description VOIP Bldg-G 2nd floor
+ ip address 146.34.179.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ ip helper-address 146.27.72.87
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan248
+ description *** Bldg-E  2nd floor ***
+ ip address 146.34.204.1 255.255.255.0
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ shutdown
+!
+interface Vlan286
+ description *** VOIP Frontgate ***
+ ip address 146.34.187.225 255.255.255.240
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan501
+ description BLDG A - G cameras
+ ip address 146.27.8.1 255.255.255.0
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan800
+ description *** CBRES-METASYS ***
+ ip address 172.31.44.1 255.255.255.128
+ ip access-group CBRES-METASYS out
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan888
+ description Wired Guest access
+ vrf forwarding L3CVX-GUEST
+ ip address 10.210.63.1 255.255.255.128
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ service-policy output POLICE-400MEG
+!
+interface Vlan900
+ description *** Bldg-F 1st floor FORENSICS***
+ ip dhcp relay information trusted
+ ip address 146.27.141.1 255.255.255.128
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan901
+ description *** Bldg-F 1st floor Data LAB ****
+ ip address 146.27.7.225 255.255.255.224
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan969
+ description *** Bldg-F 1301 NA Lab ****
+ ip address 146.27.69.161 255.255.255.224
+ ip helper-address 146.27.66.36
+ ip helper-address 146.27.72.87
+ ip helper-address 136.171.184.187
+ ip helper-address 146.27.72.118
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4060
+ description WLAN-L3CVX-GUEST
+ vrf forwarding L3CVX-GUEST
+ ip address 10.160.0.1 255.255.240.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Vlan4070
+ description WLAN-L3CVX-IND
+ vrf forwarding L3CVX-IND
+ ip address 10.178.0.1 255.255.248.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Vlan4080
+ description WLAN-L3CVX-USER
+ vrf forwarding L3CVX-USER
+ ip address 10.168.0.1 255.255.224.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Vlan4090
+ description WLAN-L3CVX-DEVICES
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.176.0.1 255.255.248.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+!
+router eigrp 109
+ !
+ address-family ipv4 vrf L3CVX-IND autonomous-system 884
+  default-metric 10000 10 255 1 1500
+  network 10.178.0.0 0.0.7.255
+  network 10.190.1.0 0.0.0.63
+  passive-interface default
+  no passive-interface Port-channel11.3402
+  no passive-interface Port-channel12.3502
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-USER autonomous-system 882
+  default-metric 10000 10 255 1 1500
+  network 10.168.0.0 0.0.31.255
+  network 10.186.1.0 0.0.0.63
+  passive-interface default
+  no passive-interface Port-channel11.3403
+  no passive-interface Port-channel12.3503
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-DEVICES autonomous-system 886
+  default-metric 10000 10 255 1 1500
+  network 10.176.0.0 0.0.7.255
+  network 10.188.1.0 0.0.0.63
+  passive-interface default
+  no passive-interface Port-channel11.3404
+  no passive-interface Port-channel12.3504
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-GUEST autonomous-system 888
+  default-metric 10000 10 255 1 1500
+  network 10.160.0.0 0.0.15.255
+  network 10.184.1.0 0.0.0.63
+  network 10.210.63.0 0.0.0.127
+  passive-interface default
+  no passive-interface Port-channel11.3401
+  no passive-interface Port-channel12.3501
+ exit-address-family
+ network 144.5.0.0
+ network 146.27.0.0
+ network 146.34.0.0
+ network 172.31.44.0 0.0.0.255
+ redistribute static metric 1500 1 255 1 1500 route-map static2eigrp
+ passive-interface default
+ no passive-interface Port-channel11
+ no passive-interface Port-channel11.980
+ no passive-interface Port-channel12
+ no passive-interface Port-channel12.982
+ nsf
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip forward-protocol udp 5246
+ip forward-protocol udp 5247
+ip forward-protocol udp 12222
+ip forward-protocol udp 12223
+no ip http server
+no ip http secure-server
+!
+ip tftp source-interface Loopback0
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim register-source Loopback0
+ip route profile
+ip route 146.27.69.160 255.255.255.224 Null0 250 name Next.hop.of.last.resort-Bldg-F1301.NA.Lab
+ip route 146.27.109.64 255.255.255.248 146.27.47.14 name Cbres-asa5512x
+ip route 146.27.109.72 255.255.255.248 146.27.47.15 name Cbres-tasa5512x
+ip route 146.27.110.212 255.255.255.252 Null0 250 name Next.hop.of.last.resort-Flab-SRX650
+ip route 146.27.111.112 255.255.255.252 Null0 250 name Next.hop.of.last.resort-chvpkfa4t.g0/0
+ip route 146.27.111.116 255.255.255.252 Null0 250 name Next.hop.of.last.resort-NST.Bldg-F.Lab.Junipers.Firewall
+ip route 146.27.111.176 255.255.255.252 Null0 250 name Next.hop.of.last.resort-Executive_A/V
+ip route 146.27.182.96 255.255.255.240 146.27.111.178 name Executive_A/V
+ip route 146.27.182.112 255.255.255.240 146.27.111.178 name Executive_A/V
+ip route 146.27.182.128 255.255.255.240 146.27.111.178 name Executive_A/V
+ip route 146.27.182.192 255.255.255.240 146.27.111.178 name Executive_A/V
+ip route 146.27.182.208 255.255.255.240 146.27.111.178 name Executive_A/V
+ip route 146.27.182.224 255.255.255.224 146.27.111.178 name Executive_A/V
+ip route 146.34.3.0 255.255.255.0 146.27.69.170 name LAB-F1301-FW1
+ip route vrf management 0.0.0.0 0.0.0.0 146.27.65.1
+ip ssh rsa keypair-name CHVPKRL1.chvpk.chevron.net
+ip ssh logging events
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-boundary-site-campus
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-boundary-site-campus-high
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark High-Speed WAN
+ deny   239.194.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+ permit 224.0.0.0 7.255.255.255
+!
+ip access-list extended CBRES-METASYS
+ permit ip host 146.36.80.240 172.31.40.0 0.0.7.255
+ permit ip host 134.248.29.7 172.31.40.0 0.0.7.255
+ permit ip host 134.248.80.138 172.31.40.0 0.0.7.255
+ permit ip host 146.46.130.145 172.31.40.0 0.0.7.255
+ permit ip host 146.46.132.55 172.31.40.0 0.0.7.255
+ permit ip host 146.46.132.53 172.31.40.0 0.0.7.255
+ permit ip 136.171.124.0 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 146.27.3.160 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 172.31.40.0 0.0.3.255 172.31.40.0 0.0.7.255
+ permit ip 172.31.44.0 0.0.3.255 172.31.40.0 0.0.7.255
+ deny   ip any any
+ip access-list extended acl-copp-match-igmp
+ permit igmp any any
+ip access-list extended acl-copp-match-pim-data
+ deny   pim any host 224.0.0.13
+ permit pim any any
+!
+!
+ip prefix-list static2eigrp seq 25 permit 146.27.114.0/24
+ip prefix-list static2eigrp seq 53 permit 146.27.182.96/28
+ip prefix-list static2eigrp seq 54 permit 146.27.182.112/28
+ip prefix-list static2eigrp seq 55 permit 146.27.182.128/28
+ip prefix-list static2eigrp seq 56 permit 146.27.182.192/28
+ip prefix-list static2eigrp seq 57 permit 146.27.182.208/28
+ip prefix-list static2eigrp seq 58 permit 146.27.182.224/27
+ip prefix-list static2eigrp seq 90 permit 146.34.3.0/24
+ip prefix-list static2eigrp seq 95 permit 192.165.218.93/32
+ip prefix-list static2eigrp seq 100 permit 192.165.218.94/32
+ip prefix-list static2eigrp seq 105 permit 192.165.218.130/32
+ip prefix-list static2eigrp seq 110 permit 146.27.109.64/29
+ip prefix-list static2eigrp seq 115 permit 146.27.109.72/29
+ip prefix-list static2eigrp seq 120 permit 146.27.196.0/24
+ip prefix-list static2eigrp seq 125 permit 146.27.197.0/25
+logging source-interface Loopback0
+logging host 134.248.81.53
+logging host 146.38.53.162
+logging host 146.36.114.214
+logging host 146.36.112.24 transport udp port 9995
+logging host 139.65.140.24
+logging host 139.65.140.25
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+route-map static2eigrp permit 10
+ match ip address prefix-list static2eigrp
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location CHVPKH / 6001 Bollinger Canyon Rd, San Ramon, California / USA / Americas/US-NA-Utility-Campus-Metro/Criticality-High
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps transceiver all
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps vswitch vsl
+snmp-server enable traps config
+snmp-server enable traps ipmulticast
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps rf
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+snmp mib notification-log globalsize 15000
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+!
+ipv6 access-list acl-copp-match-mld
+ permit icmp any any mld-report
+ permit icmp any any mld-query
+ permit icmp any any mld-reduction
+ permit icmp any any 143
+!
+ipv6 access-list acl-copp-match-ndv6
+ permit icmp any any nd-na
+ permit icmp any any nd-ns
+ permit icmp any any router-advertisement
+ permit icmp any any router-solicitation
+ permit icmp any any redirect
+!
+ipv6 access-list acl-copp-match-ndv6hl
+ permit icmp any any nd-na hoplimit
+ permit icmp any any nd-ns hoplimit
+ permit icmp any any router-advertisement hoplimit
+ permit icmp any any router-solicitation hoplimit
+ permit icmp any any redirect hoplimit
+!
+ipv6 access-list acl-copp-match-pimv6-data
+ deny 103 any host FF02::D
+ permit 103 any any
+!
+control-plane
+ service-policy input policy-default-autocopp
+!
+!
+banner exec ^CC
+****************************************************
+WARNING:
+This is an External Access Router connecting Chevron
+to 3rd Party, Joint Venture or Partner networks. Any
+changes to Access Control Lists, or New connections
+to this router must be approved by the ITC Network
+Security Team.
+****************************************************^C
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ login authentication CONSOLE
+ transport preferred none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output all
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output none
+!
+!
+monitor session 1 type capture
+ source interface Po108
+!
+!
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+diagnostic bootup level complete
+!
+!
+module provision switch 1
+ slot 1 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 17
+ slot 2 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 18
+ slot 3 slot-type 400 port-type 60 number 8 port-type 113 number 2 port-type 60 number 8 port-type 113 number 2  virtual-slot 19
+ slot 5 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 21
+ !
+module provision switch 2
+ slot 1 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 33
+ slot 2 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 34
+ slot 3 slot-type 400 port-type 60 number 8 port-type 113 number 2 port-type 60 number 8 port-type 113 number 2  virtual-slot 35
+ slot 5 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 37
+ 
+!
+
+end

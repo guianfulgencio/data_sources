@@ -1,0 +1,782 @@
+Building configuration...
+
+Current configuration : 21695 bytes
+!
+! Last configuration change at 07:43:24 CDT Fri Jun 16 2023 by admin
+! NVRAM config last updated at 07:43:59 CDT Fri Jun 16 2023 by svc-voy-ansible
+!
+version 16.6
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+no platform punt-keepalive disable-kernel-core
+!
+hostname HOU150-ETC-09VV82-MS42
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging snmp-authfail
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Vlan3218
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CST -6 0
+clock summer-time CDT recurring
+switch 1 provision c9300-48u
+!
+!
+!
+!
+no ip source-route
+ip routing
+!
+ip name-server 146.36.80.34
+ip domain name hou150.chevrontexaco.net
+!
+!
+!
+login on-failure log
+login on-success log
+!
+!
+!
+!
+!
+vtp mode off
+udld enable
+
+cpp system-default
+!
+crypto pki trustpoint TP-self-signed-1116743822
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1116743822
+ revocation-check none
+ rsakeypair TP-self-signed-1116743822
+!
+crypto pki trustpoint TP-self-signed-1700989952
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1700989952
+ revocation-check none
+ rsakeypair TP-self-signed-1700989952
+!
+!
+crypto pki certificate chain TP-self-signed-1116743822
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31313136 37343338 3232301E 170D3138 31323133 32313437 
+  32335A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 31313637 
+  34333832 32308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100CA28 F21D18D3 D49CFB84 D3B4FC87 316210FB E4AB4728 FDB6ABE4 
+  22A5C539 641B9B5C E36ABFDB F1D9CB2E 5C4EB152 4B2612BD 35459D01 39BFB668 
+  2474BD52 23DD3470 79CD5364 3EFB999D 70A72002 7DD0689F 0800B7C9 29AC85F5 
+  3434A772 59126754 B9DF95B3 D4A21DA8 751E6F81 7C776445 9202F15B 0CEB0288 
+  260FCC99 36FB299B 10E0F430 085F013B 9AD0CFAD 2226E438 B4FB384C 2323989B 
+  4D06103D 7AA992CE 3630F17E 419451FB 3E11F754 A111AD80 6A2D4251 1E29EBAE 
+  2E23BF99 EC105AFA D0D138FE D2DF4D7A BC385209 B7CC3450 0F7F3E23 9247170B 
+  AEC14AF5 DD9762A4 FB4D61EB DF1420C0 821119E5 9CD107A9 E657E7F5 93A4455A 
+  CC20C3F9 79310203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 1422BA12 CF698258 3551FACD D3468F13 8385BFF1 
+  02301D06 03551D0E 04160414 22BA12CF 69825835 51FACDD3 468F1383 85BFF102 
+  300D0609 2A864886 F70D0101 05050003 82010100 65AA5892 CD2FE906 D50046EC 
+  77E28E1A 3A5AB1E6 744DA9A2 6557B585 5F5CFD2D 021EE387 4403DB2A ED9BCAFD 
+  3193DAEB 4647F212 A24D0DA0 14CD142A 5876B9AB AEA06B90 C2156BAC DA9C75CF 
+  13B1FCC3 10D14B1D 29AA0069 DAD8B1A2 484EFF6C 729722C3 A8025FA9 AA9E0037 
+  4AAA27CB 9BAEBF3D 3291202E DF4EDA8A 93A3CED4 7885B678 202D4F0F 23DD1BD0 
+  543F9D67 6FB2AE7E CEAB34CB 5604A3AC 9FA08327 6BFAB455 596492AA B03423C1 
+  7DACA8D3 0598CB05 21844594 81E882DD 1059FDA7 D1225BCE A514AD90 5AD1FA56 
+  ECF4D130 405AC831 7D1F8B81 6417178C 30BF62F7 2B012737 ADC2977F 448CC1AD 
+  CE9C8982 47E69E61 FD106357 0DBCFDE0 BFF9AE4C
+  	quit
+crypto pki certificate chain TP-self-signed-1700989952
+!
+!
+!
+diagnostic bootup level minimal
+spanning-tree mode rapid-pvst
+spanning-tree logging
+spanning-tree extend system-id
+archive
+ path flash:cvx_134030
+ maximum 5
+errdisable recovery cause udld
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause sfp-config-mismatch
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause port-mode-failure
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause pppoe-ia-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause inline-power
+errdisable recovery cause arp-inspection
+errdisable recovery cause loopback
+errdisable recovery cause psp
+errdisable recovery interval 30
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode sso
+!
+!
+vlan 2003
+ name 10.7.184.0/21
+!
+vlan 2005
+ name 10.7.192.0/21.HPC.Other.Pod1
+!
+vlan 2007
+ name 10.7.160.0/21.HPC.Other.Pod2
+!
+vlan 3218
+ name 134.248.213.0/24.OOB.ETC.HPC
+!
+!
+class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data, LOGGING
+class-map match-any system-cpp-default
+  description DHCP Snooping, EWLC control, EWCL data 
+class-map match-any system-cpp-police-sys-data
+  description Learning cache ovfl, Crypto Control, Exception, EGR Exception, NFL SAMPLED DATA, Gold Pkt, RPF Failed
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-multicast
+  description Transit Traffic and MCAST Data
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+  description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual
+class-map match-any system-cpp-police-control-low-priority
+  description General punt
+class-map match-any non-client-nrt-class
+class-map match-any system-cpp-police-routing-control
+  description Routing control
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+!
+policy-map system-cpp-policy
+ class system-cpp-police-data
+  police rate 600 pps
+ class system-cpp-police-sys-data
+  police rate 100 pps
+ class system-cpp-police-sw-forward
+  police rate 1000 pps
+ class system-cpp-police-multicast
+  police rate 500 pps
+ class system-cpp-police-multicast-end-station
+  police rate 2000 pps
+ class system-cpp-police-punt-webauth
+  police rate 1000 pps
+ class system-cpp-police-l2-control
+  police rate 2000 pps
+ class system-cpp-police-stackwise-virt-control
+  police rate 8000 pps
+ class system-cpp-police-routing-control
+  police rate 5400 pps
+ class system-cpp-police-control-low-priority
+  police rate 200 pps
+ class system-cpp-police-l2lvx-control
+  police rate 1000 pps
+ class system-cpp-police-topology-control
+  police rate 13000 pps
+ class system-cpp-police-dot1x-auth
+  police rate 1000 pps
+ class system-cpp-police-protocol-snooping
+  police rate 2000 pps
+ class system-cpp-police-forus
+  police rate 1000 pps
+ class system-cpp-default
+  police rate 1000 pps
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel1
+ description HOU150-09MDA-M79-MR03
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ no ip address
+ shutdown
+ speed 1000
+ negotiation auto
+!
+interface GigabitEthernet1/0/1
+ description 9WW87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/2
+ description 9WW87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/3
+ description 9WW87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/4
+ description 9WW87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/5
+ description 9WW87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/6
+ description 9WW87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/7
+ description 9YY87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/8
+ description 9YY87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/9
+ description 9YY87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/10
+ description 9YY87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/11
+ description 9YY87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/12
+ description 9YY87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/13
+ description 9AAA87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/14
+ description 9AAA87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/15
+ description 9AAA87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/16
+ description 9AAA87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/17
+ description 9AAA87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/18
+ description 9AAA87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/19
+ description 9BBB87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/20
+ description 9BBB87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/21
+ description 9BBB87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/22
+ description 9BBB87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/23
+ description 9BBB87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/24
+ description 9BBB87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+!
+interface GigabitEthernet1/0/25
+ description 9CCC87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+!
+interface GigabitEthernet1/0/26
+ description 9CCC87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/27
+ description 9CCC87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/28
+ description 9CCC87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/29
+ description 9CCC87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/30
+ description 9CCC87 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/31
+ description 9XX90 Chassis 1 OA1
+ switchport access vlan 2005
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/32
+ description 9XX90 Chassis 1 OA2
+ switchport access vlan 2005
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/33
+ description 9XX90 Chassis 2 OA1
+ switchport access vlan 2005
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/34
+ description 9XX90 Chassis 2 OA2
+ switchport access vlan 2005
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/35
+ description 9XX90 Chassis 3 OA1
+ switchport access vlan 2005
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/36
+ description 9XX90 Chassis 3 OA2
+ switchport access vlan 2005
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/37
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/38
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/39
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/40
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/41
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/42
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/43
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/44
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/45
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/46
+ description 9VV90 Server iLO
+ switchport access vlan 2007
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/47
+ description HOU150-ETC-09VV82B-RU32-HPC  Mgmt
+ switchport access vlan 3218
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/48
+ description HOU150-ETC-09VV82D-RU23-HPC  Mgmt
+ switchport access vlan 3218
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet1/1/1
+ description HOU150-09MDA-M79-MR03 gig 1/1/67
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface GigabitEthernet1/1/2
+ description HOU150-09MDA-M79-MR03 gig 2/1/67
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface GigabitEthernet1/1/3
+!
+interface GigabitEthernet1/1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface TenGigabitEthernet1/1/1
+!
+interface TenGigabitEthernet1/1/2
+!
+interface TenGigabitEthernet1/1/3
+!
+interface TenGigabitEthernet1/1/4
+!
+interface TenGigabitEthernet1/1/5
+!
+interface TenGigabitEthernet1/1/6
+!
+interface TenGigabitEthernet1/1/7
+!
+interface TenGigabitEthernet1/1/8
+!
+interface FortyGigabitEthernet1/1/1
+!
+interface FortyGigabitEthernet1/1/2
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan3218
+ ip address 134.248.213.142 255.255.255.0
+ no ip proxy-arp
+!
+ip default-gateway 134.248.213.1
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip tcp path-mtu-discovery
+ip telnet source-interface Vlan3218
+no ip http server
+no ip http secure-server
+ip tftp source-interface Vlan3218
+ip route 0.0.0.0 0.0.0.0 134.248.213.1 250 name OOB.ETC.HPC
+ip ssh source-interface Vlan3218
+ip ssh version 2
+ip scp server enable
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+logging history size 10
+logging source-interface Vlan3218
+logging host 146.27.95.122
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Vlan3218
+snmp-server location HOU150 / 1500 Louisiana St, Houston, Texas / USA / Americas /US-ETC-NA-Utility-Data-center/Criticality-Low
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps license
+snmp-server enable traps memory bufferpeak
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps ipmulticast
+snmp-server enable traps transceiver all
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner login ^CCC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ length 0
+ transport preferred ssh
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred ssh
+ transport input ssh
+!
+ntp source Vlan3218
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+mac address-table aging-time 14400
+wsma agent exec
+!
+wsma agent config
+!
+wsma agent filesys
+!
+wsma agent notify
+!
+!
+end

@@ -1,0 +1,13 @@
+! SNMP configuration
+! Variables
+! {{snmp_config}} = dictionary of SNMP servers receiving config trap only
+! {{snmp_nms}} = dictionary of SNMP servers receiving full set of traps
+! Each dictionary has a server_ip and server_username variable
+!
+{% for snmp_server in snmp_config %}
+snmp-server host {{ snmp_server.server_ip }} version 3 priv {{snmp_server.username }} config
+{% endfor  %}
+!
+{% for snmp_server in snmp_nms %}
+snmp-server host {{ snmp_server.server_ip }} version 3 priv {{snmp_server.username }}
+{% endfor  %}

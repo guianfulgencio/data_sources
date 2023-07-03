@@ -1,0 +1,402 @@
+[
+  {
+    "Device Name": "ASAswppal-C9200.asai.chevrontexaco.net",
+    "IP Address": "146.39.38.130"
+  },
+  {
+    "Device Name": "BCHVGA6.BCH.chevrontexaco.net",
+    "IP Address": "146.41.168.9"
+  },
+  {
+    "Device Name": "BCOSL17.BCO.chevrontexaco.net",
+    "IP Address": "146.35.3.232"
+  },
+  {
+    "Device Name": "BCOSL19.BCO.chevrontexaco.net",
+    "IP Address": "146.35.3.235"
+  },
+  {
+    "Device Name": "BCOSL20.BCO.chevrontexaco.net",
+    "IP Address": "146.35.3.236"
+  },
+  {
+    "Device Name": "BCOSL21.BCO.chevrontexaco.net",
+    "IP Address": "146.35.3.237"
+  },
+  {
+    "Device Name": "BCOVG1.bco.chevrontexaco.net",
+    "IP Address": "146.35.3.253"
+  },
+  {
+    "Device Name": "BDOrv1-IPT.bdo.chevrontexaco.net",
+    "IP Address": "146.34.12.254"
+  },
+  {
+    "Device Name": "BDOVG10CEMC.BDO.chevrontexaco.net",
+    "IP Address": "146.34.25.10"
+  },
+  {
+    "Device Name": "BK9525VG31.bk9525.chevrontexaco.net",
+    "IP Address": "146.34.40.16"
+  },
+  {
+    "Device Name": "BOGaswBOD-2960.bog.chevrontexaco.net",
+    "IP Address": "146.39.35.30"
+  },
+  {
+    "Device Name": "BOGVG224.bog.chevrontexaco.net",
+    "IP Address": "146.41.225.125"
+  },
+  {
+    "Device Name": "BRPVGA2.brp.chevrontexaco.net",
+    "IP Address": "146.41.155.231"
+  },
+  {
+    "Device Name": "BRPVGA3.brp.chevrontexaco.net",
+    "IP Address": "146.41.155.232"
+  },
+  {
+    "Device Name": "BUE355SL00.bue355.chevrontexaco.net",
+    "IP Address": "146.39.15.4"
+  },
+  {
+    "Device Name": "BUEVENrt1.bueven.chevrontexaco.net",
+    "IP Address": "146.39.37.239"
+  },
+  {
+    "Device Name": "CA-AB-CAL-VG02.cal.chevrontexaco.net",
+    "IP Address": "146.34.19.67"
+  },
+  {
+    "Device Name": "CA-AB-CAL-VG03.cal.chevrontexaco.net",
+    "IP Address": "146.34.19.68"
+  },
+  {
+    "Device Name": "CA-AB-CAL-VG04.cal.chevrontexaco.net",
+    "IP Address": "146.34.19.69"
+  },
+  {
+    "Device Name": "CAIrt1.cai.chevrontexaco.net",
+    "IP Address": "146.39.39.125"
+  },
+  {
+    "Device Name": "CAR110RA2.CAR110.chevrontexaco.net",
+    "IP Address": "144.5.196.211"
+  },
+  {
+    "Device Name": "CHVPKAVG-A2069.chvpk.chevrontexaco.net",
+    "IP Address": "146.34.193.5"
+  },
+  {
+    "Device Name": "CHVPKGVG-G1085.chvpk.chevrontexaco.net",
+    "IP Address": "146.34.178.5"
+  },
+  {
+    "Device Name": "CHVPK-H2CR-R628-MR07A.gmn0.chevron.net",
+    "IP Address": "146.27.65.1"
+  },
+  {
+    "Device Name": "CHVPKLVG-L2349.chvpk.chevrontexaco.net",
+    "IP Address": "146.34.213.5"
+  },
+  {
+    "Device Name": "CHVPKRL2.chvpk.chevrontexaco.net",
+    "IP Address": "139.65.240.222"
+  },
+  {
+    "Device Name": "CHVPKRL2.chvpk.chevrontexaco.net",
+    "IP Address": "146.27.111.253"
+  },
+  {
+    "Device Name": "CHVPKTVG-T0075.chvpk.chevrontexaco.net",
+    "IP Address": "146.34.216.6"
+  },
+  {
+    "Device Name": "CHVPKTVG-T1349.chvpk.chevrontexaco.net",
+    "IP Address": "146.34.217.5"
+  },
+  {
+    "Device Name": "CHVPKTVG-T3349.chvpk.chevrontexaco.net",
+    "IP Address": "146.34.219.5"
+  },
+  {
+    "Device Name": "CHVPKVVG-V1309.chvpk.chevrontexaco.net",
+    "IP Address": "146.34.221.5"
+  },
+  {
+    "Device Name": "CLBasw-ppal-2.clb.chevrontexaco.net",
+    "IP Address": "146.39.34.112"
+  },
+  {
+    "Device Name": "CLGABCOSL1.F06049.chevrontexaco.net",
+    "IP Address": "146.35.246.1"
+  },
+  {
+    "Device Name": "CLGARA1-IPT.clga.chevrontexaco.net",
+    "IP Address": "146.34.85.4"
+  },
+  {
+    "Device Name": "CLGAVG1-IPT.clga.chevrontexaco.net",
+    "IP Address": "146.34.85.5"
+  },
+  {
+    "Device Name": "CLGAVG2-IPT.clga.chevrontexaco.net",
+    "IP Address": "146.34.85.6"
+  },
+  {
+    "Device Name": "COLMSRA01.COLMS.chevrontexaco.net",
+    "IP Address": "146.24.127.124"
+  },
+  {
+    "Device Name": "COV100VGA1.cov100.chevrontexaco.net",
+    "IP Address": "146.34.10.135"
+  },
+  {
+    "Device Name": "COV100VGA2.cov100.chevrontexaco.net",
+    "IP Address": "146.34.10.136"
+  },
+  {
+    "Device Name": "COV100VGA9.cov100.chevrontexaco.net",
+    "IP Address": "146.34.10.143"
+  },
+  {
+    "Device Name": "CPL594SL01.CPL594.chevrontexaco.net",
+    "IP Address": "146.46.75.2"
+  },
+  {
+    "Device Name": "CPLCL1SL01.CPLCL1.chevrontexaco.net",
+    "IP Address": "146.46.73.130"
+  },
+  {
+    "Device Name": "CPLSM1SL01.CPLSM1.chevrontexaco.net",
+    "IP Address": "146.46.74.2"
+  },
+  {
+    "Device Name": "CPLSM1SL02.CPLSM1.chevrontexaco.net",
+    "IP Address": "146.46.74.3"
+  },
+  {
+    "Device Name": "CPLSM1SL04.CPLSM1.chevrontexaco.net",
+    "IP Address": "146.46.74.5"
+  },
+  {
+    "Device Name": "CRA329VGA2.cra329.chevrontexaco.net",
+    "IP Address": "146.34.236.5"
+  },
+  {
+    "Device Name": "ELTARCSL1.eltar.chevrontexaco.net",
+    "IP Address": "146.41.211.6"
+  },
+  {
+    "Device Name": "ELTARCSL10.eltar.chevrontexaco.net",
+    "IP Address": "146.41.211.15"
+  },
+  {
+    "Device Name": "EMPSL24.EMP.chevrontexaco.net",
+    "IP Address": "146.24.76.32"
+  },
+  {
+    "Device Name": "F06052sl1.F06052.chevrontexaco.net",
+    "IP Address": "146.35.223.130"
+  },
+  {
+    "Device Name": "F06052sl2.F06052.chevrontexaco.net",
+    "IP Address": "146.35.223.135"
+  },
+  {
+    "Device Name": "F06052sl3.F06052.chevrontexaco.net",
+    "IP Address": "146.35.223.136"
+  },
+  {
+    "Device Name": "f06052vga01.bdo.chevrontexaco.net",
+    "IP Address": "146.34.25.196"
+  },
+  {
+    "Device Name": "F08946WLC10.F08946.chevrontexaco.net",
+    "IP Address": "146.39.153.11"
+  },
+  {
+    "Device Name": "GLPrt1.glp.chevrontexaco.net",
+    "IP Address": "146.39.37.84"
+  },
+  {
+    "Device Name": "HAMBMRL1.hambm.chevrontexaco.net",
+    "IP Address": "146.33.36.125"
+  },
+  {
+    "Device Name": "HOU150-ETC-09BBB55-MS47.gdc0.chevron.net",
+    "IP Address": "134.248.213.172"
+  },
+  {
+    "Device Name": "HOU150-ETC-09CCC55-MS47.gdc0.chevron.net",
+    "IP Address": "134.248.213.173"
+  },
+  {
+    "Device Name": "HOU150-ETC-09DDD55-MS47.gdc0.chevron.net",
+    "IP Address": "134.248.213.174"
+  },
+  {
+    "Device Name": "HOU150-ETC-09VV82-MS42",
+    "IP Address": "134.248.213.142"
+  },
+  {
+    "Device Name": "HOU150-ETC-09WW58-MS47.gdc0.chevron.net",
+    "IP Address": "134.248.213.161"
+  },
+  {
+    "Device Name": "HOU150-ETC-09XX55-MS47.gdc0.chevron.net",
+    "IP Address": "134.248.213.169"
+  },
+  {
+    "Device Name": "HOU150-ETC-09YY55-MS47.gdc0.chevron.net",
+    "IP Address": "134.248.213.170"
+  },
+  {
+    "Device Name": "HOU150-ETC-09YY58-MS47.gdc0.chevron.net",
+    "IP Address": "134.248.213.163"
+  },
+  {
+    "Device Name": "HOU150-ETC-09ZZ55-MS47.gdc0.chevron.net",
+    "IP Address": "134.248.213.171"
+  },
+  {
+    "Device Name": "HOU150GS3.HOU150.chevrontexaco.net",
+    "IP Address": "144.5.75.21"
+  },
+  {
+    "Device Name": "HOU150GS4.HOU150.chevrontexaco.net",
+    "IP Address": "144.5.75.22"
+  },
+  {
+    "Device Name": "hou150gs7.chevron.com",
+    "IP Address": "134.248.209.7"
+  },
+  {
+    "Device Name": "HOU150MS8P93.gmn0.chevron.net",
+    "IP Address": "146.36.9.6"
+  },
+  {
+    "Device Name": "HOU150RL1-VSS.hou150.chevrontexaco.net",
+    "IP Address": "146.36.5.249"
+  },
+  {
+    "Device Name": "HOU150RM1.hou150.chevrontexaco.newt",
+    "IP Address": "146.36.2.219"
+  },
+  {
+    "Device Name": "HOU150RM2.hou150.chevrontexaco.net",
+    "IP Address": "146.36.2.220"
+  },
+  {
+    "Device Name": "HOU150WC-TEST2.hou150.chevrontexaco.net",
+    "IP Address": "146.36.5.71"
+  },
+  {
+    "Device Name": "IQ-AR-ERV423-SL01.eRV423.chevrontexaco.net",
+    "IP Address": "146.30.85.1"
+  },
+  {
+    "Device Name": "MEDaswp2-2960-1.med.chevrontexaco.net",
+    "IP Address": "146.39.36.131"
+  },
+  {
+    "Device Name": "NA-US-VA-A-F09155-RE35.F09155.chevrontexaco.net",
+    "IP Address": "139.65.214.82"
+  },
+  {
+    "Device Name": "NOR201RA1.nor201.chevrontexaco.net",
+    "IP Address": "146.24.86.248"
+  },
+  {
+    "Device Name": "NOR201VGA1.nor201.chevrontexaco.net",
+    "IP Address": "146.41.167.4"
+  },
+  {
+    "Device Name": "PANRD1.PAN.chevrontexaco.net",
+    "IP Address": "146.39.242.241"
+  },
+  {
+    "Device Name": "PITCARA1.PITCA.chevrontexaco.net",
+    "IP Address": "146.26.88.248"
+  },
+  {
+    "Device Name": "POROR1RA2.POROR1.chevrontexaco.net",
+    "IP Address": "146.26.33.243"
+  },
+  {
+    "Device Name": "que469sm01.que469.chevrontexaxo.net",
+    "IP Address": "146.26.36.3"
+  },
+  {
+    "Device Name": "QUE469SP1.que469.chevrontexaco.net",
+    "IP Address": "146.26.36.5"
+  },
+  {
+    "Device Name": "RIC100RL1-VSS.RIC100.chevrontexaco.net",
+    "IP Address": "146.28.175.243"
+  },
+  {
+    "Device Name": "R-NBLX-CHI-ICS-DMVPN-1.nblenergy.com",
+    "IP Address": "172.28.20.1"
+  },
+  {
+    "Device Name": "R-NBLX-CHI-ICS-TRANSIT-DMVPN-1.nblenergy.com",
+    "IP Address": "172.28.254.255"
+  },
+  {
+    "Device Name": "R-NBLX-COLLIER-CGF-DMVPN-1.nblenergy.com",
+    "IP Address": "146.33.161.250"
+  },
+  {
+    "Device Name": "R-NBLX-COR-CGF-DMVPN-1.nblenergy.com",
+    "IP Address": "146.33.167.58"
+  },
+  {
+    "Device Name": "R-NBLX-LIBERTY-DMVPN-1.nblenergy.com",
+    "IP Address": "146.33.161.186"
+  },
+  {
+    "Device Name": "R-NBLX-OMICRON-ICS-DMVPN-1.nblenergy.com",
+    "IP Address": "172.28.20.2"
+  },
+  {
+    "Device Name": "R-NBLX-OMICRON-ICS-TRANSIT-DMVPN-1.nblenergy.com",
+    "IP Address": "172.28.254.254"
+  },
+  {
+    "Device Name": "R-OMEGA-ICS-DMVPN-1.nblenergy.com",
+    "IP Address": "172.20.23.25"
+  },
+  {
+    "Device Name": "R-TAM-VTI-1.nblenergy.com",
+    "IP Address": "146.30.177.209"
+  },
+  {
+    "Device Name": "SAN520SL-225A.SAN520.chevrontexaco.net",
+    "IP Address": "146.33.118.5"
+  },
+  {
+    "Device Name": "SPSRD1.SPS.chevrontexaco.net",
+    "IP Address": "146.39.69.209"
+  },
+  {
+    "Device Name": "US-CA-BDO-SL19.BDO.chevrontexaco.net",
+    "IP Address": "146.35.133.19"
+  },
+  {
+    "Device Name": "US-LA-ARC-RA1.ARC.chevrontexaco.net",
+    "IP Address": "146.25.84.188"
+  },
+  {
+    "Device Name": "US-LA-VENLA-SL01.VENLA.chevrontexaco.net",
+    "IP Address": "146.33.78.125"
+  },
+  {
+    "Device Name": "VNURA1.VNU.chevrontexaco.net",
+    "IP Address": "146.26.11.248"
+  },
+  {
+    "Device Name": "wr29ra1 (fiber)",
+    "IP Address": "146.32.1.224"
+  }
+]

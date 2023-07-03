@@ -1,0 +1,19 @@
+! Management VRF
+! Variables
+! {{ host.mgmt_vrf_name | default ("Mgmt-vrf") }} = Management VRF name
+! {{ host.mgmt_vrf_ifname | default("GigabitEthernet0/0") = Management VRF interface
+! {{ host.mgmt_vrf_ip_address | default ("169.254.0.1") }} = IP Address of the VRF mgmt interface
+! {{ host.mgmt_vrf_ip_mask | default ("255.255.255.0") }} = Subnet mask of the VRF mgmt interface
+!
+vrf definition {{ host.mgmt_vrf_name }}
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+interface {{ host.mgmt_vrf_ifname }}
+ vrf forwarding {{ host.mgmt_vrf_name }}
+ ip address {{ host.mgmt_vrf_ip_address }} {{ host.mgmt_vrf_ip_mask }}
+ no shutdown

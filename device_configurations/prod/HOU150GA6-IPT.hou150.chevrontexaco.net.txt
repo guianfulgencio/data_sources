@@ -1,0 +1,742 @@
+Building configuration...
+
+
+Current configuration : 22940 bytes
+!
+! Last configuration change at 12:43:25 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 12:43:57 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 16.12
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+service call-home
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+!
+hostname HOU150GA6-IPT
+!
+boot-start-marker
+boot system bootflash:/isr4400-universalk9.16.12.04.SPA.bin
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+card type e1 0 2
+logging buffered 128000
+logging reload warnings
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Port-channel2
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting session-duration ntp-adjusted
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+  no destination transport-method email
+no ip source-route
+!
+ip name-server 146.36.80.34
+ip domain lookup source-interface Port-channel2
+ip domain name hou150.chevrontexaco.net
+!
+!
+!
+login on-failure log
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+multilink bundle-name authenticated
+!
+flow record CHEVFLOW
+!
+!
+flow exporter CHEVFLOW
+ destination 139.65.140.12
+ source Port-channel2
+ transport udp 9995
+!
+!
+flow monitor CHEVFLOW
+ exporter CHEVFLOW
+ cache timeout active 1
+ record CHEVFLOW
+!
+!
+!
+!
+!
+!
+isdn switch-type primary-qsig
+!
+!
+crypto pki trustpoint HOU150GA6-IPT
+ enrollment selfsigned
+ fqdn none
+ subject-name CN=HOU150GA6-IPT
+ revocation-check none
+ rsakeypair HOU150GA6-IPT
+!
+crypto pki trustpoint HOU150NXENC0
+ enrollment terminal pem
+ subject-name CN=HOU150NXENC0.gdc0.chevron.net
+ subject-alt-name HOU150NXENC0.gdc0.chevron.net
+ revocation-check none
+!
+crypto pki trustpoint HOU140NXENC1
+ enrollment terminal pem
+ subject-name CN=HOU140NXENC1.gdc0.chevron.net
+ subject-alt-name HOU140NXENC1.gdc0.chevron.net
+ revocation-check none
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+!
+crypto pki certificate chain HOU150GA6-IPT
+ certificate self-signed 01
+  308202FE 308201E6 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  18311630 14060355 0403130D 484F5531 35304741 362D4950 54301E17 0D323030 
+  34303731 36343734 335A170D 33303031 30313030 30303030 5A301831 16301406 
+  03550403 130D484F 55313530 4741362D 49505430 82012230 0D06092A 864886F7 
+  0D010101 05000382 010F0030 82010A02 82010100 97C94AE7 5402EBFA 9C9E180A 
+  7670EBF5 851D81A3 8552F400 4B470D98 C9295E7F D20141DB B616A0B0 7568394B 
+  8F0C12D5 1F959F2E BA56BC83 6B1AFBB5 679CB301 2B2A5E54 FBA8661B D418CBE6 
+  FE4BEE63 1760DC78 F3B29310 16C43FA7 41A0BD45 FDF69B42 DB528ECD E02BCC54 
+  EEF3400A EC3FBBB4 3D6EF050 DE4B3B78 9D86F683 A622CEF2 E82CAE47 C7707C3E 
+  A5ED1C53 879C1053 9CC1E173 967D55D4 B7689BC0 4B69430A 3DDA3919 3FE35037 
+  06D7A9C8 2DAC4EAF 45F004CE 464B2403 A20A55ED 44F418BF 63849889 EE20690F 
+  35D5CF07 B3F3FFA7 C9771553 E8D07E76 9AEFA0B0 D224FA24 E2155EC2 5A6C54B3 
+  609A2E60 1F100993 F1CECFD6 F68CF5AA 72E0B6C7 02030100 01A35330 51300F06 
+  03551D13 0101FF04 05300301 01FF301F 0603551D 23041830 168014FB 28CA89AB 
+  1A8E008E EBB54916 7CFB6A93 B8912A30 1D060355 1D0E0416 0414FB28 CA89AB1A 
+  8E008EEB B549167C FB6A93B8 912A300D 06092A86 4886F70D 01010505 00038201 
+  01003F70 0E87FC09 90550275 50B0BD39 063F8508 95B8D8A3 3E371C88 C4DE52F1 
+  6D1E1B41 78EA16B8 60BDB1AC D112C30D F37DE623 4A8F06E4 BC0F7BC2 92E593F3 
+  DB97E15D C7D70A18 FA11CE76 64ECC479 1ED8B20C CFB5AE3D 79900EA9 99411201 
+  EC9A86AD 5BF3A2A8 8A898F64 42799894 32D3091F 72565370 7A1AA581 EFEACF5E 
+  399B88EB 334D49C3 378977EB 229B8E21 E1B7B9A7 F97ED13E DDC7F422 8CFDD632 
+  66778DE0 81122C38 EAAEE731 DC7D484F B42291DD 6C7B66F9 3AFC9B26 CA412D25 
+  51D2EEB6 3E17FB43 8BCB6322 1632C073 E273AD7F C7A147FC 7306F57F 035D4D96 
+  8B64F411 129638F8 8387E267 0AD72141 D17FFB19 23610777 17A36AD8 17512035 FE74
+  	quit
+crypto pki certificate chain HOU150NXENC0
+ certificate ca 60514F61CA7BD61CEEB62F460FF4ED42
+  308203DB 308202C3 A0030201 02021060 514F61CA 7BD61CEE B62F460F F4ED4230 
+  0D06092A 864886F7 0D01010B 05003078 310B3009 06035504 06130255 53311030 
+  0E060355 040A0C07 43686576 726F6E31 10300E06 0355040B 0C074368 6576726F 
+  6E312630 24060355 04030C1D 484F5531 35304E58 454E4330 2E676463 302E6368 
+  6576726F 6E2E6E65 74310B30 09060355 04080C02 54583110 300E0603 5504070C 
+  07436865 76726F6E 301E170D 32303034 30323139 31333431 5A170D32 35303430 
+  31313931 3334305A 3078310B 30090603 55040613 02555331 10300E06 0355040A 
+  0C074368 6576726F 6E311030 0E060355 040B0C07 43686576 726F6E31 26302406 
+  03550403 0C1D484F 55313530 4E58454E 43302E67 6463302E 63686576 726F6E2E 
+  6E657431 0B300906 03550408 0C025458 3110300E 06035504 070C0743 68657672 
+  6F6E3082 0122300D 06092A86 4886F70D 01010105 00038201 0F003082 010A0282 
+  0101008C 3B54E5AD 7F9A0E97 04199EE1 5F6C80B8 9A8A9861 8AC5FF4D 8ACA37AA 
+  CBA424AF 190CDB1C 351E929F 4C47F329 A227A698 346600A8 1D304033 A88D4A26 
+  7873FBD7 6CD68285 C3DD9347 88FEEEE2 1C7178E9 8488C1EF 4B2010C9 F9C98455 
+  4777634F BDF6A70D 24B302D8 FC6CCF47 806FE355 301F3D01 C9FDED4C 8BD404F8 
+  2DA8EAFA 4B745E9F 65A41CF8 A3A2C001 837632A1 9B33D1F4 7840018E 03ED5334 
+  191A09B0 AF82E85D 01B660E0 511EF536 6B8091B3 FD4039FB BAFC1187 A12811AC 
+  B43FC0E4 27148952 CAF04615 A95C8C55 2A356B06 504B0361 E221B187 6407B081 
+  6DF5CA50 3142E020 77B2320F CC420E56 0534C820 121B524A 5014E39B E1A8D2A9 
+  5152C702 03010001 A361305F 300B0603 551D0F04 04030202 B4301D06 03551D25 
+  04163014 06082B06 01050507 03010608 2B060105 05070302 301D0603 551D0E04 
+  160414D7 D7B3CBDA 85C3582D DFF5B941 C2F4741A F821EF30 12060355 1D130101 
+  FF040830 060101FF 02010030 0D06092A 864886F7 0D01010B 05000382 0101002E 
+  C009E456 4FB22B82 585F45BD E6588F66 3539F730 8B3537CB B6A366FF CE435958 
+  5199D989 FF68273D 7B7C35F0 DCFDEB00 4A10DFDD E9296064 E090B0C0 E3C73D4D 
+  714D117D 7578ADA3 BF0ABD42 2794AF1D E256F905 2EBDA407 38B31989 23F9A6E3 
+  7ED59B83 5348ECA2 2857E524 C3CA437B 55393F92 764FDBA7 165ED33F 2F3DB968 
+  8B47D151 6E6A17DE 5689050C A7BD37CA 8B12B6A5 7AE3E8BF 5C707603 87BA76B5 
+  1A5E3396 F74A3A0A 2AB81193 3FAEBBEE 51108137 7CABD047 A3313808 3B471F13 
+  202C7A97 56B72EB2 4F34A62A 1F5378E4 32AF533B 067B8ED6 9D970E1F 6C1787E7 
+  2335E3F8 A8AD2867 68353EFA 897575C8 8639E4D9 F5D30BDE 783DA315 D61859
+  	quit
+crypto pki certificate chain HOU140NXENC1
+ certificate ca 5A5DD9A37BA1C06408897155C3E152C4
+  308203DB 308202C3 A0030201 0202105A 5DD9A37B A1C06408 897155C3 E152C430 
+  0D06092A 864886F7 0D01010B 05003078 310B3009 06035504 06130255 53311030 
+  0E060355 040A0C07 43686576 726F6E31 10300E06 0355040B 0C074368 6576726F 
+  6E312630 24060355 04030C1D 484F5531 34304E58 454E4331 2E676463 302E6368 
+  6576726F 6E2E6E65 74310B30 09060355 04080C02 54583110 300E0603 5504070C 
+  07436865 76726F6E 301E170D 32303034 30333031 30353134 5A170D32 35303430 
+  32303130 3531335A 3078310B 30090603 55040613 02555331 10300E06 0355040A 
+  0C074368 6576726F 6E311030 0E060355 040B0C07 43686576 726F6E31 26302406 
+  03550403 0C1D484F 55313430 4E58454E 43312E67 6463302E 63686576 726F6E2E 
+  6E657431 0B300906 03550408 0C025458 3110300E 06035504 070C0743 68657672 
+  6F6E3082 0122300D 06092A86 4886F70D 01010105 00038201 0F003082 010A0282 
+  010100E1 E166A4F8 5C9C5967 15F86131 1DB94EBB 60F65FC4 A603A84B D283F35E 
+  386CC495 D77BF15D 0B9CADFD 3C6190FE E65B454D AD1EB89A 0BCB4E78 4F7C2878 
+  75265115 27ED894B 30877C1A 5DC42146 E3E739D3 E365EEDB 637C4DD7 64AFBABC 
+  C8943902 195739B8 3B1007AB 715E1466 97E88ACD E1F73F27 879AB50E A5E9244B 
+  052DEBEA A5C0BB89 866A64F8 4D380AF0 6D13B72F 8497D2C1 9D1E35AB D0DF6B81 
+  403ADA8E AFD97B96 80B6CA1C 078A765E 83E5A3AA 9A19B4A3 C36F1515 BB2A2663 
+  5E57F929 DCA9F4A9 63EF9E0A 5F017261 128C7D1A ECB84C73 4AAA57CB 16FF3B94 
+  9D56F721 26F5DD19 9A13C02B 7EE831C4 2713E4DD DA34EB94 6DF27D36 655309A2 
+  9D5A0B02 03010001 A361305F 300B0603 551D0F04 04030202 B4301D06 03551D25 
+  04163014 06082B06 01050507 03010608 2B060105 05070302 301D0603 551D0E04 
+  1604147C 520A2AA0 573875DB 256D9840 CEF0D406 6B54AD30 12060355 1D130101 
+  FF040830 060101FF 02010030 0D06092A 864886F7 0D01010B 05000382 0101004E 
+  C330BE18 8BE92E52 86FF97BD 70239AFC 97BA6AAA 5F834DB0 A5EEDC99 E7486BC3 
+  25AB3B64 BAEE71F3 7A040789 539B56F0 7859E1AE B08115F3 FB614FB8 EE596538 
+  F3ED0979 E11CE8A9 CD4134FA 7B238AE7 7966B04B C5596F97 2DA53AAD C0B7D5B7 
+  15E0A031 132522E8 B63C0F81 FA39123B 6357AEEB 6FCB0D9A 3B7A14A6 6D429F9F 
+  F68FD4B6 BD6D2D99 15741521 39A071C9 79C5A65C AA97EDA1 53896E90 4CD3BFF0 
+  88A61E37 2AB7BA74 C89D20AD 98529926 9B24C0D4 B0A41A4E B0A6F4B6 B02B3997 
+  DDB23C21 A9A26AB0 124151C4 2C742758 B4C3A2C3 4AE62880 4124F018 2C9BE71A 
+  618CA613 235E3CE7 271D56DE A71806CA 4563D00D 744EB396 374B0134 569ADF
+  	quit
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+!
+crypto pki certificate pool
+ cabundle nvram:ios_core.p7b
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+voice-card 0/1
+ no watchdog
+!
+voice-card 0/2
+ no watchdog
+!
+voice-card 0/4
+ dsp services dspfarm
+ no watchdog
+!
+no license feature hseck9
+license udi pid ISR4431/K9 sn FOC19371GVU
+license boot level securityk9
+archive
+ log config
+  hidekeys
+ path bootflash:cvx_134030
+ maximum 5
+memory free low-watermark processor 67089
+!
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode none
+!
+!
+!
+!
+controller E1 0/2/0
+ clock source line primary
+ pri-group timeslots 1-31 service mgcp
+!
+controller E1 0/2/1
+ pri-group timeslots 1-31 service mgcp
+!
+controller E1 0/2/2
+!
+controller E1 0/2/3
+!
+!
+!
+!
+class-map match-all voice-media
+ match ip dscp ef 
+class-map match-all voice-signal
+ match ip dscp cs3 
+!
+policy-map voice-gateway
+ class voice-media
+  priority 10000 5000
+ class voice-signal
+  bandwidth 2000
+ class class-default
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Port-channel2
+ description HOU150RV2-IPT gi9/27-28
+ ip address 146.34.4.75 255.255.255.192
+ no ip proxy-arp
+ no negotiation auto
+ hold-queue 150 in
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ no ip proxy-arp
+ no logging event link-status
+ load-interval 30
+ media-type rj45
+ negotiation auto
+ no snmp trap link-status
+ service-policy output voice-gateway
+ channel-group 2
+!
+interface GigabitEthernet0/0/1
+ no ip address
+ no ip proxy-arp
+ no logging event link-status
+ load-interval 30
+ media-type rj45
+ negotiation auto
+ no snmp trap link-status
+ service-policy output voice-gateway
+ channel-group 2
+!
+interface GigabitEthernet0/0/2
+ no ip address
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet0/0/3
+ no ip address
+ media-type rj45
+ negotiation auto
+!
+interface Service-Engine0/1/0
+!
+interface Service-Engine0/2/0
+!
+interface Serial0/2/0:15
+ no ip address
+ encapsulation hdlc
+ no cdp enable
+ isdn switch-type primary-qsig
+ isdn timer T310 120000
+ isdn protocol-emulate network
+ isdn incoming-voice voice
+ isdn bind-l3 ccm-manager
+!
+interface Serial0/2/1:15
+ no ip address
+ encapsulation hdlc
+ no cdp enable
+ isdn switch-type primary-qsig
+ isdn timer T310 120000
+ isdn protocol-emulate network
+ isdn incoming-voice voice
+ isdn bind-l3 ccm-manager
+!
+interface Service-Engine0/4/0
+!
+interface GigabitEthernet0
+ vrf forwarding Mgmt-intf
+ no ip address
+ negotiation auto
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip tcp path-mtu-discovery
+ip telnet source-interface Port-channel2
+no ip http server
+no ip http secure-server
+ip tftp source-interface Port-channel2
+ip route 0.0.0.0 0.0.0.0 146.34.4.65
+ip ssh version 2
+ip scp server enable
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 50 permit 146.40.2.8
+ 60 permit 146.40.2.11
+ 70 permit 146.40.2.12
+ 80 permit 146.40.2.13
+ 90 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.140.0 0.0.3.255
+ 150 permit 139.65.0.0 0.0.255.255
+ 160 deny   any log
+!
+!
+logging history size 10
+logging source-interface Port-channel2
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+ip access-list standard 10
+ 10 permit 146.22.71.201
+ 20 permit 146.23.102.220
+ 30 permit 146.22.9.201
+ 40 permit 146.36.80.81
+ 50 permit 146.27.124.18
+ 60 deny   any log
+ip access-list standard 20
+ 10 permit 139.65.136.0 0.0.3.255
+ 20 permit 139.65.140.0 0.0.3.255
+ 30 permit 139.65.192.0 0.0.15.255
+ 40 deny   any log
+ip access-list standard 30
+ 10 permit 146.34.7.179
+ 20 permit 146.34.6.179
+ 30 permit 146.34.5.179
+ 40 permit 146.34.4.179
+ 50 permit 146.22.71.201
+ 60 permit 146.27.82.194
+ 70 permit 146.23.102.220
+ 80 permit 146.24.240.56
+ 90 permit 146.22.9.201
+ 100 permit 146.36.80.131
+ 110 permit 146.36.80.142
+ 120 permit 146.36.80.139
+ 130 permit 146.36.80.149
+ 140 permit 146.36.92.124
+ 150 permit 146.36.80.124
+ 160 permit 146.36.80.81
+ 170 permit 146.24.112.45
+ 180 permit 146.27.124.21
+ 190 permit 146.27.124.18
+ 200 permit 146.36.112.50
+ 210 permit 146.27.26.0 0.0.1.255
+ 220 permit 146.36.193.0 0.0.0.255
+ 230 permit 146.27.145.0 0.0.0.255
+ 240 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 permit 146.40.10.21
+ 40 deny   any log
+ip access-list standard 1330
+ 10 permit 146.22.71.201
+ 20 permit 146.22.9.201
+ 30 permit 146.22.8.0 0.0.0.255
+ 40 permit 146.38.92.0 0.0.0.255
+ 50 permit 146.24.136.0 0.0.0.255
+ 60 permit 146.24.146.0 0.0.0.255
+ 70 permit 146.24.250.0 0.0.0.255
+ 80 permit 146.27.26.0 0.0.1.255
+ 90 permit 146.36.145.0 0.0.0.255
+ 100 permit 146.36.10.0 0.0.0.255
+ 110 permit 146.40.185.0 0.0.0.255
+ 120 permit 139.65.136.0 0.0.3.255
+ 130 permit 146.36.126.128 0.0.0.63
+ 140 permit 146.27.84.128 0.0.0.63
+ 150 permit 146.36.130.224 0.0.0.31
+ 160 deny   any log
+!
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Port-channel2
+snmp-server location HOU150 / 1500 LOUISIANA ST,  Houston,TX / USA / Americas  /US-NA-Utility-Telephony/Criticality-Medium
+snmp-server contact network operations 1-866-313-3907
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps ipmulticast
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps transceiver all
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+!
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/2/0:15
+!
+voice-port 0/1/0
+!
+voice-port 0/1/1
+!
+voice-port 0/1/2
+!
+voice-port 0/1/3
+!
+voice-port 0/2/1:15
+!
+mgcp
+mgcp call-agent hou150nxcm2.hou150.chevrontexaco.net 2427 service-type mgcp version 0.1
+mgcp dtmf-relay voip codec all mode out-of-band
+mgcp rtp unreachable timeout 1000 action notify
+mgcp modem passthrough voip mode nse
+mgcp package-capability mf-package
+mgcp package-capability rtp-package
+mgcp package-capability sst-package
+mgcp package-capability pre-package
+mgcp package-capability fm-package
+no mgcp package-capability res-package
+no mgcp package-capability fxr-package
+no mgcp timer receive-rtcp
+mgcp sdp simple
+mgcp fax t38 inhibit
+mgcp fax t38 ls_redundancy 5
+mgcp fax t38 hs_redundancy 2
+mgcp fax t38 nsf 000000
+mgcp fax t38 gateway force
+mgcp rtp payload-type g726r16 static
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local Port-channel2
+sccp ccm 146.34.4.163 identifier 1 version 7.0 
+sccp ccm 146.34.5.163 identifier 2 version 7.0 
+sccp ccm 146.34.4.169 identifier 3 version 7.0 
+sccp ccm 146.36.4.30 identifier 4 version 7.0 
+sccp
+!
+sccp ccm group 1
+ bind interface Port-channel2
+ associate ccm 1 priority 1
+ associate ccm 2 priority 2
+ associate profile 2 register XCDhou150ga6-ip
+ associate profile 1 register CFBhou150ga6-ip
+!
+sccp ccm group 2
+ bind interface Port-channel2
+ associate ccm 3 priority 1
+ associate ccm 4 priority 2
+ associate profile 3 register HOU150GA6-IPT
+!
+ccm-manager music-on-hold
+!
+ccm-manager redundant-host bocnxcm2.gdc0.chevron.net san520nxhouc0.san520.chevrontexaco.net
+ccm-manager mgcp
+no ccm-manager fax protocol cisco
+ccm-manager config server 146.34.4.164 146.34.5.164  
+ccm-manager config
+!
+dspfarm profile 2 transcode  
+ codec g729abr8
+ codec g729ar8
+ codec g711alaw
+ codec g711ulaw
+ codec g729br8
+ codec g729r8
+ codec pass-through
+ maximum sessions 50
+ associate application SCCP
+!
+dspfarm profile 1 conference  
+ codec g729br8
+ codec g729r8
+ codec g729abr8
+ codec g729ar8
+ codec g711alaw
+ codec g711ulaw
+ maximum sessions 16
+ associate application SCCP
+!
+dspfarm profile 3 conference security
+ trustpoint HOU150GA6-IPT
+ codec g729br8
+ codec g729r8
+ codec g729abr8
+ codec g729ar8
+ codec g711alaw
+ codec g711ulaw
+ codec ilbc
+ codec g722-64
+ maximum sessions 4
+ associate application SCCP
+!
+!
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ no exec
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ length 0
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+exception crashinfo buffersize 256
+network-clock synchronization automatic
+network-clock input-source 1 controller E1 0/2/0
+ntp source Port-channel2
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+end

@@ -1,0 +1,1418 @@
+Building configuration...
+
+Current configuration : 43665 bytes
+!
+! Last configuration change at 04:50:41 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 04:51:19 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.0
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname BOGaswppal-2960
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server radius AAA
+ server name HOU_RadiusVIP
+ server name LON_RadiusVIP
+ server name SIN_RadiusVIP
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Vlan1
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authentication dot1x default group AAA
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group AAA 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting dot1x default start-stop group AAA
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group AAA
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+aaa server radius dynamic-author
+!
+aaa session-id common
+clock timezone UTC -5 0
+switch 1 provision ws-c2960s-48fps-l
+authentication mac-move permit
+no ip source-route
+!
+!
+ip domain-name bog.chevrontexaco.net
+ip name-server 146.36.80.34
+ip name-server 146.39.34.32
+ip name-server 146.39.34.34
+ip device tracking probe delay 10
+ip device tracking
+vtp domain PAR
+vtp mode transparent
+!
+device-sensor notify all-changes
+!
+!
+archive
+ path flash:cvx_104720
+ maximum 5
+dot1x system-auth-control
+dot1x critical eapol
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+!
+!
+!
+!
+!
+vlan internal allocation policy ascending
+!
+vlan 2
+ name IPT_BOG
+!
+vlan 3
+ name TELDOMES_MPLS
+!
+vlan 10
+ name tmp-WLC
+!
+vlan 50
+ name Administracion
+!
+vlan 60
+ name Admin_BOGFPC60A-Mgmt
+!
+vlan 61
+ name Admin_BOGFPC60B-Mgmt
+!
+vlan 62
+ name BOGFPC60-A-B_Traffic
+!
+vlan 70-73 
+!
+vlan 100
+ name Americas_Products
+!
+vlan 110
+ name Mezzanine
+!
+vlan 120
+ name Laboratorio
+!
+vlan 130
+ name Mantenimiento
+!
+vlan 140
+ name Aforadores
+!
+vlan 150
+ name CND
+!
+vlan 160
+ name Insumos
+!
+vlan 170
+ name CGU
+!
+vlan 180
+ name Club_Empleados
+!
+vlan 190
+ name WLC_mgmt
+!
+vlan 300
+ name Wi-Fi_Users
+!
+vlan 4060,4070,4080,4090 
+!
+ip tcp path-mtu-discovery age-timer 10
+ip telnet source-interface Vlan1
+ip tftp source-interface Vlan1
+ip ssh time-out 90
+ip ssh authentication-retries 2
+ip ssh version 2
+ip scp server enable
+lldp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/0/1
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ switchport port-security
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/2
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ switchport port-security
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/3
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ switchport port-security
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/4
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ switchport port-security
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/5
+ description --User--
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ switchport port-security
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/6
+ description --Impresora--
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/7
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/8
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/9
+ description --Laura Briceno--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/10
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/11
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/12
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/13
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/14
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/15
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/16
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/17
+ description --Polycom Sala Mercadeo--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/18
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/19
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/20
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/21
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/22
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/23
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/24
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/25
+ description --Impresora--
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/26
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/27
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication open
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/28
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/29
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/30
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/31
+ description <<UPS_15KVA_1>>
+ switchport mode access
+ switchport voice vlan 2
+ switchport port-security maximum 3
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/32
+ description --Printer-SC--
+ switchport mode access
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/33
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/34
+ description <<BOGSMS61-SERVER>>
+ switchport mode access
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/35
+ description <<BOGNTAD1-SERVER>>
+ switchport mode access
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/36
+ description <<BOGW16DATA1-SERVER>>
+ switchport mode access
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/37
+ description <<CLBNTNS1-SERVER>>
+ switchport mode access
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/38
+ description <<Cisco UCS CCTV-SERVER>>
+ switchport mode access
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 1
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/39
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/40
+ description <<To_CO-DC-BOG-RL1_Port2/0/41>>
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/41
+ description --To_VG224-Fa0/0--
+ switchport access vlan 2
+ switchport mode access
+ mls qos trust device cisco-phone
+!
+interface GigabitEthernet1/0/42
+ description --BOGwa-BUILD01-CECON--
+ switchport mode access
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+!
+interface GigabitEthernet1/0/43
+ description --BOGwa-BUILD01-RECEPTION--
+ switchport mode access
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+!
+interface GigabitEthernet1/0/44
+ description ***** INTERFACE NOT IN USE, ADMINISTRATIVELY DOWN *****
+ shutdown
+!
+interface GigabitEthernet1/0/45
+ description --User--
+ switchport access vlan 100
+ switchport mode access
+ switchport voice vlan 2
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+!
+interface GigabitEthernet1/0/46
+ description ***** INTERFACE NOT IN USE, ADMINISTRATIVELY DOWN *****
+ shutdown
+!
+interface GigabitEthernet1/0/47
+ description ***** INTERFACE NOT IN USE, ADMINISTRATIVELY DOWN *****
+ shutdown
+!
+interface GigabitEthernet1/0/48
+ description ***** INTERFACE NOT IN USE, ADMINISTRATIVELY DOWN *****
+ shutdown
+!
+interface GigabitEthernet1/0/49
+ description <<To_BOG-aswFib-3760_Port-Gi1/0/1>>
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/50
+ shutdown
+!
+interface GigabitEthernet1/0/51
+ shutdown
+!
+interface GigabitEthernet1/0/52
+ shutdown
+!
+interface Vlan1
+ description VLAN Usuarios
+ ip address 146.39.35.2 255.255.255.128
+ ip helper-address 146.39.35.17
+ no ip proxy-arp
+ no ip route-cache
+!
+ip default-gateway 146.39.35.1
+no ip http server
+no ip http secure-server
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.140.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+logging source-interface Vlan1
+logging host 146.27.95.122
+logging host 199.103.13.209
+logging host 146.39.34.199
+logging host 146.39.34.197
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.141.24
+access-list 10 permit 146.22.71.201 log
+access-list 10 permit 146.23.102.220 log
+access-list 10 permit 146.22.9.201 log
+access-list 10 permit 199.103.13.209 log
+access-list 10 permit 199.103.13.208 log
+access-list 10 permit 146.22.8.18 log
+access-list 10 permit 146.36.80.81 log
+access-list 10 deny   any log
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 30 permit 146.22.71.201 log
+access-list 30 permit 146.27.82.194 log
+access-list 30 permit 146.22.9.201 log
+access-list 30 permit 146.36.80.131 log
+access-list 30 permit 146.36.80.142 log
+access-list 30 permit 146.36.80.139 log
+access-list 30 permit 146.36.80.149 log
+access-list 30 permit 199.103.13.219 log
+access-list 30 permit 199.103.13.209 log
+access-list 30 permit 199.103.13.208 log
+access-list 30 permit 146.36.80.124 log
+access-list 30 permit 146.27.124.21 log
+access-list 30 permit 146.32.0.0 0.7.255.255 log
+access-list 30 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1300 remark GESTION
+access-list 1300 permit 146.39.34.192 0.0.0.31 log
+access-list 1300 deny   any log
+access-list 1310 permit 146.22.71.201
+access-list 1310 permit 146.22.9.201
+access-list 1310 permit 139.65.136.196
+access-list 1310 permit 139.65.136.197
+access-list 1310 deny   any log
+access-list 1330 permit 146.34.7.179
+access-list 1330 permit 146.34.6.179
+access-list 1330 permit 146.34.5.179
+access-list 1330 permit 146.34.4.179
+access-list 1330 permit 146.34.11.179
+access-list 1330 permit 146.34.10.179
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.34.13.179
+access-list 1330 permit 146.34.12.179
+access-list 1330 permit 146.27.82.195
+access-list 1330 permit 146.27.166.11
+access-list 1330 permit 146.27.166.10
+access-list 1330 permit 146.23.102.220
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.36.80.134
+access-list 1330 permit 146.36.80.135
+access-list 1330 permit 146.36.80.131
+access-list 1330 permit 146.27.166.70
+access-list 1330 permit 146.39.37.252
+access-list 1330 permit 146.36.80.139
+access-list 1330 permit 146.36.80.159
+access-list 1330 permit 146.36.91.111
+access-list 1330 permit 146.39.34.30
+access-list 1330 permit 146.36.80.125
+access-list 1330 permit 146.36.80.81
+access-list 1330 permit 146.36.85.36
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.33.129.0 0.0.0.255
+access-list 1330 permit 146.36.193.0 0.0.0.255
+access-list 1330 permit 146.24.101.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 139.65.228.0 0.0.1.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.27.97.224 0.0.0.31
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1530 permit 199.103.13.219
+access-list 1530 permit 199.103.13.209
+access-list 1530 permit 199.103.13.208
+access-list 1530 permit 199.103.14.0 0.0.0.255
+access-list 1530 deny   any log
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 auth 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Vlan1
+snmp-server location BOG / Cra 56 No 21 - 05 Porteria 2 Puente Aran, Bogota Puente Aranda / Colombia / Americas /CO-NA-Utility-Wan-Remotes/Criticality-Low
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+radius-server dead-criteria time 5 tries 3
+radius-server timeout 60
+radius-server deadtime 480
+radius-server vsa send accounting
+radius-server vsa send authentication
+!
+radius server HOU_RadiusVIP
+ address ipv4 136.171.184.184 auth-port 1812 acct-port 1813
+ key 7 11240A2739321939060A727D
+!
+radius server LON_RadiusVIP
+ address ipv4 146.38.86.23 auth-port 1812 acct-port 1813
+ key 7 002900242A7B19330D011517
+!
+radius server SIN_RadiusVIP
+ address ipv4 146.40.1.23 auth-port 1812 acct-port 1813
+ key 7 080C5F6C27391722102B555D
+!
+!
+no vstack join-window mode auto
+no vstack
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input ssh
+!
+!
+monitor session 1 source interface Gi1/0/44
+monitor session 1 destination interface Gi1/0/48 encapsulation replicate
+ntp source Vlan1
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.40.10.21
+ntp server 146.22.70.251
+end

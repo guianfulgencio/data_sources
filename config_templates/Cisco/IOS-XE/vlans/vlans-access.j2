@@ -1,0 +1,39 @@
+! VLANs to deploy on L2 Access switches
+! Variables
+
+vlan {{ vlan.corp | default(???) }}
+name L3CVX-CORP
+
+vlan {{ vlan.voice }}
+name L3CVX-CORP-VOICE
+
+vlan {{ vlan.security }}
+name L3CVX-CORP-SECURITY
+
+vlan xxx
+name L3CVX-CORP-CAMERAS
+
+vlan 888
+name NST.INTERNET.ACCESS
+
+vlan 999
+name DOT1Q.NATIVE
+
+!vlans for wireless lan clients and access points
+vlan {{ vlan.mgmt_wlan | default(400) }}
+ name L3CVX-CORP-WLANMGMT
+!
+vlan {{ vlan.corp_wlan | default(4050) }}
+ name L3CVX-CORP-WLAN
+!
+vlan {{ vlan.guest_wlan | default(4060) }}
+ name L3CVX-GUEST-WLAN
+!
+vlan {{ vlan.ind_wlan | default(4070) }}
+ name L3CVX-IND-WLAN
+!
+vlan {{ vlan.wlan_user | default(4080) }}
+ name L3CVX-USER-WLAN
+!
+vlan {{ vlan.wlan_devices | default(4090) }}
+ name L3CVX-DEVICES-WLAN

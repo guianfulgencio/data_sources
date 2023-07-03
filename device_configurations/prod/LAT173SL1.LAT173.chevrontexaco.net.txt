@@ -1,0 +1,5170 @@
+Building configuration...
+
+Current configuration : 119728 bytes
+!
+! Last configuration change at 20:44:50 UTC Sun Jun 18 2023
+!
+version 15.0
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+!
+hostname LAT173SL1
+!
+boot-start-marker
+boot system flash bootflash:cat4500-entservicesk9-mz.150-2.SG11.bin
+boot-end-marker
+!
+logging buffered 128000 informational
+no logging console
+enable secret 5 $1$WZjb$E2OdRntcPRQtl.dTSTcoa/
+!
+username admin privilege 15 secret 5 $1$fQcq$XgqXCFCMDF8zUVOkwG54F1
+!
+!
+aaa new-model
+!
+!
+aaa group server radius AAA
+!
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authentication dot1x default group AAA
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group tacacs+ if-authenticated 
+aaa authorization commands 0 default group tacacs+ if-authenticated 
+aaa authorization commands 1 default group tacacs+ if-authenticated 
+aaa authorization commands 15 default group tacacs+ if-authenticated 
+aaa authorization network default group AAA 
+aaa authorization network flexvpn local 
+aaa authorization reverse-access default group tacacs+ if-authenticated 
+aaa accounting update newinfo
+aaa accounting dot1x default start-stop group AAA
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 1 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+aaa accounting network default start-stop group AAA
+aaa accounting connection default start-stop group tacacs+
+aaa accounting system default start-stop group tacacs+
+!
+!
+aaa server radius dynamic-author
+!
+aaa session-id common
+qos
+qos dbl
+qos map dscp 24 25 26 27 28 29 30 31 to tx-queue 4
+qos map dscp 32 33 34 35 36 37 38 39 to tx-queue 4
+qos map cos 5 to dscp 46 
+authentication mac-move permit
+ip subnet-zero
+no ip source-route
+ip domain-name LAT173.chevrontexaco.net
+ip name-server 146.36.80.34
+ip vrf mgmtVrf
+!
+ip multicast-routing 
+ip multicast route-limit 1000
+ip device tracking probe delay 10
+ip device tracking
+!
+!
+vtp domain ''
+vtp mode transparent
+!
+!
+!
+dot1x system-auth-control
+dot1x critical eapol
+power redundancy-mode redundant
+power dc input 4000
+!
+!
+!
+archive
+ path bootflash:
+ maximum 5
+file prompt quiet
+spanning-tree mode pvst
+spanning-tree logging
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+vlan 100
+ name 146.33.72.0/23-DATA
+!
+vlan 200
+ name 146.34.92.0/23-VOICE
+!
+vlan 800
+ name CBRES-METASYS 
+!
+vlan 900
+ name 146.33.75.240/30-SL1-SL2LINK
+!
+vlan 997
+ name 146.33.75.208/29.WLAN.Management
+!
+vlan 998
+ name 146.33.74.0/24.WLAN.Clients
+!
+vlan 999
+ name Native-VLAN
+!
+vlan 2001
+ name LAT173RA1-LAT173SL1
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+ip tftp source-interface Loopback0
+ip ssh version 2
+ip scp server enable
+!
+policy-map autoqos-voip-policy
+ class class-default
+    dbl
+!
+!
+!
+interface Loopback0
+ ip address 146.33.75.250 255.255.255.255
+ ip pim sparse-mode
+!
+interface Port-channel1
+ description 146.33.75.240/30 SL1 TO SL2 LINK
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,900,997,998
+ switchport mode trunk
+ switchport nonegotiate
+ no snmp trap link-status
+!
+interface Port-channel2
+ description LAT173 802.11 4402 Wireless Controller
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ no snmp trap link-status
+!
+interface FastEthernet1
+ ip vrf forwarding mgmtVrf
+ no ip address
+ speed auto
+ duplex auto
+!
+interface TenGigabitEthernet1/1
+!
+interface TenGigabitEthernet1/2
+!
+interface GigabitEthernet1/3
+ shutdown
+!
+interface GigabitEthernet1/4
+ description to LAT173SL2 Gi1/4
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,900,997,998
+ switchport mode trunk
+ switchport nonegotiate
+ no snmp trap link-status
+ channel-group 1 mode on
+!
+interface GigabitEthernet1/5
+ description to LAT173SL2 Gi1/5
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,900,997,998
+ switchport mode trunk
+ switchport nonegotiate
+ no snmp trap link-status
+ channel-group 1 mode on
+!
+interface GigabitEthernet1/6
+!
+interface GigabitEthernet2/1
+ description *** LAT173RA1  Gi0/0/0 ***
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 800,2001
+ switchport mode trunk
+!
+interface GigabitEthernet2/2
+ switchport access vlan 200
+ switchport mode access
+ qos trust cos
+ auto qos voip trust 
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/3
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ authentication control-direction in
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order mab
+ authentication priority dot1x mab
+ authentication periodic
+ authentication timer reauthenticate server
+ udld port
+ mab
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/4
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/5
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/6
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/7
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/8
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/9
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/10
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/11
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/12
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/13
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/14
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/15
+ switchport access vlan 100
+ switchport mode access
+ authentication control-direction in
+ authentication event server dead action authorize vlan 800
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order mab
+ authentication priority mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+!
+interface GigabitEthernet2/16
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/17
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/18
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/19
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/20
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/21
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/22
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/23
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/24
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/25
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/26
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/27
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ no snmp trap link-status
+ channel-group 2 mode on
+!
+interface GigabitEthernet2/28
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ no snmp trap link-status
+ channel-group 2 mode on
+!
+interface GigabitEthernet2/29
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ no snmp trap link-status
+ channel-group 2 mode on
+!
+interface GigabitEthernet2/30
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ no snmp trap link-status
+ channel-group 2 mode on
+!
+interface GigabitEthernet2/31
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/32
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/33
+ switchport access vlan 800
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ authentication control-direction in
+ authentication event server dead action authorize vlan 800
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order mab
+ authentication priority dot1x mab
+ authentication periodic
+ authentication timer reauthenticate server
+ udld port
+ mab
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/34
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/35
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ logging event link-status
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/36
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ logging event link-status
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/37
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/38
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/39
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/40
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/41
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/42
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/43
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/44
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/45
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/46
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/47
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet2/48
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/1
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/2
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/3
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/4
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/5
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/6
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/7
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/8
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/9
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/10
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/11
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/12
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/13
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/14
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/15
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ power inline never
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/16
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/17
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/18
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/19
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/20
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/21
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/22
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/23
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/24
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ authentication control-direction in
+ authentication event server dead action authorize vlan 100
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order mab
+ authentication priority mab
+ authentication periodic
+ authentication timer reauthenticate server
+ udld port
+ mab
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/25
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/26
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/27
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/28
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/29
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/30
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/31
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/32
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/33
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/34
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/35
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/36
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/37
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/38
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/39
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/40
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/41
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/42
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/43
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/44
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/45
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/46
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/47
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet3/48
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/1
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/2
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/3
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/4
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/5
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/6
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/7
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/8
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/9
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/10
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/11
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/12
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/13
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/14
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/15
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/16
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/17
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/18
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/19
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/20
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/21
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/22
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/23
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/24
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/25
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/26
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/27
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/28
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/29
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/30
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/31
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/32
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/33
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/34
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/35
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/36
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/37
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/38
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/39
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/40
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/41
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/42
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/43
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/44
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/45
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/46
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/47
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet4/48
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/1
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/2
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/3
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/4
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/5
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/6
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/7
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/8
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/9
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/10
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/11
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/12
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/13
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/14
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/15
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/16
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/17
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/18
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/19
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/20
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/21
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/22
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/23
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/24
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/25
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/26
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/27
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/28
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/29
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/30
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/31
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/32
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/33
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/34
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/35
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/36
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/37
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/38
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/39
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/40
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/41
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/42
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/43
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/44
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/45
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/46
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/47
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet5/48
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/1
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/2
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/3
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/4
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/5
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/6
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/7
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/8
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/9
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/10
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/11
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/12
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/13
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/14
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/15
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/16
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/17
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/18
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/19
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/20
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/21
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/22
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/23
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/24
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/25
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/26
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/27
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/28
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/29
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/30
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/31
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/32
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/33
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/34
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/35
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/36
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/37
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/38
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/39
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/40
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/41
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/42
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/43
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/44
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ load-interval 30
+ qos trust cos
+ qos trust device cisco-phone
+ udld port
+ no snmp trap link-status
+ auto qos voip cisco-phone 
+ flowcontrol receive off
+ flowcontrol send off
+ tx-queue 3
+   bandwidth percent 33
+   priority high
+   shape percent 33
+ spanning-tree portfast
+ service-policy output autoqos-voip-policy
+!
+interface GigabitEthernet6/45
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ no snmp trap link-status
+ channel-group 2 mode on
+!
+interface GigabitEthernet6/46
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ no snmp trap link-status
+ channel-group 2 mode on
+!
+interface GigabitEthernet6/47
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ no snmp trap link-status
+ channel-group 2 mode on
+!
+interface GigabitEthernet6/48
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 997
+ switchport trunk allowed vlan 997,998
+ switchport mode trunk
+ switchport nonegotiate
+ no snmp trap link-status
+ channel-group 2 mode on
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan100
+ description 146.33.72.0/23 DATA
+ ip address 146.33.72.2 255.255.254.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 134.248.0.18
+ no ip proxy-arp
+ ip pim sparse-mode
+ standby 100 ip 146.33.72.1
+ standby 100 priority 115
+ standby 100 preempt
+!
+interface Vlan200
+ description 146.34.92.0/23 VOICE
+ ip address 146.34.92.2 255.255.254.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 134.248.0.18
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+ load-interval 30
+ standby 200 ip 146.34.92.1
+ standby 200 priority 115
+ standby 200 preempt delay minimum 30
+!
+interface Vlan800
+ ip address 172.31.45.65 255.255.255.248
+ no ip proxy-arp
+ load-interval 30
+!
+interface Vlan900
+ description 146.33.75.240/30 SL1 TO SL2 LINK
+ ip address 146.33.75.241 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan997
+ description LAT173 Wireless LAN Management
+ ip address 146.33.75.209 255.255.255.248
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 134.248.0.18
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan998
+ description LAT173 Wireless LAN Clients
+ ip address 146.33.74.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 134.248.0.18
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan2001
+ ip address 146.33.75.226 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip summary-address eigrp 65055 146.34.92.0 255.255.254.0 5
+!
+!
+router eigrp 65055
+ default-metric 2000 100 255 1 1500
+ network 146.33.72.0 0.0.3.255
+ network 146.34.92.0 0.0.1.255
+ network 172.31.0.0
+ redistribute static
+ passive-interface default
+ no passive-interface Vlan2001
+ no passive-interface GigabitEthernet1/6
+ no passive-interface Vlan800
+ eigrp router-id 146.33.75.250
+ eigrp stub connected static summary
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip route 146.33.75.251 255.255.255.255 146.33.72.3
+no ip http server
+no ip http secure-server
+!
+ip flow ingress
+ip flow-cache timeout inactive 10
+ip flow-cache timeout active 1
+ip flow-export source Loopback0
+ip flow-export version 5
+ip flow-export destination 139.65.140.12 9995
+!
+ip route-cache flow
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim spt-threshold 32
+ip pim register-rate-limit 48
+ip pim register-source Loopback0
+ip tacacs source-interface Loopback0
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+!
+ip access-list extended CBRES-METASYS
+ permit ip host 146.36.80.240 172.31.40.0 0.0.7.255
+ permit ip host 134.248.80.138 172.31.40.0 0.0.7.255
+ permit ip host 146.46.130.145 172.31.40.0 0.0.7.255
+ permit ip host 146.46.132.55 172.31.40.0 0.0.7.255
+ permit ip host 146.46.132.53 172.31.40.0 0.0.7.255
+ permit ip 136.171.124.0 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 146.27.3.160 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 172.31.40.0 0.0.3.255 172.31.40.0 0.0.7.255
+ permit ip 172.31.44.0 0.0.3.255 172.31.40.0 0.0.7.255
+ deny   ip any any
+!
+ip radius source-interface Vlan100
+logging history size 10
+logging source-interface Loopback0
+logging 146.27.95.122
+logging 146.36.114.214
+logging 134.248.81.53
+logging 139.65.140.24
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 23 permit 10.10.10.0 0.0.0.7
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+!
+snmp-server group CVX v3 priv notify *tv.00001000.00000000.00000000.00000000.000000007F 
+snmp-server group CVX2 v3 priv notify *tv.00001000.00000000.00000000.00000000.000000007F 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 priv notify *tv.00001000.00000000.00000000.00000000.000000007F 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location LAT173 / 17395 S Manthey Rd, Lathrop, CA / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Low
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server host 139.65.136.12 version 3 priv CVX  config
+snmp-server host 139.65.136.12 version 3 priv CVX2  config
+snmp-server host 139.65.136.12 version 3 priv cvx2021  config
+snmp-server host 139.65.136.12 version 3 priv cvx2022  config
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs-server host 139.65.143.4
+tacacs-server host 139.65.136.58
+tacacs-server timeout 10
+tacacs-server directed-request
+tacacs-server key 7 06031D344F4B1A1606041B08
+radius-server dead-criteria time 5 tries 3
+radius-server host 136.171.184.185 auth-port 1812 acct-port 1813 key 7 0722326E60290B3015325255
+radius-server host 146.38.86.26 auth-port 1812 acct-port 1813 key 7 022B177925261D144E6E5040
+radius-server host 146.40.1.25 auth-port 1812 acct-port 1813 key 7 013E1526752B143A236C1750
+radius-server host 136.171.184.185 auth-port 1645 acct-port 1646 key 7 03294829282F33794C29405C
+radius-server host 146.38.86.26 auth-port 1645 acct-port 1646 key 7 002900242A7B19330D011517
+radius-server timeout 60
+radius-server deadtime 480
+radius-server vsa send accounting
+radius-server vsa send authentication
+!
+control-plane
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ length 0
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+ntp clock-period 17180997
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+mac address-table notification mac-move
+end

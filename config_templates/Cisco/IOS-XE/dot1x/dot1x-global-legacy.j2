@@ -1,0 +1,11 @@
+! Dot1x Global Commands
+!
+aaa new-model
+aaa session-id common
+ip device tracking probe delay 10
+ip device tracking
+authentication mac-move permit 
+device-sensor accounting
+device-sensor notify all-changes
+dot1x system-auth-control
+dot1x critical eapol

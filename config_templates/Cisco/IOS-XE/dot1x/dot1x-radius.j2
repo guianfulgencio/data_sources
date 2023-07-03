@@ -1,0 +1,29 @@
+! RADIUS server definition
+! Variables
+! {{ host.mgmt_ifname }} = Management interface name (usually Loopback0)
+!
+aaa server radius dynamic-author
+!
+radius server HOU_RadiusVIP
+address ipv4 136.171.184.185 auth-port 1812 acct-port 1813
+key MsBN@rUb@99
+!
+radius server LON_RadiusVIP
+address ipv4 146.38.86.26 auth-port 1812 acct-port 1813
+key MsBN@rUb@99
+!
+radius server SIN_RadiusVIP
+address ipv4 146.40.1.25 auth-port 1812 acct-port 1813
+key MsBN@rUb@99
+!
+aaa group server radius AAA
+ server name HOU_RadiusVIP
+ server name LON_RadiusVIP
+ server name SIN_RadiusVIP
+ ip radius source-interface {{ host.mgmt_ifname }}
+!
+radius-server dead-criteria time 5 tries 3
+radius-server timeout 60
+radius-server deadtime 480
+radius-server vsa send accounting
+radius-server vsa send authentication

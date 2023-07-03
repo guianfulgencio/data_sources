@@ -1,0 +1,2589 @@
+Building configuration...
+
+
+Current configuration : 48075 bytes
+!
+! Last configuration change at 16:47:55 EST Sun Jun 18 2023 by jvtc
+! NVRAM config last updated at 16:47:57 EST Sun Jun 18 2023 by jvtc
+!
+version 16.12
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+!
+hostname PANRD1
+!
+boot-start-marker
+boot system bootflash:isr4300-universalk9.16.12.04.SPA.bin
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+card type e1 0 2
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name HOU2_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone EST -5 0
+call-home
+ contact-email-addr nmbtcon@chevron.com
+ profile "CSSM"
+  reporting smart-licensing-data
+  destination transport-method http
+  no destination transport-method email
+  destination address http http://cssm.chevron.net/Transportgateway/services/DeviceRequestHandler 
+no ip source-route
+!
+ip multicast-routing distributed
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip name-server 146.36.80.34 146.36.82.34
+ip domain name PAN.chevrontexaco.net
+!
+!
+!
+login on-success log
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+multilink bundle-name authenticated
+!
+flow record FLOW4
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ collect ipv4 dscp
+ collect interface output
+ collect counter bytes
+ collect counter packets
+!
+!
+flow record FLOW6
+ match ipv6 protocol
+ match ipv6 source address
+ match ipv6 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ collect ipv6 dscp
+ collect interface output
+ collect counter bytes
+ collect counter packets
+!
+!
+flow exporter Exporter-1
+ destination 139.65.136.77
+ source Loopback0
+!
+!
+flow monitor FLOW4-LAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-WAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-WAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW6-LAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW6-WAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW6-WAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW4-LAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW6-LAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor net-flow
+ exporter Exporter-1
+ record FLOW4
+!
+!
+!
+!
+!
+!
+isdn switch-type primary-4ess
+!
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment terminal
+ revocation-check crl
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+!
+cts logging verbose
+!
+!
+!
+voice service voip
+ fax protocol t38 nse force version 0 ls-redundancy 5 hs-redundancy 2 fallback none
+ modem relay nse codec g711ulaw redundancy gw-controlled
+ h323
+  no h225 timeout keepalive
+!
+!
+!
+!
+voice translation-rule 1
+ rule 1 /^9/ /84789/
+!
+voice translation-rule 2
+ rule 1 /^8478/ /306/
+!
+!
+voice translation-profile 10-digit-CID-outbound
+ translate calling 2
+!
+voice translation-profile SRST-Incoming
+ translate called 1
+!
+!
+!
+!
+application
+ global
+  service alternate Default
+ !
+!
+!
+!
+!
+!
+voice-card 0/2
+ dsp services dspfarm
+ no watchdog
+!
+voice-card 0/3
+ no watchdog
+!
+voice-card 0/4
+ no watchdog
+!
+voice-card 1/0
+ no watchdog
+!
+license udi pid ISR4351/K9 sn FDO21032SG2
+license boot level uck9
+archive
+ path bootflash:cvx_032404
+ maximum 5
+memory free low-watermark processor 67089
+!
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode none
+!
+controller E1 0/2/0
+ framing no-crc4 
+ pri-group timeslots 1-31 service mgcp
+!
+!
+!
+!
+class-map match-all WAN-Traffic-L3CVX-CORP
+ match vlan  2003
+class-map match-any DSCP-CS3-AF3
+ match dscp cs3 
+ match dscp cs6 
+ match dscp af31  af32  af33 
+class-map match-any DSCP-AF4
+ match dscp af41  af42  af43 
+class-map match-any DSCP-AF2
+ match dscp af21  af22  af23 
+class-map match-any DSCP-AF1
+ match dscp af11  af12  af13 
+class-map match-all LAN-Traffic-L3CVX-CORP
+ match vlan  2001
+class-map match-any DSCP-EF
+ match dscp ef 
+class-map match-all NETWORK-CONTROL
+ match access-group name NETWORK-CONTROL
+class-map match-any L3CVX-CORP-LAN-MARK-CS3
+ match access-group name L3CVX-CORP-MARK-DSCP-CS3-CS6-AF3x
+class-map match-any L3CVX-CORP-LAN-MARK-AF4
+ match access-group name L3CVX-CORP-MARK-DSCP-AF4x
+class-map match-any L3CVX-CORP-LAN-MARK-AF1
+ match access-group name L3CVX-CORP-MARK-DSCP-AF1x-AND-LOCAL
+class-map match-any L3CVX-CORP-LAN-MARK-AF2
+ match access-group name L3CVX-CORP-MARK-DSCP-AF2x-AND-LOCAL
+ match access-group name RDP-TRAFFIC
+class-map match-any L3CVX-CORP-LAN-MARK-EF
+ match access-group name L3CVX-CORP-MARK-DSCP-EF
+class-map match-all RDP-IN
+ match access-group name RDP-TRAFFIC
+!
+policy-map WANQOS-OUT-L3CVX-CORP
+ class DSCP-EF
+  priority percent 10
+ class NETWORK-CONTROL
+  bandwidth remaining percent 5 
+ class DSCP-AF4
+  bandwidth remaining percent 25 
+ class DSCP-CS3-AF3
+  bandwidth remaining percent 5 
+ class DSCP-AF2
+  bandwidth remaining percent 25 
+  random-detect dscp-based
+ class DSCP-AF1
+  bandwidth remaining percent 15 
+  random-detect dscp-based
+ class class-default
+  bandwidth remaining percent 25 
+  random-detect dscp-based
+policy-map WANQOS-SITE-MULTI-VRF-OUT
+ class WAN-Traffic-L3CVX-CORP
+  bandwidth remaining percent 100 
+   service-policy WANQOS-OUT-L3CVX-CORP
+policy-map Gi0/1-out
+ class class-default
+  shape average percent 100   
+   service-policy WANQOS-SITE-MULTI-VRF-OUT
+policy-map QoS-RDP-IN
+ class RDP-IN
+  set dscp af21
+policy-map Gi0/1/0-out
+ class class-default
+  shape average percent 100   
+   service-policy WANQOS-SITE-MULTI-VRF-OUT
+policy-map L3CVX-CORP-SETDSCP
+ class L3CVX-CORP-LAN-MARK-EF
+  set dscp ef
+ class L3CVX-CORP-LAN-MARK-AF4
+  set dscp af41
+ class L3CVX-CORP-LAN-MARK-CS3
+  set dscp cs3
+ class L3CVX-CORP-LAN-MARK-AF2
+  set dscp af21
+ class L3CVX-CORP-LAN-MARK-AF1
+  set dscp af11
+ class class-default
+  set dscp default
+policy-map SETDSCP-MULTI-VRF-IN
+ class LAN-Traffic-L3CVX-CORP
+   service-policy L3CVX-CORP-SETDSCP
+policy-map Gig0/1-out
+ class class-default
+  shape average percent 100   
+   service-policy WANQOS-SITE-MULTI-VRF-OUT
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip flow monitor net-flow input
+ ip address 146.39.241.248 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+!
+interface Loopback1
+ ip address 146.39.241.221 255.255.255.252
+!
+interface GigabitEthernet0/0/0
+ description *** PANRL1    Gi1/0/1 ***
+ bandwidth 70000
+ ip address dhcp
+ ip nbar protocol-discovery
+ load-interval 30
+ negotiation auto
+ service-policy input SETDSCP-MULTI-VRF-IN
+!
+interface GigabitEthernet0/0/0.2001
+ encapsulation dot1Q 2001
+ ip address 146.39.241.209 255.255.255.248
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/0/1
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0/0/2
+ description WAN_Desc : BLMTAPRA1 : GigabitEthernet0/0/0 : COLUMBUS/C&W : 4041596.PA : Point to Point
+ bandwidth 70000
+ ip flow monitor FLOW4-WAN-IN input
+ ip flow monitor FLOW6-WAN-IN input
+ ip flow monitor net-flow input
+ ip flow monitor FLOW4-WAN-OUT output
+ ip flow monitor FLOW6-WAN-OUT output
+ ip address 146.39.242.241 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ negotiation auto
+!
+interface GigabitEthernet0/1/0
+ description ***Lumen EVPL : DALQX3SG10v Te2/1/8 : CID FRO2007301273 / ECCKT SN 22080949 ***
+ bandwidth 100000
+ no ip address
+ media-type rj45
+ negotiation auto
+ service-policy output Gi0/1/0-out
+!
+interface GigabitEthernet0/1/0.2013
+ description ***Lumen EVPL : NA-US-DFW-C-DALQX3-PE2 xe-0/0/2.2013 : CID FRO2007301273 / ECCKT SN 22080949 ***
+ encapsulation dot1Q 2013
+ ip address 139.65.156.126 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ service-policy input QoS-RDP-IN
+!
+interface GigabitEthernet0/1/1
+ description WAN_Desc : BLMTAPRA1 : GigabitEthernet0/0/1 : TELEFONICA / Tigo : 003156-0004 : Point to Point
+ bandwidth 20000
+ ip flow monitor FLOW4-WAN-IN input
+ ip flow monitor FLOW6-WAN-IN input
+ ip flow monitor net-flow input
+ ip flow monitor FLOW4-WAN-OUT output
+ ip flow monitor FLOW6-LAN-OUT output
+ ip flow monitor FLOW6-WAN-OUT output
+ ip address 146.39.242.245 255.255.255.252
+ ip helper-address 146.36.82.34
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ delay 100
+ negotiation auto
+!
+interface Service-Engine0/2/0
+!
+interface Serial0/2/0:15
+ no ip address
+ encapsulation hdlc
+ no cdp enable
+ isdn switch-type primary-net5
+ isdn incoming-voice voice
+ isdn bind-l3 ccm-manager
+!
+interface Service-Engine0/3/0
+!
+interface Service-Engine0/4/0
+!
+interface Service-Engine1/0/0
+!
+interface GigabitEthernet0
+ vrf forwarding Mgmt-intf
+ ip address 10.1.1.37 255.255.255.0
+ no ip proxy-arp
+ negotiation auto
+!
+!
+router eigrp 65055
+ bfd all-interfaces
+ variance 2
+ default-metric 2000 100 255 1 1500
+ network 139.65.0.0
+ network 146.0.0.0 0.63.255.255
+ redistribute bgp 65055 route-map BGP-to-EIGRP
+ redistribute static
+ passive-interface default
+ no passive-interface GigabitEthernet0/0/0.2001
+ no passive-interface GigabitEthernet0/1/1
+ no passive-interface GigabitEthernet0/0/2
+ eigrp router-id 146.39.241.248
+!
+router bgp 65055
+ bgp router-id 146.39.241.248
+ bgp log-neighbor-changes
+ bgp deterministic-med
+ bgp graceful-restart
+ timers bgp 5 15
+ neighbor 139.65.156.125 remote-as 65456
+ neighbor 139.65.156.125 description ***DALQX3-PE2 ***
+ neighbor 139.65.156.125 fall-over bfd
+ neighbor 146.39.242.252 remote-as 65055
+ neighbor 146.39.242.252 description BLMTAPRA1
+ neighbor 146.39.242.252 shutdown
+ neighbor 146.39.242.252 password 7 0531532078601F2C482F41
+ neighbor 146.39.242.252 update-source Loopback0
+ !
+ address-family ipv4
+  network 144.5.197.200 mask 255.255.255.248
+  network 146.39.240.0 mask 255.255.255.0
+  network 146.39.241.208 mask 255.255.255.248
+  network 146.39.241.220 mask 255.255.255.252
+  network 146.39.241.248 mask 255.255.255.255
+  network 146.39.241.252 mask 255.255.255.255
+  network 146.39.242.128 mask 255.255.255.192
+  network 146.39.242.240 mask 255.255.255.252
+  network 146.39.242.244 mask 255.255.255.252
+  network 146.39.242.252 mask 255.255.255.255
+  network 146.39.243.0 mask 255.255.255.0
+  network 146.41.232.0 mask 255.255.255.0
+  network 146.41.233.128 mask 255.255.255.192
+  network 146.41.233.224 mask 255.255.255.240
+  network 146.41.233.240 mask 255.255.255.240
+  neighbor 139.65.156.125 activate
+  neighbor 139.65.156.125 send-community both
+  neighbor 139.65.156.125 soft-reconfiguration inbound
+  neighbor 139.65.156.125 route-map i--65456-L in
+  neighbor 139.65.156.125 route-map o--65456-L out
+  no neighbor 146.39.242.252 activate
+  maximum-paths 2
+ exit-address-family
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+ip tcp path-mtu-discovery
+no ip http server
+no ip http secure-server
+ip tftp source-interface GigabitEthernet0
+ip route 192.168.1.0 255.255.255.0 146.39.243.6
+ip ssh source-interface Loopback0
+ip ssh logging events
+ip ssh version 2
+ip scp server enable
+!
+ip bgp-community new-format
+ip as-path access-list 1 permit ^$
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 60 permit 146.40.2.8
+ 70 permit 146.40.2.11
+ 80 permit 146.40.2.12
+ 90 permit 146.40.2.13
+ 50 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.0.0 0.0.255.255
+ 150 deny   any log
+ip access-list standard mcast-rp-sparse-wan
+ 10 permit 239.194.128.0 0.0.127.255
+ 20 permit 239.195.128.0 0.0.127.255
+ 30 permit 239.193.128.0 0.0.127.255
+ 40 permit 239.200.0.0 0.7.255.255
+ 50 permit 224.0.0.0 7.255.255.255
+!
+ip access-list extended L3CVX-CORP-MARK-DSCP-AF1x-AND-LOCAL
+ 10 remark * * * Mark LAN received traffic to DSCP AF11 (bulk traffic) * * *
+ 10 permit ip any any dscp af11
+ 20 permit ip any any dscp af12
+ 30 permit ip any any dscp af13
+ 40 permit tcp any any eq smtp
+ 50 permit tcp any eq smtp any
+ 60 permit tcp any any eq 8080
+ 70 permit tcp any eq 8080 any
+ 80 permit tcp any any range 10565 10566
+ 90 permit tcp any range 10565 10566 any
+ 100 remark CISCO-JABBER-RTP
+ 100 permit udp any any range 16384 32767
+ 110 remark MICROSOFT-LYNC
+ 110 permit tcp any any range 50000 59999
+ remark * * * Local admins can mark custom traffic to DSCP AF11 (bulk traffic) * * *
+ remark * * * by adding to this access-list. Do not delete these lines !!! * * *
+ip access-list extended L3CVX-CORP-MARK-DSCP-AF2x-AND-LOCAL
+ 10 remark * * * Mark LAN received traffic to DSCP AF21 (transactional traffic) * * *
+ 10 remark * * * Well-known Ports * * *
+ 10 permit ip any any dscp af21
+ 20 permit ip any any dscp af22
+ 30 permit ip any any dscp af23
+ 40 remark DNS
+ 40 permit udp any eq domain any
+ 50 permit udp any any eq domain
+ 60 remark BOOTP (DHCP)
+ 60 permit udp any eq bootpc any
+ 70 permit udp any eq bootps any
+ 80 permit udp any any eq bootpc
+ 90 permit udp any any eq bootps
+ 100 remark SSH & Telnet
+ 100 permit tcp any range 22 telnet any
+ 110 remark Kerberos
+ 110 permit udp any eq 88 any
+ 120 permit udp any any eq 88
+ 130 permit tcp any eq 88 any
+ 140 permit tcp any any eq 88
+ 150 remark Netbios name lookups
+ 150 permit udp any eq netbios-ns any
+ 160 permit udp any any eq netbios-ns
+ 170 remark Citrix & RDP
+ 170 permit tcp any eq 1494 any
+ 180 permit tcp any any eq 1494
+ 190 permit tcp any eq 3389 any
+ 200 permit tcp any any eq 3389
+ 210 remark TFTP
+ 210 permit udp any any eq tftp
+ 220 permit udp any eq tftp any
+ 230 remark TACACS & RADIUS
+ 230 permit tcp any eq tacacs any
+ 240 permit tcp any any eq tacacs
+ 250 permit tcp any range 1812 1813 any
+ 260 permit tcp any any range 1812 1813
+ 270 remark SQL
+ 270 permit tcp any any range 1521 1522
+ 280 permit tcp any range 1521 1522 any
+ 290 permit tcp any any eq 1433
+ 300 permit tcp any eq 1433 any
+ 310 permit udp any any eq 1434
+ 320 permit udp any eq 1434 any
+ 330 remark * * * Chevron High Priority Apps * * *
+ 330 remark JDE Subnet in San Ramon
+ 330 permit ip any 146.27.68.0 0.0.0.255
+ 340 permit ip 146.27.68.0 0.0.0.255 any
+ 350 remark SAP Subnets in San Ramon
+ 350 permit tcp any 146.27.78.0 0.0.1.255 range 3200 3800
+ 360 permit tcp 146.27.78.0 0.0.1.255 range 3200 3800 any
+ 370 remark eprocurement.chevron.com
+ 370 permit ip any host 146.23.4.51
+ 380 permit ip host 146.23.4.51 any
+ 390 remark sourcing.chevron.com
+ 390 permit ip any host 146.23.4.74
+ 400 permit ip host 146.23.4.74 any
+ 410 remark eProcurement Buyer (San Ramon)
+ 410 permit ip any host 146.27.126.40
+ 420 permit ip host 146.27.126.40 any
+ 430 remark eProcurement Buyer (Houston)
+ 430 permit ip any host 144.5.224.25
+ 440 permit ip host 144.5.224.25 any
+ 450 remark ERP-SAP Subnets (NADC-SAN520) 134.248.112.0/21
+ 450 permit ip any 134.248.112.0 0.0.7.255
+ 460 permit ip 134.248.112.0 0.0.7.255 any
+ 470 remark * * * Local admins can mark custom traffic to DSCP AF21 (high traffic) * * *
+ 470 remark * * * by adding to this access-list. BUT BE CAREFUL!!! Do not delete these lines !!! * * *
+ 470 remark GARS Subnet in San Ramon
+ 470 permit ip any 146.27.166.0 0.0.0.255
+ 480 permit ip 146.27.166.0 0.0.0.255 any
+ 490 permit ip host 146.27.61.225 any
+ 500 permit ip any host 146.27.61.225
+ 510 remark * * * Chevron Visitor Management * * * 
+ 510 permit ip any host 146.40.4.91
+ 520 permit udp any any range 16384 32767 precedence critical
+ 530 permit ip any 146.40.224.192 0.0.0.31
+ 540 permit ip 146.40.224.192 0.0.0.31 any
+ 550 permit ip host 146.40.4.91 any
+ 560 remark Added JDE Subnet in San Ramon
+ 560 permit ip any 146.27.61.0 0.0.0.255
+ 570 permit ip 146.27.61.0 0.0.0.255 any
+ip access-list extended L3CVX-CORP-MARK-DSCP-AF4x
+ 10 remark * * * Mark LAN received traffic to DSCP AF41 (video traffic) * * * 
+ 10 remark * * * Match Tandberg MXP/C-Series Endpoint UDP ports for H.323
+ 10 permit ip any any dscp af41
+ 20 permit ip any any dscp af42
+ 30 permit ip any any dscp af43
+ 40 permit udp any range 2326 2487 any range 2326 2487 dscp af41
+ 50 remark * * * Match Tandberg Codian MCU UDP ports
+ 50 remark Video Subnets in San Ramon for Codian MCU UDP Ports
+ 50 permit udp any 146.27.172.0 0.0.0.31 range 49152 65535
+ 60 permit udp 146.27.172.0 0.0.0.31 range 49152 65535 any
+ 70 remark Video Subnets in Houston for Codian MCU UDP Ports
+ 70 permit udp any 146.36.83.0 0.0.0.31 range 49152 65535
+ 80 permit udp 146.36.83.0 0.0.0.31 range 49152 65535 any
+ 90 remark Video Subnets in LONPWG for Codian MCU UDP Ports
+ 90 permit udp any 146.38.58.0 0.0.0.31 range 49152 65535
+ 100 permit udp 146.38.58.0 0.0.0.31 range 49152 65535 any
+ 110 remark Video Subnets in SGDC1 for Codian MCU UDP Ports
+ 110 permit udp any 146.40.10.128 0.0.0.31 range 49152 65535
+ 120 permit udp 146.40.10.128 0.0.0.31 range 49152 65535 any
+ 130 remark Video Subnets in San Ramon for MPS MCU UDP Ports
+ 130 permit udp any 146.27.70.0 0.0.0.63 range 2326 6951
+ 140 permit udp 146.27.70.0 0.0.0.63 range 2326 6951 any
+ip access-list extended L3CVX-CORP-MARK-DSCP-CS3-CS6-AF3x
+ 10 remark * * * Mark LAN received traffic to DSCP AF31 (call signalling) * * *
+ 10 permit ip any any dscp cs3
+ 20 permit ip any any dscp cs6
+ 30 permit ip any any dscp af31
+ 40 permit ip any any dscp af32
+ 50 permit ip any any dscp af33
+ 60 permit tcp any any range 2000 2002
+ 70 permit tcp any range 2000 2002 any
+ 80 permit tcp any any range 11000 11999
+ 90 permit tcp any range 11000 11999 any
+ 100 remark H323-H225
+ 100 permit udp any any eq 1719
+ 110 permit udp any eq 1719 any
+ 120 permit tcp any any range 1718 1720
+ 130 permit tcp any range 1718 1720 any
+ 140 remark MGCP
+ 140 permit udp any any eq 2427
+ 150 permit udp any eq 2427 any
+ 160 permit tcp any any eq 2428
+ 170 permit tcp any eq 2428 any
+ 180 remark SIP
+ 180 permit tcp any any range 5060 5061
+ 190 permit udp any any range 5060 5061
+ 200 permit tcp any range 5060 5061 any
+ 210 permit udp any range 5060 5061 any
+ 220 remark H.245 for Cisco-Tandberg video
+ 220 permit tcp any range 5556 5574 any range 5555 5565
+ 230 permit tcp any range 5555 5565 any range 5556 5574
+ 240 remark BGP
+ 240 permit tcp any any eq bgp
+ 250 permit tcp any eq bgp any
+ip access-list extended L3CVX-CORP-MARK-DSCP-EF
+ 10 remark * * * Mark LAN received traffic to DSCP EF (real-time) * * *
+ 10 permit ip any any dscp ef
+ 20 permit udp any range 16384 32767 any dscp ef
+ 30 permit udp any any range 16384 32767 dscp ef
+ 40 permit udp any range 16384 32767 any precedence critical
+ 50 permit udp any any range 16384 32767 precedence critical
+ip access-list extended NETWORK-CONTROL
+ 10 remark **** MATCHING BGP & BFD TRAFFIC ***
+ 10 permit tcp any any eq bgp
+ 20 permit udp any eq 49152 any eq 3784
+ 30 permit udp any eq 3785 any eq 3785
+ip access-list extended RDP-TRAFFIC
+ 10 permit tcp any any eq 3389
+ 20 permit udp any any eq 3389
+ 30 permit tcp any eq 3389 any
+ 40 permit udp any eq 3389 any
+!
+!
+ip prefix-list BGP-to-EIGRP seq 5 permit 0.0.0.0/0
+ip prefix-list BGP-to-EIGRP seq 10 permit 0.0.0.0/0 ge 12 le 19
+!
+ip prefix-list i--65456 seq 5 permit 0.0.0.0/0
+ip prefix-list i--65456 seq 10 permit 0.0.0.0/0 ge 8 le 19
+logging source-interface Loopback0
+logging host 146.36.114.214
+logging host 139.65.140.24
+ip access-list standard 20
+ 10 permit 139.65.136.0 0.0.3.255
+ 20 permit 139.65.140.0 0.0.3.255
+ 30 permit 139.65.192.0 0.0.15.255
+ 40 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 permit 146.40.10.21
+ 40 deny   any log
+ip access-list standard 1330
+ 10 permit 146.22.71.201
+ 20 permit 146.22.9.201
+ 30 permit 146.22.8.0 0.0.0.255
+ 40 permit 146.38.92.0 0.0.0.255
+ 50 permit 146.24.136.0 0.0.0.255
+ 60 permit 146.24.146.0 0.0.0.255
+ 70 permit 146.24.250.0 0.0.0.255
+ 80 permit 146.27.26.0 0.0.1.255
+ 90 permit 146.36.145.0 0.0.0.255
+ 100 permit 146.36.10.0 0.0.0.255
+ 110 permit 146.40.185.0 0.0.0.255
+ 120 permit 139.65.136.0 0.0.3.255
+ 130 permit 146.36.126.128 0.0.0.63
+ 140 permit 146.27.84.128 0.0.0.63
+ 150 permit 146.36.130.224 0.0.0.31
+ 160 deny   any log
+!
+!
+route-map BGP-to-EIGRP permit 10 
+ match ip address prefix-list BGP-to-EIGRP
+!
+route-map o--65456-L permit 10 
+ match ip address prefix-list o--65456-L
+ set as-path prepend 65055
+!
+route-map i--65456-L permit 10 
+ match ip address prefix-list i--65456-L
+ set local-preference 110
+!
+route-map o--65456 permit 10 
+ match as-path 1
+ set as-path prepend 65055 65055
+!
+route-map i--65456 permit 10 
+ match ip address prefix-list i--65456
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location PAN / Cia. Texaco De Panama S.A., Panama City / Panama / Americas /PA-NA-Utility-WAN-Remotes/Criticality-Medium
+snmp-server contact global.netops@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021  config
+snmp-server host 139.65.136.12 version 3 priv cvx2022  config
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp-server host 146.27.95.122 public  ipmulticast
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+!
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server HOU2_ACS
+ address ipv4 139.65.143.4
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/2/0:15
+ echo-cancel coverage 64
+ local-alerting
+!
+voice-port 0/3/0
+ echo-cancel coverage 64
+ timing hookflash-out 50
+ timing guard-out 1000
+ connection plar 84789000
+!
+voice-port 0/3/1
+ echo-cancel coverage 64
+ timing hookflash-out 50
+ timing guard-out 1000
+ connection plar 84789000
+!
+voice-port 0/3/2
+ echo-cancel coverage 64
+ timing hookflash-out 50
+ timing guard-out 1000
+ connection plar 84789000
+!
+voice-port 0/3/3
+ echo-cancel coverage 64
+ timing hookflash-out 50
+ timing guard-out 1000
+ connection plar 84789000
+!
+voice-port 1/0/0
+ echo-cancel coverage 64
+ timing hookflash-out 50
+ timing guard-out 1000
+ connection plar 84789000
+!
+voice-port 1/0/1
+ echo-cancel coverage 64
+ timing hookflash-out 50
+ timing guard-out 1000
+ connection plar 84789000
+!
+voice-port 1/0/2
+ echo-cancel coverage 80
+ timing hookflash-out 50
+ timing guard-out 1000
+ connection plar 84789000
+!
+voice-port 1/0/3
+ echo-cancel coverage 64
+ timing hookflash-out 50
+ timing guard-out 1000
+ connection plar 84789000
+!
+mgcp
+mgcp call-agent hou150nxcm2.hou150.chevrontexaco.net 2427 service-type mgcp version 0.1
+mgcp dtmf-relay voip codec all mode out-of-band
+mgcp rtp unreachable timeout 1000 action notify
+mgcp modem passthrough voip mode nse
+mgcp package-capability rtp-package
+mgcp package-capability sst-package
+mgcp package-capability pre-package
+no mgcp package-capability res-package
+no mgcp package-capability fxr-package
+no mgcp timer receive-rtcp
+mgcp sdp simple
+mgcp fax t38 ls_redundancy 5
+mgcp fax t38 hs_redundancy 2
+mgcp fax t38 nsf 000000
+mgcp fax t38 gateway force
+mgcp rtp payload-type g726r16 static
+mgcp bind control source-interface Loopback0
+mgcp bind media source-interface Loopback0
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local Loopback0
+sccp ccm 146.39.241.248 identifier 3 version 3.1 
+sccp ccm 146.34.4.163 identifier 1 version 7.0 
+sccp ccm 146.34.5.163 identifier 2 version 7.0 
+sccp ip precedence 3
+sccp
+!
+sccp ccm group 1
+ associate ccm 1 priority 1
+ associate ccm 2 priority 2
+ associate ccm 3 priority 3
+ associate profile 1 register CFB001b544373f0
+ switchback method graceful
+!
+ccm-manager music-on-hold
+!
+ccm-manager fallback-mgcp 
+ccm-manager redundant-host bocnxcm2.gdc0.chevron.net san520nxhouc0.san520.chevrontexaco.net
+ccm-manager mgcp
+no ccm-manager fax protocol cisco
+ccm-manager config server 146.34.4.164 146.34.5.164  
+ccm-manager config
+!
+telephony-service
+ mode esrst
+ srst mode auto-provision all
+ srst ephone template 5
+ srst dn template 3
+ srst dn line-mode dual
+ max-ephones 110
+ max-dn 288
+ ip source-address 146.39.241.248 port 2000
+ max-redirect 20
+ system message primary Fallback Mode: Active
+ load 7960-7940 p00305000600
+ max-conferences 8 gain -6
+ moh enable-g711 "music-on-hold.au"
+ multicast moh 239.203.2.222 port 16384
+ transfer-system full-consult
+!
+!
+dspfarm profile 1 conference  
+ description Conferencing Resources
+ codec g729br8
+ codec g729r8
+ codec g729abr8
+ codec g729ar8
+ codec g711alaw
+ codec g711ulaw
+ maximum sessions 2
+ associate application SCCP
+ shutdown
+!
+dial-peer voice 3000 voip
+ destination-pattern 84789000
+ session protocol sipv2
+ session target ipv4:146.39.241.222
+ dtmf-relay sip-notify
+ codec g711ulaw
+ no vad
+!
+dial-peer voice 1000 pots
+ description Inbound Dial-Peer used by SRST
+ translation-profile incoming SRST-Incoming
+ incoming called-number .
+ direct-inward-dial
+!
+dial-peer voice 1001 pots
+ description PSTN SRST Access
+ translation-profile outgoing 10-digit-CID-outbound
+ destination-pattern 9T
+!
+dial-peer voice 2000 pots
+ preference 10
+ destination-pattern 9T
+ port 0/3/0
+!
+dial-peer voice 2001 pots
+ preference 10
+ destination-pattern 9T
+ port 0/3/1
+!
+dial-peer voice 2002 pots
+ preference 10
+ destination-pattern 9T
+ port 0/3/2
+!
+dial-peer voice 2003 pots
+ preference 10
+ destination-pattern 9T
+ port 0/3/3
+!
+dial-peer voice 2004 pots
+ preference 10
+ destination-pattern 9T
+ port 1/0/0
+!
+dial-peer voice 2005 pots
+ preference 10
+ destination-pattern 9T
+ port 1/0/1
+!
+dial-peer voice 2006 pots
+ preference 10
+ destination-pattern 9T
+ port 1/0/2
+!
+dial-peer voice 2007 pots
+ preference 10
+ destination-pattern 9T
+ port 1/0/3
+!
+dial-peer voice 999020 pots
+ service mgcpapp
+ port 0/3/0
+!
+dial-peer voice 999021 pots
+ service mgcpapp
+ port 0/3/1
+!
+dial-peer voice 999022 pots
+ service mgcpapp
+ port 0/3/2
+!
+dial-peer voice 999023 pots
+ service mgcpapp
+ port 0/3/3
+!
+dial-peer voice 999033 pots
+ service mgcpapp
+ port 1/0/3
+!
+dial-peer voice 999030 pots
+ service mgcpapp
+ port 1/0/0
+!
+dial-peer voice 999032 pots
+ service mgcpapp
+ port 1/0/2
+!
+dial-peer voice 999031 pots
+ service mgcpapp
+ port 1/0/1
+!
+dial-peer voice 99902990 pots
+ service mgcpapp
+ port 0/3/0
+!
+dial-peer voice 99902991 pots
+ service mgcpapp
+ port 0/3/1
+!
+dial-peer voice 99902992 pots
+ service mgcpapp
+ port 0/3/2
+!
+dial-peer voice 99902993 pots
+ service mgcpapp
+ port 0/3/3
+!
+dial-peer voice 99903990 pots
+ service mgcpapp
+ port 1/0/0
+!
+dial-peer voice 99903991 pots
+ service mgcpapp
+ port 1/0/1
+!
+dial-peer voice 99903992 pots
+ service mgcpapp
+ port 1/0/2
+!
+dial-peer voice 99903993 pots
+ service mgcpapp
+ port 1/0/3
+!
+dial-peer voice 3002 voip
+ destination-pattern 84789169
+ session protocol sipv2
+ session target ipv4:146.39.241.222
+ dtmf-relay sip-notify
+ codec g711ulaw
+ no vad
+!
+dial-peer voice 3001 voip
+ destination-pattern 84789100
+ session protocol sipv2
+ session target ipv4:146.39.241.222
+ dtmf-relay sip-notify
+ codec g711ulaw
+ no vad
+!
+dial-peer voice 99902099 pots
+ service mgcpapp
+ port 0/3/0
+!
+dial-peer voice 99902199 pots
+ service mgcpapp
+ port 0/3/1
+!
+dial-peer voice 99902299 pots
+ service mgcpapp
+ port 0/3/2
+!
+dial-peer voice 99902399 pots
+ service mgcpapp
+ port 0/3/3
+!
+dial-peer voice 99903099 pots
+ service mgcpapp
+ port 1/0/0
+!
+dial-peer voice 99903199 pots
+ service mgcpapp
+ port 1/0/1
+!
+dial-peer voice 99903299 pots
+ service mgcpapp
+ port 1/0/2
+!
+dial-peer voice 99903399 pots
+ service mgcpapp
+ port 1/0/3
+!
+!
+num-exp 19... 84789...
+!
+ephone-dn-template  3
+!
+!
+ephone-dn  1  dual-line
+ number 84789102
+ label 84789102
+ description 3069102
+ name 3069102
+!
+!
+ephone-dn  2  dual-line
+ number 84789500
+ label 84789500
+ description 84789500
+ name 84789500
+!
+!
+ephone-dn  3  dual-line
+ number 84789104
+ label 84789104
+ description 3069104
+ name 3069104
+!
+!
+ephone-dn  4  dual-line
+ number 84789103
+ label 84789103
+ description 3069103
+ name 3069103
+!
+!
+ephone-dn  5  dual-line
+ number 84789044
+ label 84789044
+ description 3069044
+ name 3069044
+!
+!
+ephone-dn  6  dual-line
+ number 84789043
+ label 84789043
+ description 3069043
+ name 3069043
+!
+!
+ephone-dn  7  dual-line
+ number 84789501
+ description 84789501
+ name 84789501
+!
+!
+ephone-dn  8  dual-line
+ number 84789095
+ label 84789095
+ description 3069095
+ name 3069095
+!
+!
+ephone-dn  9  dual-line
+ number 84789164
+ label 84789164
+ description 3069164
+ name 3069164
+!
+!
+ephone-dn  10  dual-line
+ number 84789122
+ label 84789122
+ description 3069122
+ name 3069122
+!
+!
+ephone-dn  11  dual-line
+ number 84789063
+ label 84789063
+ description 3069063
+ name 3069063
+!
+!
+ephone-dn  12  dual-line
+ number 84789003
+ label 84789003
+ description 3069003
+ name 3069003
+!
+!
+ephone-dn  13  dual-line
+ number 84789051
+ label 84789051
+ description 3069051
+ name 3069051
+!
+!
+ephone-dn  14  dual-line
+ number 84789121
+ label 84789121
+ description 3069121
+ name 3069121
+!
+!
+ephone-dn  15  dual-line
+ number 84789005
+ label 84789005
+ description 3069005
+ name 3069005
+!
+!
+ephone-dn  16  dual-line
+ number 84789068
+ label 84789068
+ description 3069068
+ name 3069068
+!
+!
+ephone-dn  17  dual-line
+ number 84789154
+ label 84789154
+ description 3069154
+ name 3069154
+!
+!
+ephone-dn  18  dual-line
+ number 84789033
+ label 84789033
+ description 3069033
+ name 3069033
+!
+!
+ephone-dn  19  dual-line
+ number 84789176
+ label 84789176
+ description 3069176
+ name 3069176
+!
+!
+ephone-dn  20  dual-line
+ number 84789011
+ label 84789011
+ description 3069011
+ name 3069011
+!
+!
+ephone-dn  21  dual-line
+ number 84789137
+ label 84789137
+ description 3069137
+ name 3069137
+!
+!
+ephone-dn  22  dual-line
+ number 84789152
+ label 84789152
+ description 5074789152
+ name 5074789152
+!
+!
+ephone-dn  23  dual-line
+ number 84789002
+ label 84789002
+ description 3069002
+ name 3069002
+!
+!
+ephone-dn  24  dual-line
+ number 84789143
+ label 84789143
+ description 3069143
+ name 3069143
+!
+!
+ephone-dn  25  dual-line
+ number 84789064
+ label 84789064
+ description 3069064
+ name 3069064
+!
+!
+ephone-dn  26  dual-line
+ number 84789055
+ label 84789055
+ description 3069055
+ name 3069055
+!
+!
+ephone-dn  27  dual-line
+ number 84789174
+ description 84789174
+ name 84789174
+!
+!
+ephone-dn  28  dual-line
+ number 84789182
+ label 84789182
+ description 3069182
+ name 3069182
+ ephone-dn-template 3
+!
+!
+ephone-dn  29  dual-line
+ number 84789181
+ label 84789181
+ description 4789181
+ name 4789181
+ ephone-dn-template 3
+!
+!
+ephone-dn  30  dual-line
+ number 84789105
+ label 84789105
+ description 3069105
+ name 3069105
+!
+!
+ephone-dn  31  dual-line
+ number 81001987
+ label 81001987
+ description 3069100
+ name 3069100
+!
+!
+ephone-dn  32  dual-line
+ number 84789132
+ label 84789132
+ description 3069132
+ name 3069132
+!
+!
+ephone-dn  33  dual-line
+ number 84789136
+ label 84789136
+ description 3069136
+ name 3069136
+!
+!
+ephone-dn  34  dual-line
+ number 84789032
+ label 84789032
+ description 3069032
+ name 3069032
+ ephone-dn-template 3
+!
+!
+ephone-dn  35  dual-line
+ number 84789134
+ label 84789134
+ description 3069134
+ name 3069134
+ ephone-dn-template 3
+!
+!
+ephone-dn  36  dual-line
+ number 84789135
+ description 84789135
+ name 84789135
+ ephone-dn-template 3
+!
+!
+ephone-dn  37  dual-line
+ number 84789014
+ label 84789014
+ description 3069014
+ name 3069014
+ ephone-dn-template 3
+!
+!
+ephone-dn  38  dual-line
+ number 84789133
+ description 84789133
+ name 84789133
+ ephone-dn-template 3
+!
+!
+ephone-dn  39  dual-line
+ number 84789131
+ description 84789131
+ name 84789131
+ ephone-dn-template 3
+!
+!
+ephone-dn  40  dual-line
+ number 84789111
+ label 84789111
+ description 3069111
+ name 3069111
+ ephone-dn-template 3
+!
+!
+ephone-dn  41  dual-line
+ number 84789138
+ label 84789138
+ description 3069138
+ name 3069138
+ ephone-dn-template 3
+!
+!
+ephone-dn  42  dual-line
+ number 84789150
+ label 84789150
+ description 5074789150
+ name 5074789150
+ ephone-dn-template 3
+!
+!
+ephone-dn  43  dual-line
+ number 84789012
+ label 84789012
+ description 3069012
+ name 3069012
+ ephone-dn-template 3
+!
+!
+ephone-dn  44  dual-line
+ number 81001989
+ label 81001989
+ description 3069100
+ name 3069100
+ ephone-dn-template 3
+!
+!
+ephone  1
+ mac-address 0023.049C.0CE5
+ button  1:1
+!
+!
+!
+ephone  2
+ mac-address 0023.049B.ED35
+ button  1:3 2:2
+!
+!
+!
+ephone  3
+ mac-address 0023.049C.0CB6
+ button  1:4 2:2
+!
+!
+!
+ephone  4
+ mac-address 0023.049A.D93F
+ button  1:5
+!
+!
+!
+ephone  5
+ mac-address 0023.0435.5A65
+ button  1:6
+!
+!
+!
+ephone  6
+ mac-address 0022.905B.BA81
+ button  1:7
+!
+!
+!
+ephone  7
+ mac-address 0023.0435.5976
+ button  1:9
+!
+!
+!
+ephone  8
+ mac-address 0023.0435.57AA
+ button  1:8
+!
+!
+!
+ephone  9
+ mac-address 0023.049B.C1BA
+ button  1:10
+!
+!
+!
+ephone  10
+ mac-address 0023.049B.F31E
+ button  1:11
+!
+!
+!
+ephone  11
+ mac-address 0023.0435.57BB
+ button  1:12
+!
+!
+!
+ephone  12
+ mac-address 0023.049B.F49A
+ button  1:13
+!
+!
+!
+ephone  13
+ mac-address 0023.049B.D6DC
+ button  1:14
+!
+!
+!
+ephone  14
+ mac-address 0023.049B.C894
+ button  1:16
+!
+!
+!
+ephone  15
+ mac-address 0023.049B.C654
+ button  1:15
+!
+!
+!
+ephone  16
+ mac-address 0023.049B.F21D
+ button  1:17
+!
+!
+!
+ephone  17
+ mac-address 0023.049A.D744
+ button  1:18
+!
+!
+!
+ephone  18
+ mac-address 0023.0435.5A26
+ button  1:19
+!
+!
+!
+ephone  19
+ mac-address 0022.90B9.7121
+ button  1:20
+!
+!
+!
+ephone  20
+ mac-address 0023.0435.584E
+!
+!
+!
+ephone  21
+ mac-address 0023.049B.F487
+!
+!
+!
+ephone  22
+ mac-address 0023.049B.F375
+!
+!
+!
+ephone  23
+ mac-address 0023.049A.D615
+!
+!
+!
+ephone  24
+ mac-address 0023.049B.C3A1
+!
+!
+!
+ephone  25
+ mac-address 0023.049B.F2FA
+!
+!
+!
+ephone  26
+ mac-address 0023.0435.5769
+!
+!
+!
+ephone  27
+ mac-address 0023.049B.C6E2
+!
+!
+!
+ephone  28
+ mac-address 0023.049B.F4B8
+!
+!
+!
+ephone  29
+ mac-address 0023.049B.C64C
+!
+!
+!
+ephone  30
+ mac-address 0023.0434.F5D7
+!
+!
+!
+ephone  31
+ mac-address 0023.049B.F38B
+!
+!
+!
+ephone  32
+ mac-address 0023.0435.5732
+!
+!
+!
+ephone  33
+ mac-address 0023.049B.F269
+!
+!
+!
+ephone  34
+ mac-address 0023.049B.F370
+!
+!
+!
+ephone  35
+ mac-address 0023.049B.F21F
+!
+!
+!
+ephone  36
+ mac-address 0023.049B.F49F
+!
+!
+!
+ephone  37
+ mac-address 0023.049B.F24C
+!
+!
+!
+ephone  38
+ mac-address 0023.049A.D719
+!
+!
+!
+ephone  39
+ mac-address 0023.049B.F361
+!
+!
+!
+ephone  40
+ mac-address 0023.049B.C1DF
+!
+!
+!
+ephone  41
+ mac-address 0023.0435.577C
+!
+!
+!
+ephone  42
+ mac-address 0023.0435.5761
+!
+!
+!
+ephone  43
+ mac-address 0023.049A.D75D
+!
+!
+!
+ephone  44
+ mac-address 0023.049B.F4A1
+!
+!
+!
+ephone  45
+ mac-address 0023.049B.C886
+!
+!
+!
+ephone  46
+ mac-address 0023.049B.F2F7
+!
+!
+!
+ephone  47
+ mac-address 0023.0435.5795
+!
+!
+!
+ephone  48
+ mac-address 0023.049B.F490
+!
+!
+!
+ephone  49
+ mac-address 0023.049B.F23F
+!
+!
+!
+ephone  50
+ mac-address 0023.0435.576E
+!
+!
+!
+ephone  51
+ mac-address 0023.049B.C86B
+!
+!
+!
+ephone  52
+ mac-address 0023.049A.D986
+!
+!
+!
+ephone  53
+ mac-address 0023.049B.F317
+!
+!
+!
+ephone  54
+ mac-address 0023.049B.F3F8
+!
+!
+!
+ephone  55
+ mac-address 0023.049B.F2F6
+!
+!
+!
+ephone  56
+ mac-address 0023.049B.F222
+!
+!
+!
+ephone  57
+ mac-address 0023.049B.C6D8
+!
+!
+!
+ephone  58
+ mac-address 0023.049B.F22A
+!
+!
+!
+ephone  59
+ mac-address 0023.049B.F48A
+!
+!
+!
+ephone  60
+ mac-address 0023.049B.C83E
+!
+!
+!
+ephone  61
+ mac-address 0023.049A.CF7C
+!
+!
+!
+ephone  62
+ mac-address 0023.0435.5717
+!
+!
+!
+ephone  63
+ mac-address 0023.049B.F311
+!
+!
+!
+ephone  64
+ mac-address 0023.049B.F3E5
+!
+!
+!
+ephone  65
+ mac-address 0023.049B.F23E
+!
+!
+!
+ephone  66
+ mac-address 0023.0435.5722
+!
+!
+!
+ephone  67
+ mac-address 0023.049B.F21E
+!
+!
+!
+ephone  68
+ mac-address 0023.049B.F383
+!
+!
+!
+ephone  69
+ mac-address 0023.049B.C75F
+!
+!
+!
+ephone  70
+ mac-address 0023.049B.F359
+!
+!
+!
+ephone  71
+ mac-address 0023.0435.56A2
+!
+!
+!
+ephone  72
+ mac-address 0023.049B.F4C8
+!
+!
+!
+ephone  73
+ mac-address 0023.049B.C22B
+!
+!
+!
+ephone  74
+ mac-address 0023.049B.F362
+!
+!
+!
+ephone  75
+ mac-address 0023.049B.F3A2
+!
+!
+!
+ephone  76
+ mac-address 1D84.56B8.9400
+!
+!
+!
+ephone  77
+ mac-address 0023.049B.F1FE
+!
+!
+!
+ephone  78
+ mac-address 0023.049A.D7B5
+!
+!
+!
+ephone  79
+ mac-address 0023.049B.F4A9
+!
+!
+!
+ephone  80
+ mac-address 0023.049B.C317
+!
+!
+!
+ephone  81
+ mac-address 1D84.56B8.9402
+!
+!
+!
+ephone  82
+ mac-address 0007.EB18.3B22
+!
+!
+!
+ephone  83
+ mac-address 1D84.56B8.9404
+!
+!
+!
+ephone  84
+ mac-address 0004.F2E5.202A
+!
+!
+!
+ephone  85
+ mac-address 0004.F2E5.201E
+!
+!
+!
+ephone  86
+ mac-address 0004.F2E5.1AA0
+!
+!
+!
+ephone  87
+ mac-address 1D84.56B8.9403
+!
+!
+!
+ephone  88
+ mac-address 1D84.56B8.9406
+!
+!
+!
+ephone  89
+ mac-address 001C.259C.E75A
+!
+!
+!
+ephone  90
+ mac-address 1D84.56B8.9401
+!
+!
+!
+ephone  91
+ mac-address 1D84.56B8.9405
+!
+!
+!
+ephone  92
+ mac-address 1D84.56B8.9407
+!
+!
+!
+ephone  93
+ mac-address 0023.049B.F43E
+!
+!
+!
+ephone  94
+ mac-address 001C.25B8.58F0
+!
+!
+!
+ephone  95
+ mac-address 001C.2516.4DE6
+!
+!
+!
+ephone  96
+ mac-address 0022.6812.35D3
+!
+!
+!
+ephone  97
+ mac-address 0024.7E69.F573
+!
+!
+!
+ephone  98
+ mac-address 0022.6812.34EC
+!
+!
+!
+ephone  99
+ mac-address 001C.25B8.78C2
+!
+!
+!
+ephone  100
+ mac-address 001C.25B8.5D88
+!
+!
+!
+ephone  101
+ mac-address 0024.7E6D.AF57
+ button  1:12
+!
+!
+!
+ephone  102
+ mac-address 001C.25B8.4174
+!
+!
+!
+ephone  103
+ mac-address 0024.7E6D.D4DB
+ button  1:13
+!
+!
+!
+ephone  104
+ mac-address 0022.6812.3675
+!
+!
+!
+ephone  105
+ mac-address 0025.56CD.037D
+ button  1:12
+!
+!
+!
+ephone  106
+ mac-address 001F.3B94.8973
+!
+!
+!
+ephone  107
+ mac-address 001C.2516.6D90
+!
+!
+!
+ephone  108
+ mac-address 001C.2574.631C
+!
+!
+!
+ephone  109
+ mac-address 0022.6812.3651
+!
+!
+!
+ephone  110
+ mac-address 001C.2516.5757
+!
+!
+!
+ephone  111
+ mac-address 0023.0435.5734
+!
+!
+!
+ephone  112
+ mac-address 0021.CCCE.F2FA
+!
+!
+!
+ephone  113
+ mac-address 0021.CCCE.F2DC
+!
+!
+!
+ephone  114
+ mac-address 28D2.4428.70D5
+!
+!
+!
+ephone  115
+ mac-address 3C97.0E40.A387
+!
+!
+!
+ephone  116
+ mac-address 3C97.0E9D.2FB2
+ button  1:16
+!
+!
+!
+ephone  117
+ mac-address 28D2.4473.C646
+!
+!
+!
+ephone  118
+ mac-address 0023.0435.57AB
+ button  1:7
+!
+!
+!
+ephone  119
+ mac-address 28D2.4447.676C
+!
+!
+!
+ephone  120
+ mac-address 28D2.4467.982A
+!
+!
+!
+ephone  121
+ mac-address 68F7.28F9.1BE5
+!
+!
+!
+ephone  122
+ mac-address 28D2.4467.9DA2
+ button  1:12
+!
+!
+!
+ephone  123
+ mac-address 507B.9D6F.9AD8
+ button  1:9
+!
+!
+!
+ephone  124
+ mac-address 507B.9D6A.4883
+!
+!
+!
+ephone  125
+ mac-address 0023.049B.F43D
+!
+!
+!
+ephone  126
+ mac-address 28D2.4465.2901
+ button  1:1
+!
+!
+!
+ephone  127
+ mac-address 0021.CCD6.5104
+!
+!
+!
+ephone  128
+ mac-address 28D2.4467.91DA
+!
+!
+!
+ephone  129
+ mac-address 0023.049B.C1DE
+!
+!
+!
+ephone  130
+ mac-address 9829.A67D.9711
+!
+!
+!
+ephone  131
+ mac-address 54E1.AD91.A2CD
+!
+!
+!
+ephone  132
+ mac-address 54E1.AD92.7B8A
+ button  1:21
+!
+!
+!
+ephone  133
+ mac-address 68F7.28F9.1BE8
+ button  1:22
+!
+!
+!
+ephone  134
+ mac-address 28D2.4465.AA89
+ button  1:23
+!
+!
+!
+ephone  135
+ mac-address 54E1.AD91.A62D
+ button  1:24
+!
+!
+!
+ephone  136
+ mac-address 28D2.4467.9D97
+ button  1:25
+!
+!
+!
+ephone  137
+ mac-address 54E1.AD91.A4EB
+ button  1:26
+!
+!
+!
+ephone  138
+ mac-address 9829.A687.0C18
+ button  1:22
+!
+!
+!
+ephone  139
+ mac-address 9829.A686.ABCD
+ button  1:27
+!
+!
+!
+ephone  140
+ mac-address 9829.A686.F7F4
+ button  1:25
+!
+!
+!
+ephone  141
+ mac-address 0023.0435.5713
+!
+!
+!
+ephone  142
+ mac-address 8C16.4537.1BD3
+ button  1:30 2:31
+!
+!
+!
+ephone  143
+ mac-address 9829.A686.ABD0
+ button  1:32
+!
+!
+!
+ephone  144
+ mac-address 8C16.4537.2C18
+ button  1:33
+!
+!
+!
+ephone  145
+ mac-address 8C16.4537.2C6B
+!
+!
+!
+ephone  146
+ mac-address 8C16.4537.2B2F
+!
+!
+!
+ephone  147
+ mac-address 507B.9D62.D683
+ button  1:15
+!
+!
+!
+ephone  148
+ mac-address 54E1.AD92.842A
+!
+!
+!
+ephone  149
+ mac-address 8C16.4537.2B2B
+!
+!
+!
+ephone  150
+ mac-address 9829.A687.0C1C
+!
+!
+!
+ephone  151
+ mac-address 8C16.4537.2C87
+ button  1:23
+!
+!
+!
+ephone  152
+ mac-address 94D4.692A.449F
+!
+!
+!
+ephone  153
+ mac-address 94D4.692A.45D1
+!
+!
+!
+ephone  154
+ mac-address 94D4.692A.476E
+!
+!
+!
+ephone  155
+ mac-address 0023.049B.D8B2
+!
+!
+!
+ephone  156
+ mac-address 0023.0435.572E
+!
+!
+!
+ephone  157
+ mac-address 0023.049B.F453
+ button  1:27
+!
+!
+!
+ephone  158
+ mac-address E86A.64CF.32D7
+ button  1:28
+!
+!
+!
+ephone  159
+ mac-address 9C5A.441E.0A2E
+!
+!
+!
+ephone  160
+ mac-address 9829.A687.0D4C
+ button  1:29
+!
+!
+!
+ephone  161
+ mac-address FC45.96AA.5B7F
+!
+!
+!
+ephone  162
+ mac-address 8C16.4537.1D58
+ button  1:12
+!
+!
+!
+ephone  163
+ mac-address 507B.9D6A.46FA
+ button  1:34
+!
+!
+!
+ephone  164
+ mac-address E86A.64CF.32BC
+ button  1:35
+!
+!
+!
+ephone  165
+ mac-address 8C16.4537.1914
+ button  1:36
+!
+!
+!
+ephone  166
+ mac-address 9C5A.447F.E2C3
+ button  1:32
+!
+!
+!
+ephone  167
+ mac-address 9C5A.447F.E2B3
+!
+!
+!
+ephone  168
+ mac-address 8C16.4537.2C15
+!
+!
+!
+ephone  169
+ mac-address E86A.64CF.32C7
+!
+!
+!
+ephone  170
+ mac-address 54E1.AD92.8625
+ button  1:7
+!
+!
+!
+ephone  171
+ mac-address 54E1.AD91.A0AE
+!
+!
+!
+ephone  172
+ mac-address E86A.64CF.32C3
+!
+!
+!
+ephone  173
+ mac-address 9C5A.441E.0A35
+ button  1:15
+!
+!
+!
+ephone  174
+ mac-address E86A.64B9.53A6
+ button  1:34
+!
+!
+!
+ephone  175
+ mac-address 8C16.4537.28A3
+!
+!
+!
+ephone  176
+ mac-address E86A.64B9.50E7
+ button  1:1
+!
+!
+!
+ephone  177
+ mac-address 54E1.AD86.3050
+ button  1:30 2:31
+!
+!
+!
+ephone  178
+ mac-address 002B.6758.666C
+ button  1:37
+!
+!
+!
+ephone  179
+ mac-address E86A.64CF.3450
+!
+!
+!
+ephone  180
+ mac-address 002B.6758.73DE
+ button  1:38
+!
+!
+!
+ephone  181
+ mac-address 002B.6758.666E
+ button  1:7 2:44
+!
+!
+!
+ephone  182
+ mac-address 54E1.AD92.8790
+ button  1:39
+!
+!
+!
+ephone  183
+ mac-address 002B.6758.6FF6
+ button  1:40
+!
+!
+!
+ephone  184
+ mac-address 002B.6758.71A2
+ button  1:21
+!
+!
+!
+ephone  185
+ mac-address E86A.64CF.32C9
+ button  1:17
+!
+!
+!
+ephone  186
+ mac-address 002B.6754.B889
+ button  1:36
+!
+!
+!
+ephone  187
+ mac-address 002B.6758.6664
+ button  1:41
+!
+!
+!
+ephone  188
+ mac-address 84A9.3821.3EFD
+ button  1:27
+!
+!
+!
+ephone  189
+ mac-address 84A9.3821.420B
+ button  1:22
+!
+!
+!
+ephone  190
+ mac-address 84A9.3821.41F3
+ button  1:42
+!
+!
+!
+ephone  191
+ mac-address 9C5A.441E.0A23
+ button  1:43
+!
+!
+!
+ephone  192
+ mac-address 9829.A66C.01E1
+ button  1:15
+!
+!
+!
+ephone  193
+ mac-address 9C2D.CD21.FC4B
+ speed-dial 1 84681607 label "Quick Pulse Survey"
+ button  1:30 2:31
+!
+!
+ephone-hunt 1 sequential
+ pilot 84789510
+ list 84789102, 84789103, 84789104
+!
+!
+banner exec ^CC
+*******************************************************************************************
+WARNING - this router forms part of the Regional WAN network.
+Changes to the configuration may result in loss of connectivity.
+STOP if you are unsure what you are doing and email global.netops@chevron.com for guidance!
+*******************************************************************************************
+^C
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input ssh
+ transport output ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input ssh
+ transport output ssh
+!
+network-clock synchronization automatic
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+end

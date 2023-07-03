@@ -1,0 +1,727 @@
+Building configuration...
+
+Current configuration : 17847 bytes
+!
+! Last configuration change at 05:24:39 CST Fri Jun 16 2023 by admin
+! NVRAM config last updated at 05:25:16 CST Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname US-TX-SAN520-SL1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Vlan150
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network ACS_LIST group tacacs+ 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CST -6 0
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+ip domain-lookup source-interface Vlan100
+ip domain-name SAN520.chevrontexaco.net
+ip name-server 146.36.80.34
+ip name-server 146.36.82.34
+vtp domain SAN520
+vtp mode off
+!
+!
+!
+!
+!
+!
+!
+archive
+ path flash:cvx_122135
+ maximum 5
+!
+spanning-tree mode rapid-pvst
+spanning-tree logging
+spanning-tree portfast edge default
+spanning-tree portfast edge bpduguard default
+spanning-tree extend system-id
+spanning-tree uplinkfast
+spanning-tree pathcost method long
+spanning-tree vlan 1-4094 priority 61440
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause link-flap
+!
+!
+!
+!
+vlan internal allocation policy ascending
+!
+vlan 100
+ name DATA
+!
+vlan 200
+ name VOICE
+!
+vlan 300
+ name SECURITY
+!
+vlan 888
+ name NST.INTERNET.ACCESS
+!
+vlan 999
+ name DOT1Q.NATIVE
+!
+ip tcp path-mtu-discovery
+lldp run
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel1
+ description US-TX-SAN520-RL01
+ switchport trunk allowed vlan 100,200,300
+ switchport mode trunk
+ load-interval 30
+!
+interface FastEthernet0
+ no ip address
+!
+interface GigabitEthernet0/1
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/2
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/3
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/4
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/5
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/6
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/7
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/8
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/9
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/10
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/11
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/12
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/13
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/14
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/15
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/16
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/17
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/18
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/19
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/20
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/21
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/22
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/23
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/24
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/25
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/26
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/27
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/28
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/29
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/30
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/31
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/32
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/33
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/34
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/35
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/36
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/37
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/38
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/39
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/40
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/41
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/42
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/43
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/44
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/45
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/46
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/47
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/48
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/49
+ description US-TX-SAN520-RL01
+ switchport trunk allowed vlan 100,200,300
+ switchport mode trunk
+ logging event trunk-status
+ channel-group 1 mode active
+!
+interface GigabitEthernet0/50
+ description US-TX-SAN520-RL01
+ switchport trunk allowed vlan 100,200,300
+ switchport mode trunk
+ logging event trunk-status
+ channel-group 1 mode active
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan100
+ ip address 146.33.115.4 255.255.255.128
+ no ip proxy-arp
+!
+interface Vlan150
+ no ip address
+!
+ip default-gateway 146.33.115.1
+!
+no ip http server
+no ip http secure-server
+ip ssh source-interface Vlan100
+ip ssh version 2
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+logging history size 10
+logging source-interface Vlan100
+logging host 134.248.81.53
+logging host 146.36.114.214
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 10.0.0.0 0.63.255.255
+access-list 20 permit 10.128.0.0 0.7.255.255
+access-list 20 permit 10.254.0.0 0.0.255.255
+access-list 20 permit 146.22.0.0 0.1.255.255
+access-list 20 permit 146.24.0.0 0.7.255.255
+access-list 20 permit 146.32.0.0 0.7.255.255
+access-list 20 permit 146.40.0.0 0.3.255.255
+access-list 20 permit 146.44.0.0 0.1.255.255
+access-list 20 permit 146.46.0.0 0.0.255.255
+access-list 20 permit 136.171.0.0 0.0.255.255
+access-list 20 permit 139.65.0.0 0.0.255.255
+access-list 20 permit 134.248.0.0 0.0.255.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.22.8.197
+access-list 40 permit 134.248.2.29
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 auth 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group CVX2021 v3 auth 
+snmp-server group CVX2021 v3 priv 
+snmp-server group cvx2021 v3 priv 
+snmp-server group cvx2022 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server community CAnS33clry4U RO 1330
+snmp-server trap link ietf
+snmp-server trap-source Vlan100
+snmp-server location SAN520 / 5200 Rogers Rd, San Antonio, TX / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Low
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server host 139.65.136.12 version 3 auth CVX 
+snmp-server host 139.65.136.12 version 3 auth CVX2 
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 146.42.69.240 snmpv2c 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport output none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport input ssh
+!
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251 prefer
+ntp server 146.40.10.21
+end

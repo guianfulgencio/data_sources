@@ -1,0 +1,664 @@
+Building configuration...
+
+Current configuration : 20968 bytes
+!
+! Last configuration change at 13:46:53 PDT Fri Jun 16 2023 by admin
+! NVRAM config last updated at 13:47:28 PDT Fri Jun 16 2023 by svc-voy-ansible
+!
+version 16.12
+no service pad
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service counters max age 10
+service call-home
+service unsupported-transceiver
+no platform punt-keepalive disable-kernel-core
+!
+hostname ric841sl-lsfo-dst-s
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 128000
+no logging console
+no logging monitor
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group acs if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group acs
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock summer-time PDT recurring
+switch 1 provision c9500-16x
+!
+!
+!
+!
+call-home
+ contact-email-addr nmbtcon@chevron.com
+ profile "CiscoTAC-1"
+  destination transport-method http
+  no destination transport-method email
+ profile "CSSM"
+  reporting smart-licensing-data
+  destination transport-method http
+  no destination transport-method email
+  destination address http http://cssm.chevron.net/Transportgateway/services/DeviceRequestHandler 
+no ip source-route
+ip routing
+!
+ip multicast-routing 
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+ip name-server 146.28.194.32 146.28.158.32 146.27.66.36 146.27.66.35 146.36.82.3 146.36.82.34
+ip domain list chevrontexaco.net
+ip domain list ric841.chevrontexaco.net
+ip domain name ric841.chevrontexaco.net
+ip accounting-threshold 50
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+vtp domain ric841
+vtp mode transparent
+udld aggressive
+
+no device-tracking logging theft
+password encryption aes
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment terminal
+ revocation-check crl
+!
+crypto pki trustpoint TP-self-signed-1324361284
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1324361284
+ revocation-check none
+ rsakeypair TP-self-signed-1324361284
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+crypto pki certificate chain TP-self-signed-1324361284
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31333234 33363132 3834301E 170D3230 30383133 32323339 
+  34355A17 0D333030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 33323433 
+  36313238 34308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100BA40 C84D76E9 E40CA378 408573AE 3E39B841 375AECB8 FC1A0837 
+  06D59B8E 34717BE5 5F5D2874 216E9CAE A57A8C56 37211FE1 2A0B00E0 A7D186BD 
+  A463B9F3 955DC823 A1320061 85E42314 71E55E0D 8C55ADD3 AB87D064 F3EAB9B9 
+  10AB722D 16D210BE 29DDFF17 9ED20083 884EA157 45F7E4A3 3D503F27 06CD0EAD 
+  A73581D0 730D7D61 6DD13095 4AB653C8 ECCED239 B0F903FC 99D50D7B 5D30B08A 
+  473652E4 56719C20 A49E031D 47789330 238F3674 567CB07E D0505C0C 64BE6663 
+  D3F47E94 87D4703F 2EA6D186 23F09B37 421FF7D5 50F14926 0D7C60C6 18A39247 
+  0E91DD0F CDCCEAA2 66131C04 7F14CDF1 491E6C52 9B1C076A 23AFD9F3 1284AA64 
+  3ECB15A7 B12F0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 147FBF5C EC568B30 7E2A2125 045525BE 83CAB3A6 
+  FD301D06 03551D0E 04160414 7FBF5CEC 568B307E 2A212504 5525BE83 CAB3A6FD 
+  300D0609 2A864886 F70D0101 05050003 82010100 93BBD9C4 099E1311 E8962AF3 
+  5B089BD9 A6F71DA1 1E46B57C F6B38CEE 52A2A62A 3893038D 2DB1BD1C 835C7469 
+  49AAF449 38DFB7BE 60F8BFF2 452B1945 5BBD62C8 917B1317 587390C6 BF3501F0 
+  CC290EA3 E86F5E63 00BAEE5C 6C924942 A07332AB 53BDC56A E99D7E4C 0B1A8D7E 
+  5BD4928D 526DBA0A D0FBAA5C F73B387F EE01F5ED 9730A128 5655D9DF 2A084385 
+  1FDE7FC6 82EFAF10 3CC74586 290AEA4E A5EDF53E 25479130 23A1528F CE099923 
+  1A6CF661 31ADA179 5D51E711 C4CFB765 8E95E489 3F1889F1 B54B13D5 D9FA1F7C 
+  969BA3AB 34D0C3F2 58032327 5F010243 879EE8AA 21341C0C A1AA26A8 6BB4A458 
+  86642846 744F9033 825C10AA 1E6DC07D D6279DFA
+  	quit
+!
+!
+license boot level network-advantage
+!
+!
+diagnostic bootup level minimal
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 1-4093 priority 4096
+archive
+ path flash:cvx_134401
+ maximum 5
+memory free low-watermark processor 134356
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode sso
+!
+!
+!
+!
+!
+transceiver type all
+ monitoring
+vlan dot1q tag native 
+!
+vlan 198
+ name VLAN-198
+!
+vlan 239
+ name VLAN-239
+!
+vlan 352
+ name LSFO-Mngt-IPS
+!
+vlan 398
+ name VLAN-398
+!
+vlan 999
+ name trunks
+!
+!
+class-map match-any system-cpp-police-ewlc-control
+  description EWLC Control 
+class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data packets, LOGGING, Transit Traffic
+class-map match-any system-cpp-default
+  description EWLC Data, Inter FED Traffic 
+class-map match-any system-cpp-police-sys-data
+  description Openflow, Exception, EGR Exception, NFL Sampled Data, RPF Failed
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-high-rate-app
+  description High Rate Applications 
+class-map match-any system-cpp-police-multicast
+  description MCAST Data
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+  description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual OOB
+class-map match-any non-client-nrt-class
+class-map match-any system-cpp-police-routing-control
+  description Routing control and Low Latency
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any system-cpp-police-ios-routing
+  description L2 control, Topology control, Routing control, Low Latency
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+class-map match-any system-cpp-police-ios-feature
+  description ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed
+!
+policy-map system-cpp-policy
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 146.28.176.247 255.255.255.255
+ ip pim sparse-mode
+ ip mrm test-receiver
+!
+interface Port-channel100
+ description TRUNK LINK B/W Primary & Secondary
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,239,352,398,999
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface TenGigabitEthernet1/0/1
+ description ric841sl-340-petr
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,352,398,999
+ switchport mode trunk
+ switchport nonegotiate
+ shutdown
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TenGigabitEthernet1/0/2
+ description ric841sl-lsfo-dst-s - Te1/0/2 - Uplink connected to - ric841sl-lsf-340-petr2 - G1/1/3
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,352,398,999
+ switchport mode trunk
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TenGigabitEthernet1/0/3
+ description ric841sl-lsfo-dst-s - Te1/0/3 - Uplink connected to - ric841sl-lsf-80-petr - G1/1/2
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,398,999
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TenGigabitEthernet1/0/4
+ description ric841sl-lsfo-dst-s - Te1/0/4 - Uplink connected to - ric841sl-lsf-160-petr - G0/16
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,398,999
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TenGigabitEthernet1/0/5
+ description ric841sl-lsfo-dst-s - Te1/0/5 - Uplink connected to - ric841sl-lsf-sdp-4crdw - Gig1/1/1
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,239,398,999
+ switchport mode trunk
+ switchport nonegotiate
+ duplex full
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TenGigabitEthernet1/0/6
+ description ric841sl-lsfo-dst-s - Te1/0/6 - Uplink connected to - ric841sl-lsf-naphtha-sd - G0/15
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,398,999
+ switchport mode trunk
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TenGigabitEthernet1/0/7
+ description ric841sl-lsfo-dst-s - Te1/0/7 - Uplink connected to - ric841sl-lsf-drshutdown2 - G1/1/2
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,239,398,999
+ switchport mode trunk
+ duplex full
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TenGigabitEthernet1/0/8
+ shutdown
+!
+interface TenGigabitEthernet1/0/9
+ description ric841sl-lsfo-dst-s - Te1/0/9 - Uplink connected to - ric841sl-lsf-321-petr - G0/16
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,999
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/10
+ description ric841sl-lsfo-dst-s - Te1/0/10 <> ric841sl-lsf-164-petr - G0/14
+ switchport trunk allowed vlan 198,398,999
+ switchport mode trunk
+ duplex full
+!
+interface TenGigabitEthernet1/0/11
+ shutdown
+!
+interface TenGigabitEthernet1/0/12
+ shutdown
+!
+interface TenGigabitEthernet1/0/13
+ shutdown
+!
+interface TenGigabitEthernet1/0/14
+ shutdown
+!
+interface TenGigabitEthernet1/0/15
+ shutdown
+!
+interface TenGigabitEthernet1/0/16
+ description ric841sl-lsfo-dst-s - Te1/0/16 - Uplink connected to - ric841sl-lsf-sdp-4crde - Gig1/1/2
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,398,999
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/1/1
+ shutdown
+!
+interface TenGigabitEthernet1/1/2
+ shutdown
+!
+interface TenGigabitEthernet1/1/3
+ shutdown
+!
+interface TenGigabitEthernet1/1/4
+ shutdown
+!
+interface TenGigabitEthernet1/1/5
+ description ric841sl-lsfo-dst-s - Te1/1/5 - Uplink connected to - ric841sl-lsfo-dst-p - Te1/1/5
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,239,352,398,999
+ switchport mode trunk
+ channel-group 100 mode active
+!
+interface TenGigabitEthernet1/1/6
+ description ric841sl-lsfo-dst-s - Te1/1/6 - Uplink connected to - ric841sl-lsfo-dst-p - Te1/1/6
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 198,239,352,398,999
+ switchport mode trunk
+ channel-group 100 mode active
+!
+interface TenGigabitEthernet1/1/7
+ description ric841sl-lsfo-dst-s - Te1/1/7 - Uplink connected to - ric841sl-gilcore-VSS - Twe1/0/10
+ no switchport
+ ip address 146.28.177.169 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface TenGigabitEthernet1/1/8
+ description ric841sl-lsfo-dst-s - Te1/1/8 - Uplink connected to - ric841sl-gilcore-VSS - Twe2/0/10
+ no switchport
+ ip address 146.28.177.173 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface FortyGigabitEthernet1/1/1
+ shutdown
+!
+interface FortyGigabitEthernet1/1/2
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan198
+ description *** D&R Division ***
+ ip address 146.28.198.3 255.255.255.0
+ ip helper-address 146.28.194.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ standby 198 ip 146.28.198.1
+ standby 198 timers 5 15
+ standby 198 priority 180
+ standby 198 preempt
+ standby 198 authentication richmond
+!
+interface Vlan239
+ description *** Richmond Refinery IPT VLAN ***
+ ip address 146.28.239.3 255.255.255.0
+ ip helper-address 146.28.194.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ standby 239 ip 146.28.239.1
+ standby 239 timers 5 15
+ standby 239 priority 180
+ standby 239 preempt
+ standby 239 authentication richmond
+!
+interface Vlan352
+ description Mngt VLAN LSFO IPS
+ ip address 146.28.251.3 255.255.255.0
+ ip helper-address 146.28.194.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ standby 52 ip 146.28.251.1
+ standby 52 timers 5 15
+ standby 52 priority 180
+ standby 52 preempt
+ standby 52 authentication richmond
+ ip igmp query-interval 100
+!
+interface Vlan398
+ description **** Voice VLAN for D&R ****
+ ip address 146.34.47.3 255.255.255.0
+ ip helper-address 146.28.194.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ standby 98 ip 146.34.47.1
+ standby 98 timers 5 15
+ standby 98 priority 180
+ standby 98 preempt
+ standby 98 authentication richmond
+ ip igmp query-interval 100
+!
+interface Vlan999
+ no ip address
+!
+!
+router eigrp 109
+ network 146.28.176.247 0.0.0.0
+ network 146.28.177.168 0.0.0.3
+ network 146.28.177.172 0.0.0.3
+ network 146.28.198.0 0.0.0.255
+ network 146.28.239.0 0.0.0.255
+ network 146.28.251.0 0.0.0.255
+ network 146.34.47.0 0.0.0.255
+ passive-interface default
+ no passive-interface TenGigabitEthernet1/1/7
+ no passive-interface TenGigabitEthernet1/1/8
+!
+no ip classless
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim register-source Loopback0
+ip telnet source-interface Loopback0
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip http client source-interface Loopback0
+ip tftp source-interface Loopback0
+ip ssh source-interface Loopback0
+ip ssh version 2
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 139.65.136.0 0.0.0.255
+ 20 permit 139.65.140.0 0.0.0.255
+ 30 deny   any log
+ip access-list standard mcast-rp-sparse-wan
+ 10 permit 239.193.128.40
+ 20 permit 239.193.128.20
+ 30 permit 239.194.128.0 0.0.127.255
+ 40 permit 239.195.128.0 0.0.127.255
+ 50 permit 239.200.0.0 0.7.255.255
+!
+!
+logging trap notifications
+logging source-interface Loopback0
+logging host 139.65.140.24
+logging host 146.36.114.214
+logging host 139.65.140.25
+logging host 134.248.81.53
+ip access-list standard 20
+ 10 permit 139.65.136.0 0.0.3.255
+ 20 permit 139.65.140.0 0.0.3.255
+ 30 deny   any log
+ip access-list standard 30
+ 10 permit 146.28.222.247
+ 20 remark SNMP ACL
+ 20 deny   any log
+ remark SNMP ACL
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 deny   any log
+ip access-list extended 101
+ 10 permit ip any any
+ 20 deny   tcp any any eq tacacs log
+ 30 deny   ip any any log
+!
+!
+snmp-server engineID local 146281762407
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group default v3 priv 
+snmp-server group SNMPv3Group v3 priv read SNMPv3View access 30
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server view SNMPv3View internet included
+snmp-server trap link ietf
+snmp-server location ric841 / 841 Chevron Way, Richmond, California / USA / Americas /US-NA-Utility-Campus-Metro/Criticality-High
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server host 139.65.136.12 version 3 auth CVX  config
+snmp-server host 139.65.136.12 version 3 auth CVX2  config
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 6 EYbBLPVLGcTeASYGFhSia]OD`EgbWXFFYFS_AAB
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 6 \VG\ZOge`bXTaiJQWWEYVCZ[GM_E^BXEgfNOAAB
+ timeout 10
+!
+!
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner login ^CCC
+######################################################################
+NOTICE TO USERS
+This Chevron system is for use by authorized users only.
+To the extent permitted by law, by using this system you acknowledge
+and consent to the monitoring, access, use, and disclosure by Chevron
+of any information generated, received, or stored on the system and
+waive any right or expectation of privacy in connection with your use.
+Unauthorized and/or improper use of this system in violation of
+Chevron corporate policies is not tolerated and may result in
+disciplinary action, including termination.
+######################################################################
+^C
+!
+line con 0
+ session-timeout 5 
+ access-class 20 in
+ exec-timeout 9 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 5 
+ access-class 20 in
+ exec-timeout 5 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+line vty 5 15
+ session-timeout 5 
+ access-class 20 in
+ exec-timeout 5 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251 prefer
+ntp server 146.22.8.197
+!
+!
+!
+!
+!
+end

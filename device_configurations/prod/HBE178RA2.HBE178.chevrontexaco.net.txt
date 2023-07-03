@@ -1,0 +1,631 @@
+Building configuration...
+
+  
+Current configuration : 18023 bytes
+!
+! Last configuration change at 10:40:59 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 10:41:36 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.8
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname HBE178RA2
+!
+boot-start-marker
+boot system flash:/ir800-universalk9-mz.SPA.158-3.M2a
+boot-end-marker
+!
+!
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network flexvpn local 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+aaa session-id common
+service-module wlan-ap 0 bootimage autonomous
+!
+ignition off-timer 900
+!
+ignition undervoltage threshold 9 000
+!
+no ignition enable
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+ip vrf VRF-FLEXVPN
+ rd 65055:2000
+!
+!
+!
+!
+ip flow-cache timeout active 1
+ip domain name HBE178.chevrontexaco.net
+ip multicast-routing 
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+chat-script lte "" "AT!CALL" TIMEOUT 20 "OK"
+!
+!
+license udi pid IR829GW-LTE-VZ-AK9 sn FTX2201Z02F
+license boot module ir800 technology-package securityk9
+!
+!
+archive
+ path flash:cvx_113821
+ maximum 5
+vtp mode transparent
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+
+!
+!
+!
+crypto ikev2 keyring CVXVPN-Hubs
+ peer DALQX3RD10
+  address 146.23.20.30
+  pre-shared-key 2BD682EA1BA3F146755E9BB12381F
+ !
+ peer SJCQX1RD10
+  address 146.23.24.30
+  pre-shared-key 924F5886942D3524AF8CA65E8FDD9
+ !
+!
+!
+crypto ikev2 profile IKEPROF
+ match fvrf VRF-FLEXVPN
+ match identity remote fqdn domain chevrontexaco.net
+ identity local fqdn HBE178RA2.HBE178.chevron.net
+ authentication remote pre-share
+ authentication local pre-share
+ keyring local CVXVPN-Hubs
+ dpd 60 2 on-demand
+ aaa authorization group psk list flexvpn default
+!
+!
+!
+controller Cellular 0
+ lte sim data-profile 3 attach-profile 1 slot 1
+ lte sim fast-switchover enable
+ lte failovertimer 5
+!
+vlan 10,18,2010 
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+! 
+!
+!
+crypto ipsec transform-set FlexSHA2 esp-aes 256 esp-sha384-hmac 
+ mode tunnel
+crypto ipsec transform-set FlexVPN esp-aes 256 esp-sha256-hmac 
+ mode tunnel
+crypto ipsec transform-set FlexSHA1 esp-aes esp-sha-hmac 
+ mode tunnel
+!
+crypto ipsec profile IKEPROF
+ set transform-set FlexSHA2 
+ set ikev2-profile IKEPROF
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description loopback to SJCQX3RD10
+ ip address 146.26.98.250 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+!
+interface Loopback1
+ no ip address
+!
+interface Loopback255
+ description loopback to DALQX3RD10
+ ip address 146.26.98.251 255.255.255.255
+ ip pim sparse-mode
+!
+interface Tunnel3
+ description tunnel for global routing for DAL C-hub
+ ip address negotiated
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+ tunnel source Cellular0
+ tunnel mode ipsec ipv4
+ tunnel destination 146.23.20.30
+ tunnel path-mtu-discovery
+ tunnel vrf VRF-FLEXVPN
+ tunnel protection ipsec profile IKEPROF
+!
+interface Tunnel4
+ description tunnel for global routing for SJC C-hub
+ ip address negotiated
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+ tunnel source Cellular0
+ tunnel mode ipsec ipv4
+ tunnel destination 146.23.24.30
+ tunnel path-mtu-discovery
+ tunnel vrf VRF-FLEXVPN
+ tunnel protection ipsec profile IKEPROF
+!
+interface GigabitEthernet0
+ no ip address
+!
+interface GigabitEthernet0.2010
+ description connection to HBE178SL1
+ encapsulation dot1Q 2010
+ ip address 146.26.98.241 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface GigabitEthernet1
+ switchport mode trunk
+ no ip address
+!
+interface GigabitEthernet2
+ no ip address
+!
+interface GigabitEthernet3
+ no ip address
+!
+interface GigabitEthernet4
+ no ip address
+!
+interface Wlan-GigabitEthernet0
+ no ip address
+!
+interface GigabitEthernet5
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Cellular0
+ description Verizon 4G LTE ac no 0942131406-00001 mobile number 510-292-9680(166.154.119.247)
+ ip vrf forwarding VRF-FLEXVPN
+ ip address negotiated
+ ip access-group OUTSIDE-IN in
+ ip access-group OUTSIDE-OUT out
+ no ip unreachables
+ ip flow ingress
+ ip flow egress
+ encapsulation slip
+ load-interval 30
+ dialer in-band
+ dialer idle-timeout 0
+ dialer enable-timeout 60
+ dialer string lte
+ dialer watch-group 1
+ async mode interactive
+!
+interface Cellular1
+ no ip address
+ encapsulation slip
+!
+interface wlan-ap0
+ no ip address
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan10
+ no ip address
+!
+interface Vlan255
+ no ip address
+!
+interface Async0
+ no ip address
+ encapsulation scada
+!
+interface Async1
+ no ip address
+ encapsulation scada
+!
+!
+!
+router eigrp 65055
+ default-metric 1000 150 255 1 1500
+ network 146.0.0.0 0.63.255.255
+ redistribute bgp 65055 route-map BGP-to-EIGRP
+ passive-interface default
+ no passive-interface GigabitEthernet0.2010
+ eigrp router-id 146.26.98.250
+!
+router bgp 65055
+ template peer-policy BASELINE_POLICY
+  soft-reconfiguration inbound
+  maximum-prefix 200000 80 warning-only
+  send-community
+ exit-peer-policy
+ !
+ bgp router-id 146.26.98.250
+ bgp log-neighbor-changes
+ neighbor 146.46.4.1 remote-as 65040
+ neighbor 146.46.4.1 description SJCQX1RD10
+ neighbor 146.46.4.1 ebgp-multihop 255
+ neighbor 146.46.4.1 password 7 113A3326262A5A41360E7A7465111212
+ neighbor 146.46.4.1 timers 10 30
+ neighbor 146.46.4.1 fall-over
+ neighbor 146.46.4.1 fall-over bfd
+ neighbor 146.46.96.1 remote-as 65040
+ neighbor 146.46.96.1 description DALQX3RD10
+ neighbor 146.46.96.1 ebgp-multihop 255
+ neighbor 146.46.96.1 password 7 03207A27373772017C2D48555A302C3C
+ neighbor 146.46.96.1 timers 30 90
+ neighbor 146.46.96.1 fall-over
+ neighbor 146.46.96.1 fall-over bfd
+ !
+ address-family ipv4
+  network 146.26.3.64 mask 255.255.255.248
+  network 146.26.98.0 mask 255.255.255.128
+  network 146.26.98.128 mask 255.255.255.192
+  network 146.26.98.192 mask 255.255.255.224
+  network 146.26.98.224 mask 255.255.255.248
+  network 146.26.98.232 mask 255.255.255.252
+  network 146.26.98.236 mask 255.255.255.252
+  network 146.26.98.240 mask 255.255.255.252
+  network 146.26.98.248 mask 255.255.255.255
+  network 146.26.98.249 mask 255.255.255.255
+  network 146.26.98.250 mask 255.255.255.255
+  network 146.26.98.251 mask 255.255.255.255
+  network 146.34.38.224 mask 255.255.255.224
+  neighbor 146.46.4.1 activate
+  neighbor 146.46.4.1 inherit peer-policy BASELINE_POLICY
+  neighbor 146.46.4.1 route-map i-65040-SJCQX1 in
+  neighbor 146.46.4.1 route-map o-65040-SJCQX1 out
+  neighbor 146.46.96.1 activate
+  neighbor 146.46.96.1 inherit peer-policy BASELINE_POLICY
+  neighbor 146.46.96.1 route-map i-65040-DALQX3 in
+  neighbor 146.46.96.1 route-map o-65040-DALQX3 out
+ exit-address-family
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+no ip http server
+no ip http secure-server
+ip flow-export source Loopback0
+ip flow-export version 9
+ip flow-export destination 139.65.140.12 9995
+!
+ip tftp source-interface Loopback0
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+ip route vrf VRF-FLEXVPN 146.23.20.30 255.255.255.255 Cellular0
+ip route vrf VRF-FLEXVPN 146.23.24.30 255.255.255.255 Cellular0
+ip ssh source-interface Loopback0
+ip ssh logging events
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-boundary-site-campus
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-boundary-site-campus-high
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark High-Speed WAN
+ deny   239.194.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+ permit 224.0.0.0 7.255.255.255
+!
+ip access-list extended OUTSIDE-IN
+ remark inbound from the Internet
+ permit udp host 146.23.20.30 eq non500-isakmp host 166.154.119.247 eq non500-isakmp
+ permit udp host 146.23.24.30 eq non500-isakmp host 166.154.119.247 eq non500-isakmp
+ permit udp host 146.23.20.30 eq isakmp host 166.154.119.247 eq isakmp
+ permit udp host 146.23.24.30 eq isakmp host 166.154.119.247 eq isakmp
+ permit esp host 146.23.20.30 host 166.154.119.247
+ permit esp host 146.23.24.30 host 166.154.119.247
+ permit gre host 146.23.20.30 host 166.154.119.247
+ permit gre host 146.23.24.30 host 166.154.119.247
+ permit icmp host 146.23.20.30 host 166.154.119.247 echo-reply
+ permit icmp host 146.23.24.30 host 166.154.119.247 echo
+ deny   ip any any log
+ip access-list extended OUTSIDE-OUT
+ remark inbound from the Internet
+ permit udp host 166.154.119.247 eq non500-isakmp host 146.23.20.30 eq non500-isakmp
+ permit udp host 166.154.119.247 eq non500-isakmp host 146.23.24.30 eq non500-isakmp
+ permit udp host 166.154.119.247 eq isakmp host 146.23.20.30 eq isakmp
+ permit udp host 166.154.119.247 eq isakmp host 146.23.24.30 eq isakmp
+ permit esp host 166.154.119.247 host 146.23.20.30
+ permit esp host 166.154.119.247 host 146.23.24.30
+ permit gre host 166.154.119.247 host 146.23.20.30
+ permit gre host 166.154.119.247 host 146.23.24.30
+ permit icmp host 166.154.119.247 host 146.23.20.30 echo-reply
+ permit icmp host 166.154.119.247 host 146.23.24.30 echo
+ deny   ip any any log
+!
+!
+ip prefix-list BGP-to-EIGRP seq 5 permit 0.0.0.0/0
+ip prefix-list BGP-to-EIGRP seq 10 permit 0.0.0.0/0 ge 12 le 19
+!
+ip prefix-list KNOWN-BGP-ROUTES seq 10 permit 0.0.0.0/0 le 32
+!
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 10 permit 146.26.98.0/25
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 20 permit 146.34.38.224/27
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 30 permit 146.26.98.232/30
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 40 permit 146.26.98.236/30
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 50 permit 146.46.97.251/32
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 60 permit 146.26.98.249/32
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 70 permit 146.26.98.224/29
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 80 permit 146.26.98.192/27
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 90 permit 146.26.98.250/32
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 100 permit 146.26.98.251/32
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 110 permit 146.26.98.240/30
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 120 permit 146.26.98.128/26
+ip prefix-list o-65040-DALQX3-SJCQX1 seq 130 permit 146.26.3.64/29
+logging source-interface Loopback0
+logging host 134.248.81.53
+logging host 146.36.114.214
+logging host 134.248.81.53 vrf VRF-FLEXVPN
+logging host 146.36.114.214 vrf VRF-FLEXVPN
+logging host 139.65.141.24
+logging host 139.65.140.24
+dialer watch-list 1 ip 5.6.7.8 0.0.0.0
+dialer watch-list 1 delay route-check initial 60
+dialer watch-list 1 delay connect 1
+ipv6 ioam timestamp
+!
+route-map BGP-to-EIGRP permit 10
+ match ip address prefix-list BGP-to-EIGRP
+!
+route-map o-65040-DALQX3 permit 10
+ description PERMIT Remote Site Subnets and make DAL as standby
+ match ip address prefix-list o-65040-DALQX3-SJCQX1
+ set as-path prepend 65055 65055 65055
+!
+route-map i-65040-DALQX3 permit 20
+ description Set LOCAL PREF higher to prefer SJC as primary
+ match ip address prefix-list KNOWN-BGP-ROUTES
+ set local-preference 500
+!
+route-map o-65040-SJCQX1 permit 10
+ description PERMIT Remote Site Subnets 
+ match ip address prefix-list o-65040-DALQX3-SJCQX1
+ set as-path prepend 65055 65055
+!
+route-map i-65040-SJCQX1 permit 10
+ description permit known BGP routes that has CVX aggregates and default route
+ match ip address prefix-list KNOWN-BGP-ROUTES
+!
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location HBE178 / 17881 Gothard Street, Huntington Beach, CA / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Medium
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps wpan
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp-server host 139.65.140.25 public  ipmulticast
+snmp ifmib ifalias long
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+!
+!
+!
+control-plane
+!
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line 1 2
+ stopbits 1
+line 3
+ script dialer lte
+ no exec
+ transport preferred lat pad telnet rlogin lapb-ta mop udptn v120 ssh
+ transport output lat pad telnet rlogin lapb-ta mop udptn v120 ssh
+ rxspeed 100000000
+ txspeed 50000000
+line 4
+ no activation-character
+ no exec
+ transport preferred none
+ transport input all
+ transport output lat pad telnet rlogin lapb-ta mop udptn v120 ssh
+line 8
+ no exec
+ transport preferred lat pad telnet rlogin lapb-ta mop udptn v120 ssh
+ transport output lat pad telnet rlogin lapb-ta mop udptn v120 ssh
+ rxspeed 100000000
+ txspeed 50000000
+line 1/3 1/6
+ transport preferred none
+ transport output none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ length 0
+ transport input ssh
+ transport output none
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+ transport output none
+!
+no scheduler max-task-time
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+no iox hdm-enable
+iox client enable interface GigabitEthernet5
+no iox recovery-enable
+!
+!
+!
+!
+!
+!
+event manager applet High_CPU authorization bypass
+ event snmp oid 1.3.6.1.4.1.9.9.109.1.1.1.1.6.1 get-type exact entry-op gt entry-val "65" exit-op lt exit-val "50" poll-interval 5 maxrun 120
+ action 101 syslog msg "collecting logs for High_CPU"
+ action 102 cli command "enable"
+ action 103 cli command "show stacks 407 | append flash:snmp_data"
+ action 104 cli command "show clock | append flash:snmp_data"
+ action 105 cli command "show snmp | append flash:snmp_data"
+ action 106 cli command "show stacks 407 | append flash:snmp_data"
+ action 107 cli command "show proc cpu sort | append flash:snmp_data"
+ action 108 cli command "show ip sockets | append flash:snmp_data"
+ action 109 cli command "show stacks 407 | append flash:snmp_data"
+!
+end

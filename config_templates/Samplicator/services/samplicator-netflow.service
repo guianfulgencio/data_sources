@@ -1,0 +1,13 @@
+[Unit]
+Description=Samplicator Netflow [2055]
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/samplicate -d 0 -p 2055 -S -c "/usr/local/etc/samplicator-netflow"
+Restart=always
+RestartSec=300
+StartLimitInterval=1000
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target

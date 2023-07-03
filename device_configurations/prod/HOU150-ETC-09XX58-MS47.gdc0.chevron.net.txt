@@ -1,0 +1,503 @@
+Building configuration...
+
+Current configuration : 13690 bytes
+!
+! Last configuration change at 06:49:20 CDT Fri Jun 16 2023 by admin
+! NVRAM config last updated at 06:49:55 CDT Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service counters max age 10
+!
+hostname HOU150-ETC-09XX58-MS47
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Vlan3218
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CST -6 0
+clock summer-time CDT recurring
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+ip domain-name gdc0.chevron.net
+ip name-server 146.36.80.34
+vtp mode transparent
+!
+!
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-3884461824
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3884461824
+ revocation-check none
+ rsakeypair TP-self-signed-3884461824
+!
+!
+crypto pki certificate chain TP-self-signed-3884461824
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 33383834 34363138 3234301E 170D3139 30393237 31343033 
+  30325A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D33 38383434 
+  36313832 3430819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  8100B26D AF887B89 A4BC11E1 4617F77C 78D9286C 424E3C2B C0231893 E8B69345 
+  2530AC2C DD0084BB DF01D4F1 500153E4 01B5F7EC BF263C28 0A16418B D96685E5 
+  A24A4613 C2D3A554 484FA0E6 CACC2811 9E824765 A375084C CDC1905B 5D32F0FC 
+  B26D8591 12B63FFE 34C425F5 DA77A5B2 21FD6AB2 E5997CB9 B2522ABC 4B2EEFA8 
+  F1C70203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 1451FB0B F767A7E1 EC9152C8 670CDF1B D97F2171 26301D06 
+  03551D0E 04160414 51FB0BF7 67A7E1EC 9152C867 0CDF1BD9 7F217126 300D0609 
+  2A864886 F70D0101 05050003 8181001A 2625A3E1 41280EE6 2F1FD8AD DEDDA852 
+  EB1C78D1 811B9E3A AD692A7B A130AE9B B737F481 44A05C8E 2BB47E81 7360436C 
+  F216DE90 7D5F6C25 622D601A 9EDB0A86 6D848454 A2901C2A F760F531 F5DBB1E4 
+  36B57C6B BED01F37 0B5190A7 B3059F67 CF78B5B1 57D2859D 3AEC4B79 15D17EEF 
+  0DE6C119 5F0195C5 819362F8 694CCA
+  	quit
+archive
+ path flash:cvx_124619
+ maximum 5
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+errdisable recovery cause udld
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause sfp-config-mismatch
+errdisable recovery cause gbic-invalid
+errdisable recovery cause psecure-violation
+errdisable recovery cause port-mode-failure
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause pppoe-ia-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause inline-power
+errdisable recovery cause loopback
+errdisable recovery cause small-frame
+errdisable recovery cause psp
+errdisable recovery interval 30
+!
+!
+!
+!
+vlan internal allocation policy ascending
+!
+vlan 2002
+ name 10.7.176.0/21.HPC.Blade.Pod2
+!
+vlan 3218
+ name 134.248.213.0/24.OOB.ETC.HPC
+!
+ip tcp path-mtu-discovery
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/1
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/2
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/3
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/4
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/5
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/6
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/7
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/8
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/9
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/10
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/11
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/12
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/13
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/14
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/15
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/16
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/17
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/18
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/19
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/20
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/21
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/22
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/23
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/24
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/25
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/26
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/27
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/28
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/29
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/30
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/31
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/32
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/33
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/34
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/35
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/36
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/37
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/38
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/39
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/40
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/41
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/42
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/43
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/44
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/45
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/46
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/47
+ switchport access vlan 2002
+ spanning-tree portfast edge
+!
+interface GigabitEthernet0/48
+ description uplink to HDA
+ switchport mode trunk
+!
+interface GigabitEthernet0/49
+ description HOU150-ETC-9VV58-ms45
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface GigabitEthernet0/50
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan3002
+ no ip address
+!
+interface Vlan3218
+ ip address 134.248.213.162 255.255.255.0
+ no ip proxy-arp
+!
+ip default-gateway 134.248.213.1
+no ip http server
+no ip http secure-server
+!
+ip tftp source-interface Vlan3218
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+logging history size 10
+logging source-interface Vlan3218
+logging host 146.27.95.122
+logging host 146.36.114.214
+logging host 139.65.140.24
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Vlan3218
+snmp-server location HOU150 / 1500 Louisiana Street, Houston,TX  / USA /Americas /US-NA-Utility-Data-center/Criticality-Low
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps transceiver all
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+no vstack
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+ntp source Vlan3218
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+mac address-table aging-time 14400
+end

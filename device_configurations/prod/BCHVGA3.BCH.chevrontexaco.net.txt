@@ -1,0 +1,594 @@
+Building configuration...
+
+
+  
+Current configuration : 12711 bytes
+!
+! Last configuration change at 04:49:43 CDT Fri Jun 16 2023 by admin
+! NVRAM config last updated at 04:50:19 CDT Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.9
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+!
+hostname BCHVGA3
+!
+boot-start-marker
+boot system flash:vg3x0-universalk9-mz.SPA.159-3.M6.bin
+boot-end-marker
+!
+!
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface GigabitEthernet0/0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting session-duration ntp-adjusted
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CST -6 0
+clock summer-time CDT recurring
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+!
+!
+!
+ip domain lookup source-interface GigabitEthernet0/0
+ip domain name BCH.chevrontexaco.net
+ip cef
+no ipv6 cef
+multilink bundle-name authenticated
+!
+stcapp ccm-group 1
+stcapp
+!
+stcapp feature access-code
+!
+stcapp feature speed-dial
+!
+!
+!
+stcapp supplementary-services
+ port 0/0/0
+  fallback-dn 83916144
+ port 0/0/2
+  fallback-dn 83916144
+ port 0/0/4
+  fallback-dn 83916358
+ port 0/0/5
+  fallback-dn 83916444
+ port 0/0/6
+  fallback-dn 7107
+ port 0/0/7
+  fallback-dn 7074
+ port 0/0/8
+  fallback-dn 83916262
+ port 0/0/9
+  fallback-dn 83916321
+ port 0/0/10
+  fallback-dn 83916326
+ port 0/0/11
+  fallback-dn 7067
+ port 0/0/12
+  fallback-dn 83916390
+ port 0/0/13
+  fallback-dn 7118
+ port 0/0/14
+  fallback-dn 7120
+ port 0/0/15
+  fallback-dn 83916327
+ port 0/0/16
+  fallback-dn 7095
+ port 0/0/17
+  fallback-dn 7109
+ port 0/0/19
+  fallback-dn 7079
+ port 0/0/20
+  fallback-dn 7124
+ port 0/0/21
+  fallback-dn 7108
+ port 0/0/22
+  fallback-dn 7076
+ port 0/0/23
+  fallback-dn 7073
+!
+!
+!
+!
+!
+voice-card 0
+!
+!
+!
+voice service voip
+ fax protocol t38 nse force version 0 ls-redundancy 5 hs-redundancy 2 fallback none
+!
+!
+!
+!
+!
+!
+license udi pid VG310 sn FJC2430D0AH
+license boot module vg3x0 technology-package uck9
+hw-module pvdm 0/0
+!
+archive
+ log config
+  hidekeys
+ path flash0:cvx_104713
+ maximum 5
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface GigabitEthernet0/0
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ description BCHRL01-VSS Gig 1/6/23
+ ip address 146.41.168.6 255.255.252.0
+ no ip proxy-arp
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ ip address dhcp
+ shutdown
+ duplex auto
+ speed auto
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+!
+no ip http server
+no ip http secure-server
+ip tftp source-interface GigabitEthernet0/0
+ip route 0.0.0.0 0.0.0.0 146.41.168.1
+ip ssh source-interface GigabitEthernet0/0
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+logging source-interface GigabitEthernet0/0
+logging host 146.36.92.124
+logging host 146.27.145.4
+logging host 146.27.145.68
+logging host 146.27.145.132
+logging host 146.27.95.122
+logging host 134.248.81.53
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+!
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source GigabitEthernet0/0
+snmp-server location BCH / 10285 Highway 23 South, Belle Chasse, Louisiana / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Medium
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp-server manager
+snmp ifmib ifalias long
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/0/0
+ no echo-cancel enable
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/1
+ timeouts initial 60
+ timeouts interdigit 60
+ caller-id enable
+!
+voice-port 0/0/2
+ no echo-cancel enable
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/3
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/4
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/5
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/6
+ no echo-cancel enable
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/7
+ no echo-cancel enable
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/8
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/9
+ no echo-cancel enable
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/10
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/11
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/12
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/13
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/14
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/15
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/16
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/17
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/18
+ timeouts initial 60
+ timeouts interdigit 60
+ caller-id enable
+!
+voice-port 0/0/19
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/20
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/21
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/22
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 0/0/23
+ no echo-cancel enable
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local GigabitEthernet0/0
+sccp ccm 146.34.5.163 identifier 2 version 7.0 
+sccp ccm 146.34.4.163 identifier 1 version 7.0 
+sccp
+!
+sccp ccm group 1
+ associate ccm 1 priority 1
+ associate ccm 2 priority 2
+!
+!
+no ccm-manager fax protocol cisco
+ccm-manager config server 146.34.4.164 146.34.5.164 
+ccm-manager config
+ccm-manager sccp local GigabitEthernet0/0
+!
+dial-peer voice 999200 pots
+ service stcapp
+ port 0/0/0
+!
+dial-peer voice 999202 pots
+ service stcapp
+ port 0/0/2
+!
+dial-peer voice 999203 pots
+ service stcapp
+ port 0/0/3
+!
+dial-peer voice 999204 pots
+ service stcapp
+ port 0/0/4
+!
+dial-peer voice 999205 pots
+ service stcapp
+ port 0/0/5
+!
+dial-peer voice 999206 pots
+ service stcapp
+ port 0/0/6
+!
+dial-peer voice 999207 pots
+ service stcapp
+ port 0/0/7
+!
+dial-peer voice 999208 pots
+ service stcapp
+ port 0/0/8
+!
+dial-peer voice 999209 pots
+ service stcapp
+ port 0/0/9
+!
+dial-peer voice 999210 pots
+ service stcapp
+ port 0/0/10
+!
+dial-peer voice 999211 pots
+ service stcapp
+ port 0/0/11
+!
+dial-peer voice 999212 pots
+ service stcapp
+ port 0/0/12
+!
+dial-peer voice 999213 pots
+ service stcapp
+ port 0/0/13
+!
+dial-peer voice 999214 pots
+ service stcapp
+ port 0/0/14
+!
+dial-peer voice 999215 pots
+ service stcapp
+ port 0/0/15
+!
+dial-peer voice 999216 pots
+ service stcapp
+ port 0/0/16
+!
+dial-peer voice 999217 pots
+ service stcapp
+ port 0/0/17
+!
+dial-peer voice 999219 pots
+ service stcapp
+ port 0/0/19
+!
+dial-peer voice 999220 pots
+ service stcapp
+ port 0/0/20
+!
+dial-peer voice 999221 pots
+ service stcapp
+ port 0/0/21
+!
+dial-peer voice 999222 pots
+ service stcapp
+ port 0/0/22
+!
+dial-peer voice 999223 pots
+ service stcapp
+ port 0/0/23
+!
+!
+!
+banner exec ^C%
+##########################
+WARNING: This hardware revision of the [VG310] requires Cisco IOS Release 15.6(3)M or later.
+Downgrading to an older release will cause FXS port failure.
+For more information, refer to the following field notice [FN-64285]
+##########################
+^C
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp source GigabitEthernet0/0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

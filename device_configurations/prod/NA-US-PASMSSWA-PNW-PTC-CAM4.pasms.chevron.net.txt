@@ -1,0 +1,471 @@
+Building configuration...
+
+Current configuration : 15557 bytes
+!
+! Last configuration change at 01:56:29 UTC Tue Jul 11 2000
+!
+version 16.12
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service call-home
+no platform punt-keepalive disable-kernel-core
+no platform punt-keepalive settings
+no platform bridge-security all
+!
+hostname NA-US-PASMSSWA-PNW-PTC-CAM4
+!
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+enable password 7 05080F1C2243
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group tacacs+ if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting session-duration ntp-adjusted
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+rep bpduleak
+ptp mode e2etransparent 
+vtp domain PASMS
+vtp mode transparent
+!
+!
+!
+!
+!
+ip arp entry learn 1000
+ip name-server 146.25.47.34
+no ip domain lookup
+ip domain name pasms.chevron.net
+!
+!
+!
+login on-success log
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+  no destination transport-method email
+no device-tracking logging theft
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+crypto pki trustpoint TP-self-signed-2976736262
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2976736262
+ revocation-check none
+ rsakeypair TP-self-signed-2976736262
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+crypto pki certificate chain TP-self-signed-2976736262
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 32393736 37333632 3632301E 170D3030 30313031 30303032 
+  34395A17 0D333030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 39373637 
+  33363236 32308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 01009FD6 AE7A8922 69147C00 18573900 0A5A5DA2 22CB26D4 34EBE6EA 
+  DADBC586 366D4E4F 1B689343 FE20B20E 8B9C8FAD 348E951F D28B0F03 098045D0 
+  CF1ED3DE 65D69BBB F881F089 F8EF2B5E 451A1C1F 867896E4 DA6EF29E A647F98F 
+  071C3111 593DF69B AEF823C1 D94D7C09 A318707F 1225BB1C 9EA8A65E 17FFA46D 
+  53741DEC 0408AC59 651F27F0 8A9217D3 F96DC3F2 48F99D0A 1BEE00E1 AF10E64A 
+  41286B72 3CD88E45 42F5FA1A 95BEF1DC FD1DC8DD 80DF72B9 0CCB5C2B 61EB651D 
+  C82891FC E7EA094C B85C493C BD47AF81 E1EF9ADB DCDBD4E0 E5152FD9 06B2BBF7 
+  5C2D58B6 E5F9C3D7 AAE2FE10 43FAEBE3 92AD40BE E5BB18B7 EBA3F13F E9D0C2C1 
+  92038E6E 167F0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 1475AABB 3A2C1C55 A6209EA1 98443EF1 CE6A4030 
+  4C301D06 03551D0E 04160414 75AABB3A 2C1C55A6 209EA198 443EF1CE 6A40304C 
+  300D0609 2A864886 F70D0101 05050003 82010100 18BF7063 39982D57 D79CB101 
+  B1C5E3E1 099ECD5F 4767FA78 656F541C 39FA6E35 F3E4EB37 0019AEC0 35506C95 
+  C6EB5F88 F4F255AD D8AB9793 F5AC276B ECB93D68 9F8797A1 B00B05BC CC73951F 
+  7FBF6925 E6BA42E1 E9074ED7 2C3E1607 4BBAFF1B 119F9EEA 5128DB0F 51188526 
+  0431C20D C65D6426 6D052E8F 560800CA 582AA236 AAF79EFD C16A1803 E63BA5B8 
+  D0CDFC75 80A750EF 7AE8DA66 29088C6A 5C962214 A6258FEB 46A7C3D6 96B747EA 
+  98B46BEB BBEC9598 2E5F8BC0 80F5B5E0 F46B68AA 39D0DEE7 5DB95181 B6C608C3 
+  BE1D5A5A 1CC52AE3 82DF0565 36DEAA13 485617FB 58A4A701 619A96CD 5824C04B 
+  649931CB B0E725F8 6A926FD6 4EB1BCD8 5E05B18A
+  	quit
+!
+diagnostic bootup level minimal
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree loopguard default
+spanning-tree portfast bpduguard default
+spanning-tree extend system-id
+archive
+ path flash:cvx_115520
+ maximum 5
+memory free low-watermark processor 89999
+!
+!
+alarm-profile defaultPort
+ alarm not-operating 
+ syslog not-operating 
+ notifies not-operating 
+!
+alarm facility power-supply syslog
+alarm facility temperature primary relay major 
+alarm facility temperature primary syslog 
+alarm facility temperature primary notifies 
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+
+!
+!
+transceiver type all
+ monitoring
+vlan internal allocation policy ascending
+!
+vlan 130
+ name Security-2
+!
+vlan 139
+ name APT
+!
+vlan 156
+ name Security
+!
+vlan 355
+ name DataPNW
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet1/1
+ description NA-US-PASMSSWD-PNW-PTC
+ switchport mode trunk
+!
+interface GigabitEthernet1/2
+ shutdown
+!
+interface GigabitEthernet1/3
+ switchport access vlan 130
+ spanning-tree portfast
+!
+interface GigabitEthernet1/4
+ switchport access vlan 130
+ spanning-tree portfast
+!
+interface GigabitEthernet1/5
+ switchport access vlan 130
+ shutdown
+ spanning-tree portfast
+!
+interface GigabitEthernet1/6
+ switchport access vlan 130
+ shutdown
+ spanning-tree portfast
+!
+interface GigabitEthernet1/7
+ shutdown
+!
+interface GigabitEthernet1/8
+ shutdown
+!
+interface GigabitEthernet1/9
+ shutdown
+!
+interface GigabitEthernet1/10
+ description ARUBA AP
+ switchport access vlan 139
+ switchport mode access
+ spanning-tree portfast
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan130
+ ip address 146.25.30.89 255.255.254.0
+!
+ip default-gateway 146.25.30.1
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 50 permit 146.40.2.8
+ 60 permit 146.40.2.11
+ 70 permit 146.40.2.12
+ 80 permit 146.40.2.13
+ 90 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.0.0 0.0.255.255
+ 150 deny   any log
+!
+logging host 172.19.29.37
+logging host 172.19.29.50
+logging host 139.65.140.24
+ip access-list standard 10
+ 10 permit 146.25.47.143
+ 20 remark "SNMP RO Access List"
+ 20 permit 172.19.29.37
+ 30 deny   any log
+ip access-list standard 20
+ 10 permit 10.0.0.0 0.63.255.255
+ 20 permit 10.128.0.0 0.7.255.255
+ 30 permit 10.254.0.0 0.0.255.255
+ 40 permit 146.22.0.0 0.1.255.255
+ 50 permit 146.24.0.0 0.7.255.255
+ 60 permit 146.32.0.0 0.7.255.255
+ 70 permit 146.40.0.0 0.3.255.255
+ 80 permit 146.44.0.0 0.1.255.255
+ 90 permit 146.46.0.0 0.0.255.255
+ 100 permit 136.171.0.0 0.0.255.255
+ 110 permit 139.65.140.0 0.0.3.255
+ 120 permit 139.65.136.0 0.0.3.255
+ 130 permit 139.65.0.0 0.0.255.255
+ 140 permit 134.248.0.0 0.0.255.255
+ 150 deny   any log
+ip access-list standard 30
+ 10 permit 146.25.32.19
+ 20 remark "NTP Server Access List"
+ 20 permit 146.25.32.17
+ 30 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 134.248.2.29
+ 30 deny   any log
+ip access-list standard 99
+ 10 remark ITC SNMPv3 RO access
+ 10 permit 139.65.136.9 log
+ 20 permit 139.65.136.36 log
+ 30 permit 139.65.136.37 log
+ 40 deny   any log
+ip access-list standard 1330
+ 10 permit 146.22.71.201
+ 20 permit 146.22.8.0 0.0.0.255
+ 30 permit 146.38.92.0 0.0.0.255
+ 40 permit 146.24.136.0 0.0.0.255
+ 50 permit 146.24.146.0 0.0.0.255
+ 60 permit 146.24.250.0 0.0.0.255
+ 70 permit 146.27.26.0 0.0.1.255
+ 80 permit 146.36.145.0 0.0.0.255
+ 90 permit 146.36.10.0 0.0.0.255
+ 100 permit 146.40.185.0 0.0.0.255
+ 110 permit 139.65.136.0 0.0.3.255
+ 120 permit 139.65.140.0 0.0.3.255
+ 130 permit 146.36.126.128 0.0.0.63
+ 140 permit 146.27.84.128 0.0.0.63
+ 150 permit 146.36.130.224 0.0.0.31
+ 160 deny   any log
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group GCirrus v3 auth read SWView access 10
+snmp-server group cvx2021 v3 priv 
+snmp-server group GITCsnmp v3 auth read SWView access 99
+snmp-server view SWView internet included
+snmp-server view SWView system included
+snmp-server view SWView interfaces included
+snmp-server view SWView chassis included
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server location PSG001 / 250 Industrial Road, Pascagoula, Mississippi / USA / Americas / US-NA-Utility-Campus-Metro/Criticality-Low
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps tty
+snmp-server enable traps power-ethernet group 1 threshold 0
+snmp-server enable traps power-ethernet police
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps cpu threshold
+snmp-server enable traps vtp
+snmp-server enable traps vlancreate
+snmp-server enable traps vlandelete
+snmp-server enable traps flash insertion
+snmp-server enable traps flash removal
+snmp-server enable traps port-security
+snmp-server enable traps auth-framework sec-violation
+snmp-server enable traps transceiver all
+snmp-server enable traps config-copy
+snmp-server enable traps config
+snmp-server enable traps config-ctid
+snmp-server enable traps bridge newroot topologychange
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps syslog
+snmp-server enable traps errdisable
+snmp-server enable traps vlan-membership
+snmp-server enable traps mac-notification change move threshold
+snmp-server host 139.65.136.12 version 3 priv CVX  config
+snmp-server host 139.65.136.41 version 3 priv CVX  config
+snmp-server host 139.65.136.9 version 3 priv CVX  config
+snmp-server host 146.22.71.201 version 3 priv CVX  config
+snmp-server host 139.65.136.12 version 3 priv CVX2  config
+snmp-server host 139.65.136.41 version 3 priv CVX2  config
+snmp-server host 146.22.71.201 version 3 priv CVX2  config
+snmp-server host 139.65.136.12 version 3 priv cvx2021  config
+snmp-server host 139.65.136.41 version 3 priv cvx2021  config
+snmp-server host 146.22.71.201 version 3 priv cvx2021  config
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp-server host 172.19.29.37 snmptrap 
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+control-plane
+!
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+banner motd ^CC
+######################################################################
+NOTICE TO USERS
+This Chevron system is for use by authorized users only.
+To the extent permitted by law, by using this system you acknowledge
+and consent to the monitoring, access, use, and disclosure by Chevron
+of any information generated, received, or stored on the system and
+waive any right or expectation of privacy in connection with your use.
+Unauthorized and/or improper use of this system in violation of
+Chevron corporate policies is not tolerated and may result in
+disciplinary action, including termination.
+######################################################################
+^C
+!
+line con 0
+ exec-timeout 5 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line aux 0
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line vty 0 4
+ access-class 20 in
+ exec-timeout 5 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input all
+line vty 5 15
+ access-class 20 in
+ exec-timeout 5 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+!
+!
+!
+!
+!
+!
+end

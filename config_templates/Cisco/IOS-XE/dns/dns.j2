@@ -1,0 +1,8 @@
+! DNS configuration to use Anycast servers
+! Variables
+! {{ host.mgmt_ifname | default ("Loopback0")}} = Management interface of the device
+!
+ip name-server 146.23.1.1 146.23.2.2
+ip domain-lookup
+ip domain lookup source-interface {{ host.mgmt_ifname }}
+ip domain-name gmn0.chevron.net

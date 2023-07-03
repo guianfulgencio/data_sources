@@ -1,0 +1,7 @@
+! SSH
+! Variables
+! {{ host.mgmt_ifname }} = Management Interface name (usually Loopback0)
+!
+ip ssh source-interface {{ host.mgmt_ifname }}
+ip ssh version 2
+ip scp server enable

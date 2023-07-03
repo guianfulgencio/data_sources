@@ -1,0 +1,323 @@
+Building configuration...
+
+Current configuration : 8758 bytes
+!
+! Last configuration change at 10:41:22 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 10:41:59 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname HOU140RPSL-IPT
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Vlan911
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+system mtu routing 1500
+!
+!
+!
+!
+no ip source-route
+ip routing
+!
+!
+ip domain-name hou140.chevrontexaco.net
+vtp domain HOU140
+vtp mode transparent
+!
+!
+!
+!
+!
+!
+!
+archive
+ path flash:cvx_113823
+ maximum 5
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+vlan internal allocation policy ascending
+!
+vlan 911 
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Vlan911
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel6
+ description HOU140RV2-IPT
+ switchport trunk allowed vlan 911
+ switchport mode trunk
+!
+interface GigabitEthernet0/1
+ description HOU140RV2-IPT
+ switchport trunk allowed vlan 911
+ switchport mode trunk
+!
+interface GigabitEthernet0/2
+ description HOU140RV2-IPT
+ switchport access vlan 911
+ switchport trunk allowed vlan 911
+ switchport mode trunk
+!
+interface GigabitEthernet0/3
+ switchport access vlan 911
+ switchport mode access
+!
+interface GigabitEthernet0/4
+ switchport access vlan 911
+ switchport mode access
+!
+interface GigabitEthernet0/5
+ switchport access vlan 911
+ switchport mode access
+!
+interface GigabitEthernet0/6
+ switchport access vlan 911
+ switchport mode access
+!
+interface GigabitEthernet0/7
+ switchport access vlan 911
+ switchport mode access
+!
+interface GigabitEthernet0/8
+ switchport access vlan 911
+ switchport mode access
+!
+interface GigabitEthernet0/9
+ switchport access vlan 911
+ switchport mode access
+!
+interface GigabitEthernet0/10
+!
+interface GigabitEthernet0/11
+!
+interface GigabitEthernet0/12
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan911
+ ip address 146.34.2.4 255.255.255.240
+ no ip proxy-arp
+!
+ip default-gateway 146.34.2.227
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+no ip http server
+no ip http secure-server
+ip tftp source-interface Vlan911
+ip tftp blocksize 8192
+ip route 0.0.0.0 0.0.0.0 146.34.2.1
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+!
+logging history size 10
+logging source-interface Vlan911
+logging host 134.248.81.53
+logging host 146.35.144.236
+logging host 146.36.114.214
+logging host 139.65.140.24
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1430 permit 146.35.147.59
+access-list 1430 deny   any log
+access-list 1440 permit 146.35.147.59
+access-list 1440 permit 146.35.144.9
+access-list 1440 permit 146.35.147.106
+access-list 1440 permit 146.35.4.50
+access-list 1440 permit 172.16.36.61
+access-list 1440 permit 146.35.144.142
+access-list 1440 permit 146.35.144.225
+access-list 1440 permit 146.35.144.214
+access-list 1440 permit 146.35.144.221
+access-list 1440 permit 146.35.144.223
+access-list 1440 permit 146.35.144.222
+access-list 1440 permit 146.36.126.128 0.0.0.63
+access-list 1440 permit 146.27.84.128 0.0.0.63
+access-list 1440 deny   any log
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server group snmp-ro v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server community t3Mbl0r%tH3rM4L RO 1440
+snmp-server trap link ietf
+snmp-server trap-source Vlan911
+snmp-server location HOU140 / 1400 Smith St, Houston,TX / USA / Americas /US-NA-Utility-Telephony/Criticality-Medium
+snmp-server contact network operations  1-888-463-8677 option 3
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server host 139.65.136.12 version 3 auth CVX  config
+snmp-server host 139.65.136.12 version 3 auth CVX2  config
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+ntp source Vlan911
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

@@ -1,0 +1,1445 @@
+Building configuration...
+
+Current configuration : 42418 bytes
+!
+! Last configuration change at 14:56:37 UTC Fri Jun 9 2023 by pqmt
+!
+version 16.12
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+! Call-home is enabled by Smart-Licensing.
+service call-home
+no platform punt-keepalive disable-kernel-core
+!
+hostname X-ALEN-CORE-1
+!
+!
+vrf definition ICS
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging discriminator HPNA mnemonics includes CONFIG_I 
+logging count
+logging buffered 128000
+logging persistent size 1000000 filesize 8192
+logging rate-limit 30 except warnings
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server radius NOBLE-RADIUS
+ server name ALPHA-RADIUS
+ server name BETA-RADIUS
+ ip radius source-interface Loopback0
+ deadtime 1
+ load-balance method least-outstanding
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name HOU2_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authentication ppp default if-needed local
+aaa authentication dot1x default group radius
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group radius 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+switch 1 provision ws-c3850-24xu
+switch 2 provision ws-c3850-24xu
+!
+!
+!
+!
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+  no destination transport-method email
+no ip source-route
+ip routing
+!
+!
+!
+!
+!
+ip name-server 10.10.201.143 10.10.200.35 10.70.200.52
+no ip domain lookup
+ip domain name nblenergy.com
+ip dhcp excluded-address 10.140.226.1 10.140.226.50
+ip dhcp excluded-address 10.140.10.1 10.140.10.50
+ip dhcp excluded-address 10.140.11.1 10.140.11.50
+ip dhcp excluded-address 10.140.12.1 10.140.12.50
+ip dhcp excluded-address 10.140.13.1 10.140.13.50
+ip dhcp excluded-address 10.140.14.1 10.140.14.50
+ip dhcp excluded-address 10.140.15.1 10.140.15.50
+ip dhcp excluded-address 10.140.115.1 10.140.115.50
+ip dhcp excluded-address 10.140.114.1 10.140.114.50
+ip dhcp excluded-address 10.140.113.1 10.140.113.50
+ip dhcp excluded-address 10.140.112.1 10.140.112.50
+ip dhcp excluded-address 10.140.111.1 10.140.111.50
+ip dhcp excluded-address 10.140.110.1 10.140.110.50
+ip dhcp excluded-address 10.140.109.1 10.140.109.50
+ip dhcp excluded-address 10.140.9.1 10.140.9.50
+ip dhcp excluded-address 10.140.150.1 10.140.150.50
+ip dhcp excluded-address 10.140.151.1 10.140.151.50
+ip dhcp excluded-address 10.140.245.1 10.140.245.100
+ip dhcp excluded-address 10.140.112.60
+!
+ip dhcp pool VLAN226
+ network 10.140.226.0 255.255.255.0
+ default-router 10.140.226.1 
+!
+ip dhcp pool VLAN110
+ network 10.140.110.0 255.255.255.0
+ default-router 10.140.110.1 
+ domain-name nblenergy.com
+ dns-server 146.30.168.11 146.30.168.10 10.10.200.35 
+ option 43 ip 10.116.60.28 10.116.60.29 
+!
+ip dhcp pool VLAN10
+ network 10.140.10.0 255.255.255.0
+ option 150 ip 10.140.50.20 
+ default-router 10.140.10.1 
+ domain-name nblenergy.com
+ dns-server 146.30.168.11 146.30.168.10 10.10.200.35 
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+udld enable
+
+no device-tracking logging theft
+!
+flow record NETFLOW-FLOWRECORD
+ match ipv4 source address
+ match ipv4 destination address
+ match ipv4 protocol
+ match transport source-port
+ match transport destination-port
+ collect counter bytes long
+ collect counter packets long
+ collect timestamp absolute first
+ collect timestamp absolute last
+!
+!
+flow exporter NETFLOW-FLOWEXPORTER-IPFIX
+ description DO NOT MODIFY. USED BY NETFLOW.
+ destination 10.10.196.164
+ source Vlan255
+ transport udp 2055
+!
+!
+flow monitor NETFLOW-FLOWMONITOR
+ exporter NETFLOW-FLOWEXPORTER-IPFIX
+ record NETFLOW-FLOWRECORD
+!
+!
+crypto pki trustpoint TP-self-signed-4043377255
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-4043377255
+ revocation-check none
+ rsakeypair TP-self-signed-4043377255
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+!
+crypto pki certificate chain TP-self-signed-4043377255
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 34303433 33373732 3535301E 170D3138 30383037 32303535 
+  35345A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D34 30343333 
+  37373235 35308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100A195 24190C03 65B45D32 01DAB01D C9536F21 F85953AA CFBA2473 
+  81829FDA 34B4C91E 60791998 F42BD3EE CC044150 2E512BE7 36D7F7CB 49A8B02E 
+  F7F29697 4D1538C1 7E6A9AF2 47454D40 1FADB86A 7C5403A5 062DB155 91B829BC 
+  AC97CDAF 927E0DA2 99B5DC77 C786E2CA 4A3203AF 0FE45B53 0F5B477E D20906DB 
+  48952F47 4D211894 728410F1 7AA488ED 9385C31C 77E8BC64 E7200078 EF7727CD 
+  9B460790 13BF0F2E 062E0A55 E2DE1097 026AFE80 A713263F 4FBC4754 1DD1BE7F 
+  F3B06C5F E1A7D7A8 71EF36D1 9D664464 2946218C 81B35C22 79385598 26D3C333 
+  730F9B90 D9E1E58C 618E00AD 24BDCECB 34299CE6 B8A7028B 0E8AF79F 8DF1D1A0 
+  9E8EFF7D 13A70203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 14BA5AEA AB7183F3 D0A1D81F AD6E044F 7AECB80A 
+  80301D06 03551D0E 04160414 BA5AEAAB 7183F3D0 A1D81FAD 6E044F7A ECB80A80 
+  300D0609 2A864886 F70D0101 05050003 82010100 2078D95D 547425BF B65D84DF 
+  D6A35D67 361CFAA8 5A08357B C8FDF7D3 B4DD6C14 02A5DF32 6624BB60 0EE7D5DE 
+  26BC8E9C E62F642E B94C030A 96F963CF 575518CA AA8EEC43 F5BADF92 305F27DE 
+  351B2903 0F2E19AD A60B78A0 D8DD0A1A 3C7EBBF2 A4EE4376 20BA435C 0B9E374E 
+  E9D75AE4 0A5D733F 37FF097E F9B0933E 066E6D66 3BF59EC8 BF6171EA 2535D21F 
+  13830C3C EF31A757 C3ADC20C E9D8BD47 E5BAC20E 6739EA2F D4395E82 3F0C0B81 
+  7320AA66 5EFEC4CF D145CD71 F6A914D3 053ACA78 B4588053 A65D755C 3E622134 
+  D1EA77AC 9932086B 3A1DDD13 4F60C813 F8C7DFDD 6B348449 D135EC24 5B9CF21E 
+  F80F434F ECCC9978 C9FD6A3E 36C92533 CB705102
+  	quit
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+!
+!
+license boot level ipservicesk9
+!
+!
+diagnostic bootup level minimal
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 1-4094 priority 24576
+archive
+ path flash:cvx_033444
+ maximum 5
+memory free low-watermark processor 79475
+!
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause sfp-config-mismatch
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause port-mode-failure
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause pppoe-ia-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause storm-control
+errdisable recovery cause inline-power
+errdisable recovery cause arp-inspection
+errdisable recovery cause link-monitor-failure
+errdisable recovery cause oam-remote-failure
+errdisable recovery cause loopback
+errdisable recovery cause psp
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode sso
+!
+!
+!
+!
+!
+transceiver type all
+ monitoring
+lldp run
+!
+!
+class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data, LOGGING
+class-map match-any system-cpp-default
+  description EWLC control, EWLC data, Inter FED 
+class-map match-any system-cpp-police-sys-data
+  description Learning cache ovfl, High Rate App, Exception, EGR Exception, NFL SAMPLED DATA, RPF Failed
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-multicast
+  description Transit Traffic and MCAST Data
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+  description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual
+class-map match-any non-client-nrt-class
+class-map match-any system-cpp-police-routing-control
+  description Routing control and Low Latency
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+!
+policy-map system-cpp-policy
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description L3-CVX-MGMT
+ ip address 146.30.164.161 255.255.255.255
+!
+interface Port-channel1
+ description **** CONNECTION TO X-ALEN-FDST-1 ****
+ switchport mode trunk
+!
+interface Port-channel2
+ description **** CONNECTED TO X-ALEN-MDF-1 ****
+ switchport mode trunk
+!
+interface Port-channel3
+ description **** CONNECTED TO X-ALEN-SRVR-2 ****
+ switchport mode trunk
+!
+interface Port-channel4
+ description **** CONNECTED TO R-ALEN-DMVPN-1 ****
+ switchport trunk native vlan 250
+ switchport trunk allowed vlan 1,250,1250
+ switchport mode trunk
+!
+interface Port-channel5
+ description *** Microwave PTP to Mal-Pico-sw1 2/0/47 ***
+ no switchport
+ ip address 10.240.240.18 255.255.255.252
+!
+interface Tunnel900
+ description GRE Tunnel to Aseng to allow EIGRP adjacency
+ bandwidth 1000000
+ ip address 10.240.240.49 255.255.255.252
+ ip mtu 1400
+ delay 1
+ keepalive 10 3
+ tunnel source TenGigabitEthernet1/0/10
+ tunnel destination 172.16.1.254
+ tunnel path-mtu-discovery
+!
+interface Tunnel1900
+ description GRE Tunnel to Pico for ICS network transit
+ vrf forwarding ICS
+ ip address 172.21.198.6 255.255.255.252
+ ip mtu 1400
+ tunnel source Port-channel5
+ tunnel destination 10.240.240.17
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ ip address 10.140.255.46 255.255.255.0
+ negotiation auto
+!
+interface TenGigabitEthernet1/0/1
+ description F-ALEN-ICS-1 Port 7
+ switchport trunk allowed vlan 1000-1399,1401-2000
+ switchport mode trunk
+ speed 1000
+ duplex full
+!
+interface TenGigabitEthernet1/0/2
+ description **** CONNECTION TO X-ALEN-FDST-1 ****
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface TenGigabitEthernet1/0/3
+ description **** CONNECTED TO X-ALEN-MDF-1 ****
+ switchport mode trunk
+ channel-group 2 mode active
+!
+interface TenGigabitEthernet1/0/4
+ description **** CONNECTED TO X-ALEN-SRVR-2 ****
+ switchport mode trunk
+ channel-group 3 mode active
+!
+interface TenGigabitEthernet1/0/5
+ description **** CONNECTED TO R-ALEN-DMVPN-1 ****
+ switchport trunk native vlan 250
+ switchport trunk allowed vlan 1,250,1250
+ switchport mode trunk
+ channel-group 4 mode active
+!
+interface TenGigabitEthernet1/0/6
+ description *** Microwave PTP to Mal-Pico-sw1 2/0/47 ***
+ no switchport
+ ip flow monitor NETFLOW-FLOWMONITOR input
+ ip flow monitor NETFLOW-FLOWMONITOR output
+ no ip address
+ channel-group 5 mode active
+!
+interface TenGigabitEthernet1/0/7
+ description *** SPAN to ESX Host *** 
+!
+interface TenGigabitEthernet1/0/8
+ description *** SPAN to ESX Host ***
+!
+interface TenGigabitEthernet1/0/9
+ description F-ALEN-INET-1
+ switchport access vlan 250
+ spanning-tree portfast
+!
+interface TenGigabitEthernet1/0/10
+ description *** Microwave PTP to Aseng *** 172.16.1.254
+ no switchport
+ ip address 172.16.2.254 255.255.255.0
+!
+interface TenGigabitEthernet1/0/11
+ description **** Connection to F-ALEN-ICS-1 ICS Zone ****
+ switchport access vlan 400
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet1/0/12
+ description **** Connection to F-ALEN-ICS-1 Business Zone ****
+ switchport access vlan 1400
+ switchport mode access
+ speed 1000
+ duplex full
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet1/0/13
+ description *** SPAN Egress to PA ***
+!
+interface TenGigabitEthernet1/0/14
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet1/0/15
+ description **** CONNECTED TO X-ALEN-INET-1 MGMT F0 PORT ****
+ switchport trunk native vlan 955
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface TenGigabitEthernet1/0/16
+ description *** Business Server ***
+ switchport trunk allowed vlan 1-999
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/17
+ description *** Business Server ***
+ switchport trunk allowed vlan 1-999
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/18
+ description *** Business Server ***
+ switchport trunk allowed vlan 1-999
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/19
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/20
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/21
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/22
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/23
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet1/0/24
+ description *** Business Server ***
+ switchport trunk allowed vlan 1-999
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet1/1/1
+!
+interface GigabitEthernet1/1/2
+!
+interface GigabitEthernet1/1/3
+!
+interface GigabitEthernet1/1/4
+!
+interface TenGigabitEthernet1/1/1
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet1/1/2
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet1/1/3
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet1/1/4
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet1/1/5
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet1/1/6
+!
+interface TenGigabitEthernet1/1/7
+!
+interface TenGigabitEthernet1/1/8
+!
+interface FortyGigabitEthernet1/1/1
+!
+interface FortyGigabitEthernet1/1/2
+!
+interface TenGigabitEthernet2/0/1
+ description F-ALEN-ICS-1 (sby) Port 7
+ switchport trunk allowed vlan 1000-1399,1401-2000
+ switchport mode trunk
+ speed 1000
+ duplex full
+!
+interface TenGigabitEthernet2/0/2
+ description **** CONNECTION TO X-ALEN-FDST-1 ****
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface TenGigabitEthernet2/0/3
+ description **** CONNECTED TO X-ALEN-MDF-1 ****
+ switchport mode trunk
+ channel-group 2 mode active
+!
+interface TenGigabitEthernet2/0/4
+ description **** CONNECTED TO X-ALEN-SRVR-2 ****
+ switchport mode trunk
+ channel-group 3 mode active
+!
+interface TenGigabitEthernet2/0/5
+ description **** CONNECTED TO R-ALEN-DMVPN-1 ****
+ switchport trunk native vlan 250
+ switchport trunk allowed vlan 1,250,1250
+ switchport mode trunk
+ channel-group 4 mode active
+!
+interface TenGigabitEthernet2/0/6
+ description *** MW PTP to Pico link2 ***
+ no switchport
+ ip flow monitor NETFLOW-FLOWMONITOR input
+ ip flow monitor NETFLOW-FLOWMONITOR output
+ no ip address
+ shutdown
+ channel-group 5 mode active
+!
+interface TenGigabitEthernet2/0/7
+ description *** SPAN to ESX Host ***
+!
+interface TenGigabitEthernet2/0/8
+!
+interface TenGigabitEthernet2/0/9
+ description F-ALEN-INET-1
+ switchport access vlan 250
+ spanning-tree portfast
+!
+interface TenGigabitEthernet2/0/10
+!
+interface TenGigabitEthernet2/0/11
+ description **** Connection to F-ALEN-ICS-1 ICS Zone ****
+ switchport access vlan 400
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet2/0/12
+ description **** Connection to F-ALEN-ICS-1 Business Zone ****
+ switchport access vlan 1400
+ switchport mode access
+ speed 1000
+ duplex full
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet2/0/13
+ description *** SPAN Egress to PA ***
+!
+interface TenGigabitEthernet2/0/14
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet2/0/15
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/0/16
+ description *** Business Server ***
+ switchport trunk allowed vlan 1-999
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/0/17
+ description *** Business Server ***
+ switchport trunk allowed vlan 1-999
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/0/18
+ description *** Business Server ***
+ switchport trunk allowed vlan 1-999
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/0/19
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/0/20
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/0/21
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/0/22
+ description ** ICS Server **
+ switchport trunk allowed vlan 1000-2000
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/0/23
+ switchport access vlan 955
+ switchport mode access
+ spanning-tree portfast
+!
+interface TenGigabitEthernet2/0/24
+ description *** Business Server ***
+ switchport trunk allowed vlan 1-999
+ switchport mode trunk
+!
+interface GigabitEthernet2/1/1
+!
+interface GigabitEthernet2/1/2
+!
+interface GigabitEthernet2/1/3
+!
+interface GigabitEthernet2/1/4
+!
+interface TenGigabitEthernet2/1/1
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet2/1/2
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet2/1/3
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet2/1/4
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet2/1/5
+ description **SAN1 - ALEN**
+ switchport access vlan 243
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet2/1/6
+!
+interface TenGigabitEthernet2/1/7
+!
+interface TenGigabitEthernet2/1/8
+!
+interface FortyGigabitEthernet2/1/1
+!
+interface FortyGigabitEthernet2/1/2
+!
+interface Vlan1
+ description === Management  ===
+ no ip address
+ shutdown
+!
+interface Vlan2
+ ip address 10.209.1.3 255.255.255.0
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan9
+ description MCC/PROD OFF VOICE
+ ip address 10.116.64.1 255.255.255.240
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan10
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan11
+ description CCR + FLOOR 1 VOICE
+ ip address 10.116.64.17 255.255.255.240
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan12
+ description LEVEL 2 VOICE
+ ip address 10.116.64.33 255.255.255.240
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan13
+ description LEVEL 3 VOICE
+ ip address 10.116.64.49 255.255.255.240
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan14
+ description LEVEL 4 VOICE
+ ip address 10.116.64.65 255.255.255.240
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan15
+ description LEVEL 5 VOICE
+ ip address 10.116.64.81 255.255.255.240
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan50
+ description VOICE
+ ip address 10.116.65.193 255.255.255.240 secondary
+ ip address 10.140.50.1 255.255.255.0
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan100
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan109
+ description MCC + PROD OFF DATA
+ ip address 10.116.64.97 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan110
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan111
+ description CCR + FLOOR 1 DATA
+ ip address 10.116.64.129 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan112
+ description LEVEL 2 DATA
+ ip address 10.116.64.161 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan113
+ description LEVEL 3 DATA
+ ip address 10.116.64.193 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan114
+ description LEVEL 4 DATA
+ ip address 10.116.64.225 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan115
+ description LEVEL 5 DATA
+ ip address 10.116.65.1 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan150
+ description CLIENT WLAN
+ ip address 10.116.66.1 255.255.255.128
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan151
+ description CLIENT WLAN
+ ip address 10.116.66.129 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan185
+ description ***** AV VLAN *****
+ ip address 10.116.65.33 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan199
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan200
+ ip address 10.140.200.1 255.255.255.0
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan201
+ description SERVERS
+ ip address 146.30.164.1 255.255.255.192
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+ ip helper-address 146.30.164.5
+!
+interface Vlan224
+ description ****CCTV VLAN****
+ ip address 10.116.65.65 255.255.255.224 secondary
+ ip address 10.140.224.1 255.255.255.0
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan225
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan226
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan232
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan233
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan234
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan235
+ ip address 10.116.65.97 255.255.255.224 secondary
+ ip address 10.140.235.1 255.255.255.0
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan238
+ ip address 10.116.65.129 255.255.255.224 secondary
+ ip address 10.140.238.1 255.255.255.0
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan239
+ ip address 10.140.239.1 255.255.255.0
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan240
+ no ip address
+ ip helper-address 10.70.200.170
+ ip helper-address 10.8.200.170
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan243
+ description ISCSI
+ ip address 146.30.164.177 255.255.255.240
+!
+interface Vlan245
+ description AP CAPWAP
+ ip address 10.116.65.161 255.255.255.224
+ ip helper-address 146.30.168.11
+ ip helper-address 146.30.168.25
+ ip helper-address 146.30.168.120
+ ip helper-address 10.8.200.170
+ ip helper-address 10.10.210.137
+ ip helper-address 10.20.200.36
+ ip helper-address 136.171.184.187
+!
+interface Vlan250
+ description WAN EGRESS
+ ip address 146.30.164.193 255.255.255.248
+ ip route-cache policy
+!
+interface Vlan255
+ no ip address
+!
+interface Vlan400
+ description **** Connection to F-ALEN-ICS-1 ICS Zone ****
+ ip address 10.140.199.9 255.255.255.252
+!
+interface Vlan955
+ description CVX-MGMT
+ ip address 146.30.164.65 255.255.255.224
+!
+interface Vlan1100
+ description **** ICS CLIENT WORKSTATIONS ****
+ vrf forwarding ICS
+ ip address 172.21.192.1 255.255.255.192
+!
+interface Vlan1110
+ description **** ICS CAMERAS ****
+ vrf forwarding ICS
+ ip address 172.21.192.129 255.255.255.192
+!
+interface Vlan1120
+ description **** ICS RESERVED ****
+ vrf forwarding ICS
+ ip address 172.21.192.193 255.255.255.192
+!
+interface Vlan1200
+ description **** ICS SERVERS ****
+ vrf forwarding ICS
+ ip address 172.21.192.65 255.255.255.192
+!
+interface Vlan1201
+ description **** ICS FIELD NETWORK 1 ****
+ vrf forwarding ICS
+ ip address 172.21.194.1 255.255.255.0
+ arp timeout 240
+!
+interface Vlan1202
+ description **** ICS FIELD NETWORK 2 ****
+ vrf forwarding ICS
+ ip address 172.21.195.1 255.255.255.0
+ arp timeout 240
+!
+interface Vlan1203
+ description **** ICS FIELD NETWORK 3 ****
+ vrf forwarding ICS
+ ip address 172.21.196.1 255.255.255.0
+ arp timeout 240
+!
+interface Vlan1204
+ description **** ICS FIELD NETWORK 4 ****
+ vrf forwarding ICS
+ ip address 172.21.197.1 255.255.255.0
+ arp timeout 240
+!
+interface Vlan1235
+ description ***** ICS_SERVER_MGMT *****
+ vrf forwarding ICS
+ ip address 172.21.193.1 255.255.255.0
+!
+interface Vlan1250
+ vrf forwarding ICS
+ ip address 172.21.198.254 255.255.255.248
+!
+interface Vlan1255
+ vrf forwarding ICS
+ ip address 172.21.199.1 255.255.255.0
+!
+interface Vlan1350
+ description **** L3 Connectivity to Process Control Network (Eagle Firewall/Dragon switches) ****
+ vrf forwarding ICS
+ ip address 172.21.198.17 255.255.255.240
+!
+interface Vlan1400
+ description **** Connection to F-ALEN-ICS-1 Business Zone ****
+ vrf forwarding ICS
+ ip address 172.21.198.1 255.255.255.252
+!
+!
+router eigrp NBL
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  af-interface Port-channel5
+   summary-address 10.116.64.0 255.255.252.0
+   summary-address 10.140.0.0 255.255.0.0
+   summary-address 146.30.164.0 255.255.255.0
+  exit-af-interface
+  !
+  af-interface Tunnel900
+   summary-address 10.116.64.0 255.255.252.0
+   summary-address 10.140.0.0 255.255.0.0
+   summary-address 146.30.164.0 255.255.255.0
+   hello-interval 30
+   hold-time 90
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000000 10 255 1 1500
+   distribute-list route-map EIGRP_FILTER out Port-channel5
+   distribute-list route-map EG_FILTER in Port-channel5
+  exit-af-topology
+  network 10.0.0.0
+  network 146.30.164.0 0.0.0.255
+  eigrp router-id 146.30.164.161
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf ICS autonomous-system 100
+  !
+  af-interface Tunnel1900
+   summary-address 172.21.192.0 255.255.248.0
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000000 10 255 1 1500
+  exit-af-topology
+  neighbor 172.21.198.249 Vlan1250
+  network 172.20.0.0 0.3.255.255
+ exit-address-family
+!
+ip default-gateway 10.140.255.1
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip tcp path-mtu-discovery
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 146.30.164.195 200
+ip route 10.140.0.0 255.255.255.0 146.30.164.195
+ip route 172.16.1.0 255.255.255.0 172.16.2.1
+ip route 172.21.192.0 255.255.248.0 10.140.199.10
+ip route vrf Mgmt-vrf 0.0.0.0 0.0.0.0 10.140.255.1
+ip route vrf ICS 10.65.0.0 255.255.0.0 172.21.198.20
+ip route vrf ICS 10.140.0.0 255.255.0.0 172.21.198.2
+ip route vrf ICS 146.30.164.0 255.255.255.0 172.21.198.2
+ip ssh version 2
+!
+!
+ip access-list standard EIGRP_REDISTRIBUTED_STATIC_NETS
+ 10 permit 172.21.192.0 0.0.7.255
+ip access-list standard VTY_FILTER
+ 10 deny   10.10.208.216
+ 20 deny   10.70.200.220
+ 30 deny   10.10.208.184
+ 40 deny   10.45.200.98
+ 50 deny   10.10.208.113
+ 60 deny   10.10.208.124
+ 70 deny   10.35.200.50
+ 80 deny   10.45.200.51
+ 90 permit 10.0.0.0 0.255.255.255
+ 100 permit 172.16.0.0 0.15.255.255
+ 110 permit 216.166.78.0 0.0.0.255
+ 120 permit 23.132.240.0 0.0.0.255
+ 130 permit 65.201.46.232 0.0.0.7
+ 140 permit 74.205.148.176 0.0.0.7
+ 150 permit 63.97.210.128 0.0.0.31
+ 160 permit 139.65.136.0 0.0.3.255
+ 170 permit 139.65.140.0 0.0.3.255
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 60 permit 146.40.2.8
+ 70 permit 146.40.2.11
+ 80 permit 146.40.2.12
+ 90 permit 146.40.2.13
+ 50 permit 146.40.2.7
+ 100 permit 146.42.255.132
+ 110 permit 139.65.136.0 0.0.3.255
+ 120 permit 139.65.140.0 0.0.3.255
+ 130 permit 139.65.0.0 0.0.255.255
+ 140 deny   any log
+!
+!
+!
+ip prefix-list EG_FILTER seq 90 permit 10.75.0.0/16 ge 24
+ip prefix-list EG_FILTER seq 100 permit 10.75.0.0/16
+ip prefix-list EG_FILTER seq 110 permit 10.116.72.0/22
+ip prefix-list EG_FILTER seq 120 permit 146.30.163.0/24
+!
+ip prefix-list EIGRP_FILTER seq 100 permit 10.140.0.0/16
+ip prefix-list EIGRP_FILTER seq 105 permit 10.75.0.0/16 ge 24
+ip prefix-list EIGRP_FILTER seq 110 permit 10.75.0.0/16
+ip prefix-list EIGRP_FILTER seq 130 permit 10.240.240.48/30
+ip prefix-list EIGRP_FILTER seq 140 permit 10.75.200.10/32
+ip prefix-list EIGRP_FILTER seq 150 permit 146.30.163.0/24
+ip prefix-list EIGRP_FILTER seq 160 permit 10.116.72.0/22
+ip prefix-list EIGRP_FILTER seq 170 permit 10.116.64.0/22
+ip prefix-list EIGRP_FILTER seq 180 permit 146.30.164.0/24
+logging origin-id hostname
+logging source-interface Vlan255
+logging host 139.65.140.24
+logging host 139.65.141.24
+logging host 146.38.53.162
+ip access-list standard 20
+ 10 permit 10.0.0.0 0.63.255.255
+ 20 permit 10.128.0.0 0.7.255.255
+ 30 permit 10.254.0.0 0.0.255.255
+ 40 permit 146.22.0.0 0.1.255.255
+ 50 permit 146.24.0.0 0.7.255.255
+ 60 permit 146.32.0.0 0.7.255.255
+ 70 permit 146.40.0.0 0.3.255.255
+ 80 permit 146.44.0.0 0.1.255.255
+ 90 permit 146.46.0.0 0.0.255.255
+ 100 permit 136.171.0.0 0.0.255.255
+ 110 permit 139.65.136.0 0.0.3.255
+ 120 permit 139.65.140.0 0.0.3.255
+ 130 permit 139.65.0.0 0.0.255.255
+ 140 permit 134.248.0.0 0.0.255.255
+ 150 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 deny   any log
+ip access-list standard 80
+ 10 remark ***** SNMPv3 Hosts ****
+ 10 permit 10.70.200.160
+ 20 permit 10.62.200.213
+ 30 permit 10.10.196.160
+ 40 permit 10.10.196.161
+ 50 permit 10.8.200.160
+ 60 permit 10.8.200.161
+ 70 permit 10.20.196.160
+ 80 permit 10.70.200.251
+ 90 permit 10.10.201.74
+ 100 permit 10.10.202.108
+ 110 permit 10.10.196.23
+ 120 permit 10.10.202.28
+!
+route-map EIGRP_FILTER permit 100 
+ match ip address prefix-list EIGRP_FILTER
+!
+route-map STATIC->EIGRP permit 100 
+ match ip address EIGRP_REDISTRIBUTED_STATIC_NETS
+!
+route-map EG_FILTER deny 100 
+ match ip address prefix-list EG_FILTER
+!
+route-map EG_FILTER permit 1000 
+!
+!
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2022 v3 priv 
+snmp-server group NBLNetwork v3 priv read snmpread write snmpwrite access 80
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server view snmpread iso included
+snmp-server view snmpwrite iso included
+snmp-server trap link ietf
+snmp-server location F30849 / Avenida Parque de Africa, Cont. AX-16, C, Malabo / Equatorial Guinea / EMEA /GQ-Noble-NA-Utility-WAN-Remotes/Criticality-High
+snmp-server contact NOC: GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.138.9 version 3 priv cvx2023 
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server HOU2_ACS
+ address ipv4 139.65.143.4
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+radius server ALPHA-RADIUS
+ address ipv4 10.10.200.99 auth-port 1645 acct-port 1646
+ timeout 15
+ key 7 15562E0F113832052F606110
+!
+radius server BETA-RADIUS
+ address ipv4 10.20.200.99 auth-port 1645 acct-port 1646
+ timeout 15
+ key 7 00403605114912270872187C
+!
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+banner motd ^C
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++                                                                      +
++  This system is to be used ONLY by authorized users conducting       +
++  legitimate corporate business.  User processing activities are      +
++  monitored for administrative and security purposes.  Anyone using   +
++  this system expressly consents to such monitoring and to the use    +
++  of any evidence of unauthorized access, use, or modification for    +
++  criminal prosecution.                                               +
++                                                                      +
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 032E0B12035A31020F0700044932
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class VTY_FILTER in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class VTY_FILTER in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+!
+monitor session 1 destination interface Te1/0/7 - 8
+monitor session 1 destination interface Te2/0/7
+monitor session 1 source remote vlan 1500 
+monitor session 2 source vlan 243 , 250
+monitor session 2 destination interface Te1/0/13
+monitor session 2 destination interface Te2/0/13
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251 prefer
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+!
+end

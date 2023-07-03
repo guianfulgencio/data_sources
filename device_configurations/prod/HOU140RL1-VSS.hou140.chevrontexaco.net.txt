@@ -1,0 +1,5582 @@
+Building configuration...
+
+Current configuration : 137274 bytes
+!
+! Last configuration change at 10:48:39 UTC Fri Jun 16 2023
+! NVRAM config last updated at 16:46:27 UTC Wed Apr 19 2023 by svc-voy-ansible
+!
+version 15.5
+service nagle
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+service counters max age 10
+!
+hostname HOU140RL1-VSS
+!
+boot-start-marker
+boot system bootdisk:s6t64-ipservicesk9-mz.SPA.155-1.SY2.bin
+boot-end-marker
+!
+!
+vrf definition L3CVX-DEVICES
+ rd 65003:65017
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-GUEST
+ rd 65003:65006
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-IND
+ rd 65003:65007
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-USER
+ rd 65003:65016
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization config-commands
+aaa authorization exec default group tacacs+ if-authenticated 
+aaa authorization commands 0 default group tacacs+ if-authenticated 
+aaa authorization commands 1 default group tacacs+ if-authenticated 
+aaa authorization commands 15 default group tacacs+ if-authenticated 
+aaa authorization reverse-access default group tacacs+ if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 1 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group tacacs+
+aaa accounting system default start-stop group tacacs+
+!
+!
+!
+!
+!
+aaa session-id common
+platform ip cef load-sharing ip-only
+no platform qos rewrite ip dscp
+no ip source-route
+!
+ip vrf management
+!
+!
+ip domain-lookup source-interface Loopback0
+ip domain-name hou140.chevrontexaco.net
+ip name-server 146.36.80.34
+
+ip multicast-routing 
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+ip accounting-threshold 100
+vtp domain HOU140
+vtp mode transparent
+udld enable
+
+!
+!
+!
+!
+!
+!
+switch virtual domain 100
+ switch mode virtual
+ switch 1 priority 200
+ switch 2 priority 50
+!
+!
+!
+!
+flow record net-flow
+ match ipv4 tos
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match flow direction
+ collect ipv4 version
+ collect interface input
+ collect interface output
+ collect counter bytes
+ collect counter packets
+ collect timestamp sys-uptime first
+ collect timestamp sys-uptime last
+!
+!
+flow exporter net-flow
+ destination 146.36.114.213
+ source Loopback0
+ template data timeout 16
+!
+!
+flow monitor net-flow
+ exporter net-flow
+ record net-flow
+!
+!
+!
+!
+!
+archive
+ path bootdisk:cvx_113827
+ maximum 5
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge bpduguard default
+no spanning-tree optimize bpdu transmission
+spanning-tree extend system-id
+spanning-tree pathcost method long
+spanning-tree vlan 1,45-47,51-101,128,130,137-141,145-147,151 priority 24576
+spanning-tree vlan 152-217,219-317,319-802,809-887,889-3101,3103 priority 24576
+spanning-tree vlan 3104-4094 priority 24576
+spanning-tree vlan 2-44,48-50,102-127,129,131-136,142-144,148-150 priority 8192
+spanning-tree vlan 218,318,803-808,3102 priority 8192
+spanning-tree vlan 888 priority 4096
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+errdisable recovery cause udld
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause unicast-flood
+errdisable recovery cause arp-inspection
+port-channel per-module load-balance
+!
+redundancy
+ main-cpu
+  auto-sync running-config
+ mode sso
+!
+vlan internal allocation policy ascending
+vlan access-log ratelimit 2000
+!
+vlan 2
+ name 146.36.176.0/24.2nd.data
+!
+vlan 3
+ name 146.36.180.0/24.3rd.data
+!
+vlan 4
+ name 146.36.239.0/24.4th.data
+!
+vlan 5
+ name 146.36.252.0/24.5th.data
+!
+vlan 6
+ name 146.36.253.0/24.6th.data
+!
+vlan 7
+ name 146.36.181.0/24.7th.data
+!
+vlan 8
+ name 146.36.184.0/24.8th.data
+!
+vlan 9
+ name 146.36.185.0/24.9th.data
+!
+vlan 10
+ name 146.36.186.0/24.10th.data
+!
+vlan 11
+ name 146.36.187.0/24.11th.data
+!
+vlan 12
+ name 146.36.188.0/24.12th.data
+!
+vlan 13
+ name 146.36.189.0/24.13th.data
+!
+vlan 14
+ name 146.36.190.0/24.14th.data
+!
+vlan 15
+ name 146.36.237.0/24.15th.data
+!
+vlan 16
+ name 146.36.177.0/24.16th.data
+!
+vlan 17
+ name 146.36.162.0/24.17th.data
+!
+vlan 18
+ name 146.36.163.0/24.18th.data
+!
+vlan 19
+ name 146.36.164.0/24.19th.data
+!
+vlan 20
+ name 146.36.236.0/24.20th.data
+!
+vlan 21
+ name 146.36.224.0/24.21st.data
+!
+vlan 22
+ name 146.36.225.0/24.22nd.data
+!
+vlan 23
+ name 146.36.232.0/24.23rd.data
+!
+vlan 24
+ name 146.36.233.0/24.24th.data
+!
+vlan 25
+ name 146.36.238.0/24.25th.data
+!
+vlan 26
+ name 146.36.226.0/24.26th.data
+!
+vlan 27
+ name 146.36.179.0/24.27th.data
+!
+vlan 28
+ name 146.36.227.0/24.28th.data
+!
+vlan 29
+ name 146.36.228.0/24.29th.data
+!
+vlan 30
+ name 146.36.229.0/24.30th.data
+!
+vlan 31
+ name 146.36.230.0/24.31st.data
+!
+vlan 32
+ name 146.36.231.0/24.32nd.data
+!
+vlan 33
+ name 146.36.251.0/24.33rd.data
+!
+vlan 34
+ name 146.36.170.0/24.34th.data
+!
+vlan 35
+ name 146.36.178.0/24.35th.data
+!
+vlan 36
+ name 146.36.171.0/24.36th.data
+!
+vlan 37
+ name 146.26.240.0/24.37th.data
+!
+vlan 38
+ name 146.36.247.0/24.38th.data
+!
+vlan 39
+ name 146.36.241.0/24.39th.data
+!
+vlan 40
+ name 146.36.249.0/24.40th.data
+!
+vlan 41
+ name 146.36.250.0/24.41st.data
+!
+vlan 42
+ name 146.36.242.0/24.42nd.data
+!
+vlan 43
+ name 146.36.243.0/24.43rd.data
+!
+vlan 44
+ name 146.36.244.0/24.44th.data
+!
+vlan 45
+ name 146.36.245.0/24.45th.data
+!
+vlan 46
+ name 146.36.254.0/24.46th.data
+!
+vlan 47
+ name 146.36.255.0/24.47th.data
+!
+vlan 48
+ name 146.36.246.0/24.48th.data
+!
+vlan 49
+ name 146.36.165.0/24.49th.data
+!
+vlan 50
+ name 146.36.223.0/24.50th.data
+!
+vlan 52
+ name 146.36.52.0/24.UNIX
+!
+vlan 80
+ name 146.36.5.80/29.WLAN.Mgmt
+!
+vlan 101
+ name 146.41.1.128/26.1st.voice
+!
+vlan 102
+ name 146.41.1.192/26.2nd.voice
+!
+vlan 103
+ name 146.41.3.0/24.3rd.voice
+!
+vlan 104
+ name 146.41.4.0/24.4th.voice
+!
+vlan 105
+ name 146.41.5.0/24.5th.voice
+!
+vlan 106
+ name 146.41.6.0/24.6th.voice
+!
+vlan 107
+ name 146.41.7.0/24.7th.voice
+!
+vlan 108
+ name 146.41.8.0/24.8th.voice
+!
+vlan 109
+ name 146.41.9.0/24.9th.voice
+!
+vlan 110
+ name 146.41.10.0/24.10th.voice
+!
+vlan 111
+ name 146.41.11.0/24.11th.voice
+!
+vlan 112
+ name 146.41.12.0/24.12th.voice
+!
+vlan 113
+ name 146.41.13.0/24.13th.voice
+!
+vlan 114
+ name 146.41.14.0/24.14th.voice
+!
+vlan 115
+ name 146.41.15.0/24.15th.voice
+!
+vlan 116
+ name 146.41.16.0/24.16th.voice
+!
+vlan 117
+ name 146.41.17.0/24.17th.voice
+!
+vlan 118
+ name 146.41.18.0/24.18th.voice
+!
+vlan 119
+ name 146.41.19.0/24.19th.voice
+!
+vlan 120
+ name 146.41.20.0/24.20th.voice
+!
+vlan 121
+ name 146.41.21.0/24.21st.voice
+!
+vlan 122
+ name 146.41.22.0/24.22nd.voice
+!
+vlan 123
+ name 146.41.23.0/24.23rd.voice
+!
+vlan 124
+ name 146.41.24.0/24.24th.voice
+!
+vlan 125
+ name 146.41.25.0/24.25th.voice
+!
+vlan 126
+ name 146.41.26.0/24.26th.voice
+!
+vlan 127
+ name 146.41.27.0/24.27th.voice
+!
+vlan 128
+ name 146.41.28.0/24.28th.voice
+!
+vlan 129
+ name 146.41.29.0/24.29th.voice
+!
+vlan 130
+ name 146.41.30.0/24.30th.voice
+!
+vlan 131
+ name 146.41.31.0/24.31st.voice
+!
+vlan 132
+ name 146.41.32.0/24.32nd.voice
+!
+vlan 133
+ name 146.41.33.0/24.33rd.voice
+!
+vlan 134
+ name 146.41.34.0/24.34th.voice
+!
+vlan 135
+ name 146.41.35.0/24.35th.voice
+!
+vlan 136
+ name 146.41.36.0/24.36th.voice
+!
+vlan 137
+ name 146.41.37.0/24.37th.voice
+!
+vlan 138
+ name 146.41.38.0/24.38th.voice
+!
+vlan 139
+ name 146.41.39.0/24.39th.voice
+!
+vlan 140
+ name 146.41.40.0/24.40th.voice
+!
+vlan 141
+ name 146.41.41.0/24.41st.voice
+!
+vlan 142
+ name 146.41.42.0/24.42nd.voice
+!
+vlan 143
+ name 146.41.43.0/24.43rd.voice
+!
+vlan 144
+ name 146.41.44.0/24.44th.voice
+!
+vlan 145
+ name 146.41.45.0/24.45th.voice
+!
+vlan 146
+ name 146.41.46.0/24.46th.voice
+!
+vlan 147
+ name 146.41.47.0/24.47th.voice
+!
+vlan 148
+ name 146.41.48.0/24.48th.voice
+!
+vlan 149
+ name 146.41.49.0/24.49th.voice
+!
+vlan 150
+ name 146.41.50.0/24.50th.voice
+!
+vlan 151
+ name 146.41.1.0/26.B1.voice
+!
+vlan 152
+ name 146.41.1.64/24.B2.voice
+!
+vlan 170
+ name 136.171.170.0/24.ETC.Lab
+!
+vlan 182
+ name 146.36.182.0/24.wireless
+!
+vlan 191
+ name JSM_Staging
+!
+vlan 201
+ name 146.36.248.0/25.46th.IOC-Room
+!
+vlan 202
+ name 146.36.183.0/25.46th.DSC-Room
+!
+vlan 210
+ name 146.36.182.0/24.Aruba.data
+!
+vlan 211
+ name 10.25.246.0/24.10th.lab
+!
+vlan 218
+ name 146.36.191.0/26.18th.lab
+!
+vlan 318
+ name 146.36.235.224/27.18th.data
+!
+vlan 327
+ name HOU140_CAMERAS_136.171.227.0/24
+!
+vlan 328
+ name 136.171.128.0/22.WLAN.Business
+!
+vlan 332
+ name 136.171.132.0/22.WLAN
+!
+vlan 336
+ name 136.171.136.0/22.WLAN
+!
+vlan 340
+ name 136.171.140.0/22.WLAN
+!
+vlan 800
+ name CBRES-METASYS
+!
+vlan 801
+ name 146.36.248.192/27-EFIT-Rm30999
+!
+vlan 802
+ name 146.36.248.224/28-EFIT-Rm25999
+!
+vlan 803
+ name 146.36.248.128/27-EFIT-RM48164
+!
+vlan 804
+ name 146.36.248.160/27-EFIT-RM48066
+!
+vlan 805
+ name 146.36.127.160/27-EFIT-RM49066
+!
+vlan 806
+ name 146.36.127.128/27-EFIT-RM49164-R
+!
+vlan 807
+ name 146.36.127.224/28-EFIT-RM49997
+!
+vlan 808
+ name 146.36.127.240/28-EFIT-RM14175
+!
+vlan 810
+ name native-vlan-hou140fa40-trunk
+!
+vlan 888
+ name CVXGUEST
+!
+vlan 940
+ name 146.36.191.176/29.40th.routing
+!
+vlan 999
+ name dot1q.native
+!
+vlan 1000 
+!
+vlan 2601
+ name dot1q.native.Gi6/1
+!
+vlan 3102
+ name 146.41.2.224/28.IPT.RSPAN
+ remote-span
+!
+vlan 3103
+ name 146.41.2.192/27.IPT3.RSPAN
+ remote-span
+!
+vlan 3104
+ name 146.41.2.192/27.IPT4.RSPAN
+ remote-span
+!
+vlan 4060
+ name WLAN-L3CVX-GUEST
+!
+vlan 4070
+ name WLAN-L3CVX-IND
+!
+vlan 4080
+ name WLAN-L3CVX-USER
+!
+vlan 4090
+ name WLAN-L3CVX-DEVICES
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+!
+class-map match-any class-copp-icmp-redirect-unreachable
+class-map match-all class-copp-glean
+class-map match-all class-copp-receive
+class-map match-all class-copp-options
+class-map match-all class-copp-broadcast
+class-map match-all class-copp-mcast-acl-bridged
+class-map match-all class-copp-slb
+class-map match-all class-copp-mtu-fail
+class-map match-all class-copp-ttl-fail
+class-map match-all class-copp-arp-snooping
+class-map match-any class-copp-mcast-copy
+class-map match-any class-copp-ip-connected
+class-map match-any class-copp-match-igmp
+ match access-group name acl-copp-match-igmp
+class-map match-all class-copp-unknown-protocol
+class-map match-any class-copp-vacl-log
+class-map match-all class-copp-mcast-ipv6-control
+class-map match-any class-copp-match-pimv6-data
+ match access-group name acl-copp-match-pimv6-data
+class-map match-any class-copp-mcast-punt
+class-map match-all class-copp-unsupp-rewrite
+class-map match-all class-copp-ucast-egress-acl-bridged
+class-map match-all class-copp-ip-admission
+class-map match-any class-copp-dpss-divert
+class-map match-all class-copp-service-insertion
+class-map match-all class-copp-mac-pbf
+class-map match-any class-copp-match-mld
+ match access-group name acl-copp-match-mld
+class-map match-all class-copp-ucast-ingress-acl-bridged
+class-map match-all class-copp-dhcp-snooping
+class-map match-all class-copp-wccp
+class-map match-all class-copp-nd
+class-map match-any class-copp-ipv6-connected
+class-map match-all class-copp-mcast-rpf-fail
+class-map match-any class-copp-match-ndv6hl
+ match access-group name acl-copp-match-ndv6hl
+class-map match-any class-copp-ucast-rpf-fail
+class-map match-all class-copp-mcast-ip-control
+class-map match-any class-copp-match-pim-data
+ match access-group name acl-copp-match-pim-data
+class-map match-any class-copp-match-ndv6
+ match access-group name acl-copp-match-ndv6
+class-map match-any class-copp-mcast-v4-data-on-routedPort
+class-map match-any class-copp-mcast-v6-data-on-routedPort
+!
+policy-map policy-default-autocopp
+ class class-copp-mcast-v4-data-on-routedPort
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-mcast-v6-data-on-routedPort
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-dpss-divert
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-mld
+   police rate 10000 pps burst 10000 packets    conform-action set-discard-class-transmit 48    exceed-action transmit 
+ class class-copp-match-igmp
+   police rate 10000 pps burst 10000 packets    conform-action set-discard-class-transmit 48    exceed-action transmit 
+ class class-copp-icmp-redirect-unreachable
+   police rate 100 pps burst 10 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ucast-rpf-fail
+   police rate 100 pps burst 10 packets    conform-action transmit     exceed-action drop 
+ class class-copp-vacl-log
+   police rate 2000 pps burst 1 packets    conform-action transmit     exceed-action drop 
+ class class-copp-mcast-punt
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-mcast-copy
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ip-connected
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-ipv6-connected
+   police rate 1000 pps burst 256 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-pim-data
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-pimv6-data
+   police rate 1000 pps burst 1000 packets    conform-action transmit     exceed-action drop 
+ class class-copp-match-ndv6hl
+   police rate 10 pps burst 1 packets    conform-action drop     exceed-action drop 
+ class class-copp-match-ndv6
+   police rate 1000 pps burst 1000 packets    conform-action set-discard-class-transmit 48    exceed-action drop 
+policy-map type lan-queuing cos-queueing
+ class class-default
+policy-map CVXGUEST-POLICE-1Gbps
+ class class-default
+    police 1000000000    conform-action transmit     exceed-action drop 
+!
+!
+ auto qos default
+!
+!
+!
+interface Loopback0
+ ip address 146.36.5.244 255.255.255.255
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+ load-interval 30
+!
+interface Port-channel1
+ no switchport
+ no ip address
+ shutdown
+!
+interface Port-channel3
+ description HOU140SL03 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 3,102,103,327,800,888
+!
+interface Port-channel4
+ description HOU140SL4 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 4,104,888
+!
+interface Port-channel5
+ description HOU140SL05 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 5,105,800,888
+!
+interface Port-channel6
+ description HOU140SL06 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 6,106,888
+!
+interface Port-channel7
+ description HOU140SL07 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 7,107,327,888
+!
+interface Port-channel8
+ description HOU140SL08 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 8,108,888
+!
+interface Port-channel9
+ description HOU140SL09 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 9,109,888
+!
+interface Port-channel10
+ description HOU140SL10 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 10,110,210,800,888,4060,4070,4080
+!
+interface Port-channel11
+ description HOU140SL11 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 11,111,888
+!
+interface Port-channel12
+ description HOU140SL12 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 12,112,888
+!
+interface Port-channel13
+ description HOU140SL13 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 13,113,888
+!
+interface Port-channel14
+ description HOU140SL14 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 14,114,808,888
+!
+interface Port-channel15
+ description HOU140SL15 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 15,115,800,888
+!
+interface Port-channel16
+ description HOU140SL16 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 16,116,888
+!
+interface Port-channel17
+ description HOU140SL17 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 17,117,888
+!
+interface Port-channel18
+ description HOU140SL18 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 18,118,170,218,318,888
+!
+interface Port-channel19
+ description HOU140SL19 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 19,119,888
+!
+interface Port-channel20
+ description HOU140SL20 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 20,120,800,888
+!
+interface Port-channel21
+ description HOU140SL21
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 21,121,888
+!
+interface Port-channel22
+ description HOU140SL22
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 22,122,888
+!
+interface Port-channel23
+ description HOU140SL23
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 23,123,888
+!
+interface Port-channel24
+ description HOU140SL24
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 24,124,888
+!
+interface Port-channel25
+ description HOU140SL25 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 25,125,800,802,888
+!
+interface Port-channel26
+ description HOU140SL26 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 26,126,888
+!
+interface Port-channel27
+ description HOU140SL27 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 27,127,888
+!
+interface Port-channel28
+ description HOU140SL28 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 28,128,888
+!
+interface Port-channel29
+ description HOU140SL29 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 29,129,888
+!
+interface Port-channel30
+ description HOU140SL30 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 30,130,800,888
+!
+interface Port-channel31
+ description HOU140SL31 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 31,131,888
+!
+interface Port-channel32
+ description HOU140SL32 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 32,132,888
+!
+interface Port-channel33
+ description HOU140SL33 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 33,133,888
+!
+interface Port-channel34
+ description HOU140SL34 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 34,134,888,4060,4080
+!
+interface Port-channel35
+ description HOU140SL35 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 35,135,800,888
+!
+interface Port-channel36
+ description HOU140SL36 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 36,136,888
+!
+interface Port-channel37
+ description HOU140SL37 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 37,137,888
+!
+interface Port-channel38
+ description HOU140SL38 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 38,138,800,888
+!
+interface Port-channel39
+ description HOU140SL39 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 39,139,888
+!
+interface Port-channel40
+ description HOU140SL40 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 40,140,800,888,940
+!
+interface Port-channel41
+ description HOU140SL41 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 41,141,888
+!
+interface Port-channel42
+ description HOU140SL42 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 42,142,888
+!
+interface Port-channel43
+ description HOU140SL40 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 43,143,888
+!
+interface Port-channel44
+ description HOU140SL44 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 44,144,888
+!
+interface Port-channel45
+ description HOU140SL45 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 45,145,800,888
+!
+interface Port-channel46
+ description HOU140SL46 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 46,146,201,202,888
+!
+interface Port-channel47
+ description HOU140SL47 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 47,147,888
+!
+interface Port-channel48
+ description HOU140SL48 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 48,148,803,804,888
+!
+interface Port-channel49
+ description HOU140SL49 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 49,149,805-807,888
+!
+interface Port-channel50
+ description HOU140SL50 Po1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 50,150,327,800,888
+!
+interface Port-channel92
+ description HOU150RM1 Port-Channel92 [CVX-CORP]
+ no switchport
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Port-channel92.761
+ description HOU150RM1
+ encapsulation dot1Q 761
+ ip address 146.36.2.174 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Port-channel92.3405
+ description HOU150RM1 Port-Channel92.3405 [VRF L3CVX-GUEST]
+ encapsulation dot1Q 3405
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.130.73 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel92.3406
+ description HOU150RM1 Port-Channel92.3406 [VRF L3CVX-IND]
+ encapsulation dot1Q 3406
+ vrf forwarding L3CVX-IND
+ ip address 10.190.130.73 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel92.3407
+ description HOU150RM1 Port-Channel92.3407 [VRF L3CVX-USER]
+ encapsulation dot1Q 3407
+ vrf forwarding L3CVX-USER
+ ip address 10.186.130.73 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel92.3408
+ description HOU150RM1 Port-Channel92.3408 [VRF L3CVX-DEVICES]
+ encapsulation dot1Q 3408
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.130.73 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel93
+ description HOU150-RM2 Port-Channel93 [CVX-CORP]
+ no switchport
+ no ip address
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Port-channel93.861
+ description HOU150RL1-VSS
+ encapsulation dot1Q 861
+ ip address 146.36.2.178 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Port-channel93.3505
+ description HOU150-RM2 Port-Channel93.3505 [VRF L3CVX-GUEST]
+ encapsulation dot1Q 3505
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.130.75 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel93.3506
+ description HOU150-RM2 Port-Channel93.3506 [VRF L3CVX-IND]
+ encapsulation dot1Q 3506
+ vrf forwarding L3CVX-IND
+ ip address 10.190.130.75 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel93.3507
+ description HOU150-RM2 Port-Channel93.3507 [VRF L3CVX-USER]
+ encapsulation dot1Q 3507
+ vrf forwarding L3CVX-USER
+ ip address 10.186.130.75 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel93.3508
+ description HOU150-RM2 Port-Channel93.3508 [VRF L3CVX-DEVICES]
+ encapsulation dot1Q 3508
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.130.75 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Port-channel129
+ description HOU140WC-02 
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+!
+interface Port-channel210
+ description VSL Port Channel *DO NOT DELETE*
+ no switchport
+ no ip address
+ no platform qos channel-consistency
+ switch virtual link 1
+!
+interface Port-channel211
+ description hou140wc-01ha
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ shutdown
+!
+interface Port-channel220
+ description VSL Port Channel *DO NOT DELETE*
+ no switchport
+ no ip address
+ no platform qos channel-consistency
+ switch virtual link 2
+!
+interface Port-channel231
+ description HOU140WC-02HA
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+!
+interface Port-channel327
+ description HOU140SL1B1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,101,102,151,152,327,800,888
+ load-interval 30
+ flowcontrol receive on
+!
+interface Port-channel328
+ description HOU140SL1B2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,327,888
+ load-interval 30
+ flowcontrol receive on
+!
+interface Port-channel350
+ description Link to Temp L2 Switch For Panel
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 2,3,16
+!
+interface Port-channel470
+ description HOU140SL47-47947
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 47,147,888
+!
+interface TenGigabitEthernet1/1/1
+ description VSL for VSS *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 210 mode on
+!
+interface TenGigabitEthernet1/1/2
+ description HOU150RM1 Te5/3
+ no switchport
+ no ip address
+ load-interval 30
+ udld port
+ channel-group 92 mode active
+!
+interface TenGigabitEthernet1/1/3
+ description HOU140SL03 Te 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 3,102,103,327,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 3 mode active
+!
+interface TenGigabitEthernet1/1/4
+ description HOU140SL04 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 4,104,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 4 mode active
+!
+interface TenGigabitEthernet1/1/5
+ description HOU140SL05 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 5,105,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 5 mode active
+!
+interface TenGigabitEthernet1/1/6
+ description HOU140SL06 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 6,106,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 6 mode active
+!
+interface TenGigabitEthernet1/1/7
+ description HOU140SL07 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 7,107,327,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 7 mode active
+!
+interface TenGigabitEthernet1/1/8
+ description HOU140SL08 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 8,108,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 8 mode active
+!
+interface TenGigabitEthernet1/1/9
+ description HOU140SL09 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 9,109,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 9 mode active
+!
+interface TenGigabitEthernet1/1/10
+ description HOU140SL10 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 10,110,210,800,888,4060,4070,4080
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 10 mode active
+!
+interface TenGigabitEthernet1/1/11
+ description HOU140SL11 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 11,111,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 11 mode active
+!
+interface TenGigabitEthernet1/1/12
+ description HOU140SL12 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 12,112,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 12 mode active
+!
+interface TenGigabitEthernet1/1/13
+ description HOU140SL13 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 13,113,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 13 mode active
+!
+interface TenGigabitEthernet1/1/14
+ description HOU140SL14 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 14,114,808,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 14 mode active
+!
+interface TenGigabitEthernet1/1/15
+ description HOU140SL15 Ten 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 15,115,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 15 mode active
+!
+interface TenGigabitEthernet1/1/16
+ description HOU140SL16 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 16,116,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 16 mode active
+!
+interface TenGigabitEthernet1/1/17
+ description HOU140SL45  Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 45,145,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 45 mode active
+!
+interface TenGigabitEthernet1/1/18
+ description HOU140SL33 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 33,133,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 33 mode active
+!
+interface TenGigabitEthernet1/1/19
+ description HOU140SL44  Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 44,144,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 44 mode active
+!
+interface TenGigabitEthernet1/1/20
+ description HOU140SL47 Te3/0/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 47,147,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 47 mode active
+!
+interface TenGigabitEthernet1/1/21
+ description HOU140SL34 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 34,134,888,4060,4080
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 34 mode active
+!
+interface TenGigabitEthernet1/1/22
+ description HOU140SL43  Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 43,143,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 43 mode active
+!
+interface TenGigabitEthernet1/1/23
+ description HOU140SL17 Ten 3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 17,117,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 17 mode active
+!
+interface TenGigabitEthernet1/1/24
+ description HOU140SL35 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 35,135,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 35 mode active
+!
+interface TenGigabitEthernet1/1/25
+ description HOU140SL42  Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 42,142,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 42 mode active
+!
+interface TenGigabitEthernet1/1/26
+ description HOU140SL38 Te3/0/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 38,138,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 38 mode active
+!
+interface TenGigabitEthernet1/1/27
+ description HOU140SL39 Te3/0/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 39,139,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 39 mode active
+!
+interface TenGigabitEthernet1/1/28
+ description HOU140SL49 Te3/0/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 49,149,805-807,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 49 mode active
+!
+interface TenGigabitEthernet1/1/29
+ description HOU140WC-02
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 129 mode on
+!
+interface TenGigabitEthernet1/1/30
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ shutdown
+ channel-group 211 mode on
+!
+interface TenGigabitEthernet1/1/31
+ description HOU140WC-02HA
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 231 mode on
+!
+interface TenGigabitEthernet1/1/32
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface TenGigabitEthernet1/2/1
+ description VSL for VSS *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 210 mode on
+!
+interface TenGigabitEthernet1/2/2
+ description HOU140SL20 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 20,120,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 20 mode active
+!
+interface TenGigabitEthernet1/2/3
+ description HOU140SL19 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 19,119,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 19 mode active
+!
+interface TenGigabitEthernet1/2/4
+ description HOU140SL18 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 18,118,170,218,318,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 18 mode active
+!
+interface TenGigabitEthernet1/2/5
+ description HOU140SL21  Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 21,121,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 21 mode active
+!
+interface TenGigabitEthernet1/2/6
+ description HOU140SL22 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 22,122,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 22 mode active
+!
+interface TenGigabitEthernet1/2/7
+ description HOU140SL23 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 23,123,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 23 mode active
+!
+interface TenGigabitEthernet1/2/8
+ description HOU140SL24 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 24,124,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 24 mode active
+!
+interface TenGigabitEthernet1/2/9
+ description HOU140SL25 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 25,125,800,802,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 25 mode active
+!
+interface TenGigabitEthernet1/2/10
+ description HOU140SL26 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 26,126,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 26 mode active
+!
+interface TenGigabitEthernet1/2/11
+ description HOU140SL27 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 27,127,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 27 mode active
+!
+interface TenGigabitEthernet1/2/12
+ description HOU140SL28 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 28,128,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 28 mode active
+!
+interface TenGigabitEthernet1/2/13
+ description HOU140SL29 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 29,129,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 29 mode active
+!
+interface TenGigabitEthernet1/2/14
+ description HOU140SL30 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 30,130,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 30 mode active
+!
+interface TenGigabitEthernet1/2/15
+ description HOU140SL31  Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 31,131,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 31 mode active
+!
+interface TenGigabitEthernet1/2/16
+ description HOU140SL32 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 32,132,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 32 mode active
+!
+interface TenGigabitEthernet1/2/17
+ description HOU140SL46 Te3/0/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 46,146,201,202,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 46 mode active
+!
+interface TenGigabitEthernet1/2/18
+ description HOU140SL50 Te3/0/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 50,150,327,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 50 mode active
+!
+interface TenGigabitEthernet1/2/19
+ description HOU140SL36 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 36,136,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 36 mode active
+!
+interface TenGigabitEthernet1/2/20
+ description HOU140SL41  Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 41,141,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 41 mode active
+!
+interface TenGigabitEthernet1/2/21
+ description HOU140SL37 Te 3/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 37,137,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 37 mode active
+!
+interface TenGigabitEthernet1/2/22
+ description HOU140SL40  Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 40,140,800,888,940
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 40 mode active
+!
+interface TenGigabitEthernet1/2/23
+ description HOU140SL48 Te3/0/1 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 48,148,803,804,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 48 mode active
+!
+interface TenGigabitEthernet1/2/24
+ description HOU140SL1B2 Ten1/1/3
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,327,888
+ load-interval 30
+ udld port
+ channel-group 328 mode on
+!
+interface TenGigabitEthernet1/2/25
+ description HOU140SL1B1 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,101,102,151,152,327,800,888
+ load-interval 30
+ udld port
+ spanning-tree guard root
+ channel-group 327 mode active
+!
+interface TenGigabitEthernet1/2/26
+ description HOU140SLB1 Gi 0/25
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,101,151,152,888,3102
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ no snmp trap link-status
+!
+interface TenGigabitEthernet1/2/27
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface TenGigabitEthernet1/2/28
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface TenGigabitEthernet1/2/29
+ description HOU140WC-02
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 129 mode on
+!
+interface TenGigabitEthernet1/2/30
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface TenGigabitEthernet1/2/31
+ description HOU140WC-02HA
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 231 mode on
+!
+interface TenGigabitEthernet1/2/32
+ description *UMI* HOU160RM2 Gi4/24 Free Space Optics (FSO) Backup Link BULT
+ no switchport
+ bandwidth 1000000
+ ip address 146.36.2.141 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip hello-interval eigrp 65103 60
+ ip hold-time eigrp 65103 180
+ ip pim dr-priority 0
+ load-interval 30
+ delay 1000000
+ udld port
+ no snmp trap link-status
+!
+interface TenGigabitEthernet1/3/1
+ description VSL for VSS *DO NOT DELETE*
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 210 mode on
+!
+interface TenGigabitEthernet1/3/2
+ description VSS Dual-Active Detection
+ no switchport
+ no ip address
+ no cdp enable
+ dual-active fast-hello
+!
+interface TenGigabitEthernet1/3/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet1/3/8
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet1/3/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet1/3/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface mgmt0
+ description HOU140RL1-VSS
+ no ip address
+ no ip proxy-arp
+ shutdown
+!
+interface GigabitEthernet1/5/1
+ description HOU150SI-VLAN888-NEW Gi1/0/25
+ switchport
+ switchport trunk native vlan 888
+ switchport mode access
+ switchport access vlan 888
+ switchport nonegotiate
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ storm-control broadcast level 10.00
+ flowcontrol send off
+ spanning-tree portfast disable
+ spanning-tree guard loop
+!
+interface GigabitEthernet1/5/2
+ description HOU140SL3_RM03049
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 2,3,16
+ load-interval 30
+ udld port
+ channel-protocol lacp
+ channel-group 350 mode active
+!
+interface GigabitEthernet1/5/3
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/4
+ description HOU140SL47-47947 Gi 1/1/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 47,147,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 470 mode active
+!
+interface GigabitEthernet1/5/5
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/6
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/7
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/8
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/9
+ description fsb-ssp42 .30
+ switchport
+ switchport mode access
+ switchport access vlan 16
+ switchport nonegotiate
+ load-interval 30
+ shutdown
+ no snmp trap link-status
+ flowcontrol send off
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/5/10
+ description fsb-ssp42 .30
+ switchport
+ switchport mode access
+ switchport access vlan 16
+ switchport nonegotiate
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ flowcontrol send off
+ spanning-tree portfast edge
+!
+interface GigabitEthernet1/5/11
+ description F2 RU35 HOU140FHS40
+ switchport
+ switchport mode access
+ switchport access vlan 800
+ no logging event link-status
+ load-interval 30
+ udld port
+ no snmp trap link-status
+ flowcontrol send off
+!
+interface GigabitEthernet1/5/12
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/13
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/14
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/15
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/16
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/17
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/18
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/19
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/20
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/21
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/22
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/23
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/24
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/25
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/26
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/27
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/28
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/29
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/30
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/31
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/32
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/33
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/34
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/35
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/36
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/37
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/38
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/39
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/40
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/41
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/42
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/43
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/44
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/45
+ description HOU140SLB1 Gi 0/25
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,101,151,152,888,3102
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/46
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet1/5/47
+ description HOU140RV1-IPT Gi1/0/11
+ no switchport
+ ip address 146.34.9.209 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ delay 2
+ udld port
+!
+interface GigabitEthernet1/5/48
+ description HOU140RV2-IPT Gi1/0/47
+ no switchport
+ ip address 146.34.9.213 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ udld port
+!
+interface TenGigabitEthernet2/1/1
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 220 mode on
+!
+interface TenGigabitEthernet2/1/2
+ description HOU150RM2 Te5/3
+ no switchport
+ no ip address
+ load-interval 30
+ udld port
+ channel-group 93 mode active
+!
+interface TenGigabitEthernet2/1/3
+ description HOU140SL03Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 3,102,103,327,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 3 mode active
+!
+interface TenGigabitEthernet2/1/4
+ description HOU140SL04 Ten 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 4,104,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 4 mode active
+!
+interface TenGigabitEthernet2/1/5
+ description HOU140SL05 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 5,105,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 5 mode active
+!
+interface TenGigabitEthernet2/1/6
+ description HOU140SL06 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 6,106,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 6 mode active
+!
+interface TenGigabitEthernet2/1/7
+ description HOU140SL07 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 7,107,327,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 7 mode active
+!
+interface TenGigabitEthernet2/1/8
+ description HOU140SL08 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 8,108,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 8 mode active
+!
+interface TenGigabitEthernet2/1/9
+ description HOU140SL09 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 9,109,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 9 mode active
+!
+interface TenGigabitEthernet2/1/10
+ description HOU140SL10 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 10,110,210,800,888,4060,4070,4080
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 10 mode active
+!
+interface TenGigabitEthernet2/1/11
+ description HOU140SL11 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 11,111,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 11 mode active
+!
+interface TenGigabitEthernet2/1/12
+ description HOU140SL12 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 12,112,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 12 mode active
+!
+interface TenGigabitEthernet2/1/13
+ description HOU140SL13 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 13,113,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 13 mode active
+!
+interface TenGigabitEthernet2/1/14
+ description HOU140SL14 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 14,114,808,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 14 mode active
+!
+interface TenGigabitEthernet2/1/15
+ description HOU140SL15 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 15,115,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 15 mode active
+!
+interface TenGigabitEthernet2/1/16
+ description HOU140SL16 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 16,116,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 16 mode active
+!
+interface TenGigabitEthernet2/1/17
+ description HOU140SL45 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 45,145,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 45 mode active
+!
+interface TenGigabitEthernet2/1/18
+ description HOU140SL33 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 33,133,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 33 mode active
+!
+interface TenGigabitEthernet2/1/19
+ description HOU140SL44 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 44,144,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 44 mode active
+!
+interface TenGigabitEthernet2/1/20
+ description HOU140SL47 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 47,147,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 47 mode active
+!
+interface TenGigabitEthernet2/1/21
+ description HOU140SL34 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 34,134,888,4060,4080
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 34 mode active
+!
+interface TenGigabitEthernet2/1/22
+ description HOU140SL43 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 43,143,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 43 mode active
+!
+interface TenGigabitEthernet2/1/23
+ description HOU140SL17 Te 3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 17,117,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 17 mode active
+!
+interface TenGigabitEthernet2/1/24
+ description HOU140SL35 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 35,135,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 35 mode active
+!
+interface TenGigabitEthernet2/1/25
+ description HOU140SL42  Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 42,142,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 42 mode active
+!
+interface TenGigabitEthernet2/1/26
+ description HOU140SL38 Te3/0/5 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 38,138,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 38 mode active
+!
+interface TenGigabitEthernet2/1/27
+ description HOU140SL39 Te3/0/5 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 39,139,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 39 mode active
+!
+interface TenGigabitEthernet2/1/28
+ description HOU140SL49 Te3/0/5 
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 49,149,805-807,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 49 mode active
+!
+interface TenGigabitEthernet2/1/29
+ description HOU140WC-02
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 129 mode on
+!
+interface TenGigabitEthernet2/1/30
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface TenGigabitEthernet2/1/31
+ description HOU140WC-02HA
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 231 mode on
+!
+interface TenGigabitEthernet2/1/32
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface TenGigabitEthernet2/2/1
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 220 mode on
+!
+interface TenGigabitEthernet2/2/2
+ description HOU140SL20 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 20,120,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 20 mode active
+!
+interface TenGigabitEthernet2/2/3
+ description HOU140SL19 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 19,119,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 19 mode active
+!
+interface TenGigabitEthernet2/2/4
+ description HOU140SL18 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 18,118,170,218,318,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 18 mode active
+!
+interface TenGigabitEthernet2/2/5
+ description HOU140SL21 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 21,121,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 21 mode active
+!
+interface TenGigabitEthernet2/2/6
+ description HOU140SL22  Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 22,122,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 22 mode active
+!
+interface TenGigabitEthernet2/2/7
+ description HOU140SL23 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 23,123,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 23 mode active
+!
+interface TenGigabitEthernet2/2/8
+ description HOU140SL24 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 24,124,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 24 mode active
+!
+interface TenGigabitEthernet2/2/9
+ description HOU140SL25 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 25,125,800,802,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 25 mode active
+!
+interface TenGigabitEthernet2/2/10
+ description HOU140SL26 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 26,126,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 26 mode active
+!
+interface TenGigabitEthernet2/2/11
+ description HOU140SL27 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 27,127,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 27 mode active
+!
+interface TenGigabitEthernet2/2/12
+ description HOU140SL28 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 28,128,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 28 mode active
+!
+interface TenGigabitEthernet2/2/13
+ description HOU140SL29 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 29,129,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 29 mode active
+!
+interface TenGigabitEthernet2/2/14
+ description HOU140SL30  Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 30,130,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 30 mode active
+!
+interface TenGigabitEthernet2/2/15
+ description HOU140SL31 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 31,131,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 31 mode active
+!
+interface TenGigabitEthernet2/2/16
+ description HOU140SL32 Te3/0/1
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 32,132,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 32 mode active
+!
+interface TenGigabitEthernet2/2/17
+ description HOU140SL46 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 46,146,201,202,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 46 mode active
+!
+interface TenGigabitEthernet2/2/18
+ description HOU140SL50 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 50,150,327,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 50 mode active
+!
+interface TenGigabitEthernet2/2/19
+ description HOU140SL36 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 36,136,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 36 mode active
+!
+interface TenGigabitEthernet2/2/20
+ description HOU140SL41  Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 41,141,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 41 mode active
+!
+interface TenGigabitEthernet2/2/21
+ description HOU140SL37 Te 3/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 37,137,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 37 mode active
+!
+interface TenGigabitEthernet2/2/22
+ description HOU140SL40  Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 40,140,800,888,940
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 40 mode active
+!
+interface TenGigabitEthernet2/2/23
+ description HOU140SL48 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 48,148,803,804,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ spanning-tree guard root
+ channel-group 48 mode active
+!
+interface TenGigabitEthernet2/2/24
+ description HOU140SL1B2 Ten1/1/4
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,327,888
+ load-interval 30
+ udld port
+ channel-group 328 mode on
+!
+interface TenGigabitEthernet2/2/25
+ description HOU140SL1B1 Te3/0/5
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,101,102,151,152,327,800,888
+ load-interval 30
+ udld port
+ spanning-tree guard root
+ channel-group 327 mode active
+!
+interface TenGigabitEthernet2/2/26
+ description HOU140SLB2 Gi 0/26
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,101,151,152,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ no snmp trap link-status
+!
+interface TenGigabitEthernet2/2/27
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface TenGigabitEthernet2/2/28
+ no switchport
+ no ip address
+ load-interval 30
+!
+interface TenGigabitEthernet2/2/29
+ description HOU140WC-02
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 129 mode on
+!
+interface TenGigabitEthernet2/2/30
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ shutdown
+ channel-group 211 mode on
+!
+interface TenGigabitEthernet2/2/31
+ description HOU140WC-02HA
+ switchport
+ switchport trunk native vlan 80
+ switchport mode trunk
+ switchport trunk allowed vlan 80,328,332,336,340,4060,4070,4080,4090
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 231 mode on
+!
+interface TenGigabitEthernet2/2/32
+ description HOU160RM1-VSS Te2/1/1 : Phonoscope Circuit ID# CHEVFI0005
+ no switchport
+ ip address 146.36.5.213 255.255.255.254
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ delay 20
+ udld port
+!
+interface TenGigabitEthernet2/2/32.3509
+ description HOU160RL1-VSS Ten2/1/1.3509 [VRF L3CVX-GUEST]
+ encapsulation dot1Q 3509
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.130.80 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet2/2/32.3510
+ description HOU160RL1-VSS Ten2/1/1.3510 [VRF L3CVX-IND]
+ encapsulation dot1Q 3510
+ vrf forwarding L3CVX-IND
+ ip address 10.190.130.80 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet2/2/32.3511
+ description HOU160RL1-VSS Ten2/1/1.3511 [VRF L3CVX-USER]
+ encapsulation dot1Q 3511
+ vrf forwarding L3CVX-USER
+ ip address 10.186.130.80 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet2/2/32.3512
+ description HOU160RL1-VSS Ten2/1/1.3512 [VRF L3CVX-DEVICES]
+ encapsulation dot1Q 3512
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.130.80 255.255.255.254
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface TenGigabitEthernet2/3/1
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 220 mode on
+!
+interface TenGigabitEthernet2/3/2
+ description VSS Dual-Active Detection
+ no switchport
+ no ip address
+ no cdp enable
+ dual-active fast-hello
+!
+interface TenGigabitEthernet2/3/3
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/4
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/5
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/6
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet2/3/8
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet2/3/9
+ no switchport
+ no ip address
+ shutdown
+!
+interface FortyGigabitEthernet2/3/10
+ no switchport
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/5/1
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/2
+ description HOU140SL3_RM03049
+ switchport
+ switchport mode trunk
+ switchport trunk allowed vlan 2,3,16
+ load-interval 30
+ udld port
+ channel-protocol lacp
+ channel-group 350 mode active
+!
+interface GigabitEthernet2/5/3
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/4
+ description HOU140SL47-47947 Gi 1/1/2
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 47,147,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ channel-group 470 mode active
+!
+interface GigabitEthernet2/5/5
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/6
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/7
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/8
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/9
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/10
+ description F2 RU35 HOU140FHS40
+ switchport
+ switchport trunk native vlan 810
+ switchport mode trunk
+ switchport trunk allowed vlan 801-808,810
+ switchport access vlan 800
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ udld port
+ no snmp trap link-status
+ flowcontrol send off
+ spanning-tree portfast disable
+!
+interface GigabitEthernet2/5/11
+ description Rack F2 RU42 HOU140FHS40 Mgmt Port
+ switchport
+ switchport mode access
+ switchport access vlan 2
+ no logging event link-status
+ load-interval 30
+ udld port
+ no snmp trap link-status
+!
+interface GigabitEthernet2/5/12
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/13
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/14
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/15
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/16
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/17
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/18
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/19
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/20
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/21
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/22
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/23
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/24
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/25
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/26
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/27
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/28
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/29
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/30
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/31
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/32
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/33
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/34
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/35
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/36
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/37
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/38
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/39
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/40
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/41
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/42
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/43
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/44
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/45
+ description HOU140SLB2 Gi 0/26
+ switchport
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport trunk allowed vlan 2,101,151,152,800,888
+ logging event link-status
+ logging event trunk-status
+ logging event spanning-tree status
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/46
+ no switchport
+ no ip address
+ load-interval 30
+ shutdown
+!
+interface GigabitEthernet2/5/47
+ description HOU140RV1-IPT Gi1/0/12
+ no switchport
+ ip address 146.34.9.217 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ delay 2
+ udld port
+!
+interface GigabitEthernet2/5/48
+ description HOU140RV2-IPT Gi1/0/48
+ no switchport
+ ip address 146.34.9.221 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ udld port
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan2
+ description SLB1 data
+ ip address 146.36.176.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan3
+ description 3rd floor data
+ ip address 146.36.180.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan4
+ description 4th Floor Data
+ ip address 146.36.239.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan5
+ description 5th floor data
+ ip address 146.36.252.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan6
+ description 6th floor data
+ ip address 146.36.253.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan7
+ description 7th floor data
+ ip address 146.36.181.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan8
+ description 8th floor data
+ ip address 146.36.184.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan9
+ description 9th floor data
+ ip address 146.36.185.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan10
+ description 10th floor data
+ ip address 146.36.186.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan11
+ description 11th floor data
+ ip address 146.36.187.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan12
+ description 12th floor data
+ ip address 146.36.188.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan13
+ description 13th floor data
+ ip address 146.36.189.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan14
+ description 14th floor data
+ ip address 146.36.190.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan15
+ description 15th Floor Data
+ ip address 146.36.237.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan16
+ description 16th floor data
+ ip address 146.36.177.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan17
+ description 17th Floor Data
+ ip address 146.36.162.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan18
+ description 18th floor data
+ ip address 146.36.163.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan19
+ description 19th floor data
+ ip address 146.36.164.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan20
+ description 20th floor data
+ ip address 146.36.236.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan21
+ description 21st Floor Data
+ bandwidth 1000000
+ ip address 146.36.224.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan22
+ description 22nd Floor Data
+ bandwidth 1000000
+ ip address 146.36.225.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan23
+ description 23rd Floor Data
+ bandwidth 1000000
+ ip address 146.36.232.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan24
+ description 24th Floor Data
+ ip address 146.36.233.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan25
+ description 25th Floor Data
+ ip address 146.36.238.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan26
+ description 26th floor data
+ ip address 146.36.226.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan27
+ description 27th Floor Data
+ ip address 146.36.179.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan28
+ description 28th floor data
+ ip address 146.36.227.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan29
+ description 29th floor data
+ ip address 146.36.228.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan30
+ description 30th floor data
+ ip address 146.36.229.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan31
+ description 31st floor data
+ ip address 146.36.230.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan32
+ description 32nd floor data
+ ip address 146.36.231.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan33
+ description 33rd floor data
+ ip address 146.36.251.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan34
+ description 34th floor data
+ ip address 146.36.170.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan35
+ description 35th floor data
+ ip address 146.36.178.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan36
+ description 36th floor data
+ ip address 146.36.171.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan37
+ description 37th floor data
+ ip address 146.36.240.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan38
+ description 38th floor data
+ ip address 146.36.247.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan39
+ description 39th floor data
+ ip address 146.36.241.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan40
+ description 40th floor data
+ ip address 146.36.249.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 146.36.249.58
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan41
+ description 41st floor data
+ ip address 146.36.250.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan42
+ description 42nd floor data
+ ip address 146.36.242.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan43
+ description 43rd floor data
+ ip address 146.36.243.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan44
+ description 44th floor data
+ ip address 146.36.244.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan45
+ description 45th floor data
+ ip address 146.36.245.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan46
+ description 46th floor data
+ ip address 146.36.254.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan47
+ description 47th floor data
+ ip address 146.36.255.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan48
+ description 48th floor data
+ ip address 146.36.246.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan49
+ description 49th floor data
+ ip address 146.36.165.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan50
+ description 50th floor data
+ ip address 146.36.223.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan52
+ no ip address
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ shutdown
+!
+interface Vlan80
+ description WLAN Mgmt
+ ip address 146.36.5.81 255.255.255.248
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan101
+ description HOU140 1st Floor Voice
+ bandwidth 10000000
+ ip address 146.41.1.129 255.255.255.192
+ ip helper-address 146.36.80.34
+ ip helper-address 146.36.80.32
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan102
+ description HOU140 2nd Floor Voice
+ ip address 146.41.1.193 255.255.255.192
+ ip helper-address 146.36.80.34
+ ip helper-address 146.36.80.32
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan103
+ description HOU140SL03 Voice
+ bandwidth 10000000
+ ip address 146.41.3.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan104
+ description HOU140SL4 Voice
+ bandwidth 10000000
+ ip address 146.41.4.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan105
+ description HOU140SL05 Voice
+ bandwidth 10000000
+ ip address 146.41.5.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan106
+ description HOU140SL06 Voice
+ bandwidth 10000000
+ ip address 146.41.6.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan107
+ description HOU140SL07 Voice
+ bandwidth 10000000
+ ip address 146.41.7.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan108
+ description HOU140SL08 Voice
+ bandwidth 10000000
+ ip address 146.41.8.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan109
+ description HOU140SL09 Voice
+ bandwidth 10000000
+ ip address 146.41.9.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan110
+ description HOU140SL10 Voice
+ bandwidth 10000000
+ ip address 146.41.10.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan111
+ description HOU140SL11 Voice
+ bandwidth 10000000
+ ip address 146.41.11.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan112
+ description HOU140SL12 Voice
+ bandwidth 10000000
+ ip address 146.41.12.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan113
+ description HOU140SL13 Voice
+ bandwidth 10000000
+ ip address 146.41.13.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan114
+ description HOU140SL14 Voice
+ bandwidth 10000000
+ ip address 146.41.14.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan115
+ description HOU140SL15 Voice
+ bandwidth 10000000
+ ip address 146.41.15.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan116
+ description HOU140SL16 Voice
+ bandwidth 10000000
+ ip address 146.41.16.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan117
+ description HOU140SL17 Voice
+ bandwidth 10000000
+ ip address 146.41.17.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan118
+ description HOU140SL18 Voice
+ bandwidth 10000000
+ ip address 146.41.18.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan119
+ description HOU140SL19 Voice
+ bandwidth 10000000
+ ip address 146.41.19.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan120
+ description HOU140SL20 Voice
+ bandwidth 10000000
+ ip address 146.41.20.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan121
+ ip address 146.41.21.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan122
+ ip address 146.41.22.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan123
+ ip address 146.41.23.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan124
+ description HOU140SL24 Voice
+ bandwidth 10000000
+ ip address 146.41.24.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan125
+ description HOU140SL25 Voice
+ bandwidth 10000000
+ ip address 146.41.25.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan126
+ description HOU140SL26 Voice
+ bandwidth 10000000
+ ip address 146.41.26.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan127
+ description HOU140SL27 Voice
+ bandwidth 10000000
+ ip address 146.41.27.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan128
+ description HOU140SL28 Voice
+ bandwidth 10000000
+ ip address 146.41.28.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan129
+ description HOU140SL29 Voice
+ bandwidth 10000000
+ ip address 146.41.29.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan130
+ description HOU140SL30 Voice
+ bandwidth 10000000
+ ip address 146.41.30.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan131
+ description HOU140SL31 Voice
+ bandwidth 10000000
+ ip address 146.41.31.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan132
+ description HOU140SL32 Voice
+ bandwidth 10000000
+ ip address 146.41.32.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan133
+ description HOU140SL33 Voice
+ bandwidth 10000000
+ ip address 146.41.33.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan134
+ description HOU140SL34 Voice
+ bandwidth 10000000
+ ip address 146.41.34.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan135
+ description HOU140SL35 Voice
+ bandwidth 10000000
+ ip address 146.41.35.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan136
+ description HOU140SL36 Voice
+ bandwidth 10000000
+ ip address 146.41.36.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan137
+ description HOU140SL37 Voice
+ bandwidth 10000000
+ ip address 146.41.37.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan138
+ description HOU140SL38 Voice
+ bandwidth 10000000
+ ip address 146.41.38.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan139
+ description HOU140SL39 Voice
+ bandwidth 10000000
+ ip address 146.41.39.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan140
+ description HOU140SL40 Voice
+ bandwidth 10000000
+ ip address 146.41.40.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan141
+ description HOU140SL41 Voice
+ bandwidth 10000000
+ ip address 146.41.41.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan142
+ description HOU140SL42 Voice
+ bandwidth 10000000
+ ip address 146.41.42.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan143
+ description HOU140SL43 Voice
+ bandwidth 10000000
+ ip address 146.41.43.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan144
+ description HOU140SL44 Voice
+ bandwidth 10000000
+ ip address 146.41.44.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan145
+ description HOU140SL45 Voice
+ bandwidth 10000000
+ ip address 146.41.45.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan146
+ description HOU140SL46 Voice
+ bandwidth 10000000
+ ip address 146.41.46.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan147
+ description HOU140SL47 Voice
+ bandwidth 10000000
+ ip address 146.41.47.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan148
+ description HOU140SL48 Voice
+ bandwidth 10000000
+ ip address 146.41.48.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan149
+ description HOU140SL49 Voice
+ bandwidth 10000000
+ ip address 146.41.49.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan150
+ description HOU140SL50 Voice
+ bandwidth 10000000
+ ip address 146.41.50.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan151
+ description HOU140 B1 Voice
+ bandwidth 10000000
+ ip address 146.41.1.1 255.255.255.192
+ ip helper-address 146.36.80.34
+ ip helper-address 146.36.80.32
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan152
+ description HOU140 B2 Voice
+ bandwidth 10000000
+ ip address 146.41.1.65 255.255.255.192
+ ip helper-address 146.36.80.34
+ ip helper-address 146.36.80.32
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan170
+ description 136.171.170.0/24.ETC.Lab
+ ip address 136.171.170.1 255.255.255.0
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan182
+ no ip address
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ shutdown
+!
+interface Vlan191
+ no ip address
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.124
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+ shutdown
+!
+interface Vlan201
+ description 46th.IOC-Room
+ ip address 146.36.248.1 255.255.255.128
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan202
+ description 46th.DSC-Room
+ ip address 146.36.183.1 255.255.255.128
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan210
+ description Arbua Pilot data
+ ip address 146.36.182.1 255.255.255.0
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 146.36.3.178
+ ip helper-address 136.171.88.29
+ ip helper-address 146.36.80.34
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip flow monitor net-flow input
+ ip flow monitor net-flow output
+ load-interval 30
+!
+interface Vlan218
+ ip address 146.36.191.153 255.255.255.252
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan318
+ ip address 146.36.235.225 255.255.255.224
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan327
+ ip address 136.171.227.1 255.255.255.0
+ ip helper-address 136.171.184.187
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan328
+ description HOU140WLAN.BUSINESS
+ ip address 136.171.128.1 255.255.252.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan332
+ description HOU140WLAN.BUSINESS
+ ip address 136.171.132.1 255.255.252.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan336
+ description HOU140WLAN.BUSINESS
+ ip address 136.171.136.1 255.255.252.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan340
+ description HOU140WLAN.BUSINESS
+ ip address 136.171.140.1 255.255.252.0
+ ip helper-address 146.36.82.34
+ ip helper-address 146.36.80.34
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan800
+ description *** CBRES-METASYS ***
+ ip address 172.31.41.1 255.255.255.192
+ ip access-group CBRES-METASYS out
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan888
+ description WLAN-L3CVX-GUEST
+ vrf forwarding L3CVX-GUEST
+ ip address 10.210.126.1 255.255.255.0
+ ip helper-address 146.22.3.10
+ ip helper-address 146.22.17.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan940
+ description 146.36.191.176/29.40th.routing
+ bandwidth 10000000
+ ip address 146.36.191.177 255.255.255.248
+ ip helper-address 146.36.82.34
+ ip helper-address 136.171.184.187
+ ip helper-address 136.171.102.74
+ ip helper-address 136.171.88.29
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface Vlan4060
+ description WLAN-L3CVX-GUEST
+ vrf forwarding L3CVX-GUEST
+ ip address 10.161.0.1 255.255.224.0
+ ip helper-address 146.22.3.10
+ ip helper-address 146.22.17.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4070
+ description WLAN-L3CVX-IND
+ vrf forwarding L3CVX-IND
+ ip address 10.178.64.1 255.255.248.0
+ ip helper-address 146.22.3.10
+ ip helper-address 146.22.17.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4080
+ description WLAN-L3CVX-USER
+ vrf forwarding L3CVX-USER
+ ip address 10.169.0.1 255.255.224.0
+ ip helper-address 146.22.3.10
+ ip helper-address 146.22.17.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4090
+ description WLAN-L3CVX-DEVICES
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.176.64.1 255.255.248.0
+ ip helper-address 146.22.3.10
+ ip helper-address 146.22.17.10
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+!
+router eigrp HOU140
+ !
+ address-family ipv4 unicast autonomous-system 65103
+  !
+  af-interface default
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Vlan940
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1/5/47
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface GigabitEthernet2/5/47
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1/5/48
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface GigabitEthernet2/5/48
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface TenGigabitEthernet2/2/32
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface TenGigabitEthernet1/1/2
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface TenGigabitEthernet2/1/2
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel92.761
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel93.861
+   no passive-interface
+  exit-af-interface
+  !
+  topology base
+   redistribute static route-map static2eigrp
+  exit-af-topology
+  network 136.171.0.0
+  network 146.34.0.0
+  network 146.36.0.0
+  network 146.41.0.0
+  network 172.31.41.0 0.0.0.63
+  nsf
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf L3CVX-USER autonomous-system 882
+  !
+  af-interface default
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel92.3407
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel93.3507
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface TenGigabitEthernet2/2/32.3511
+   no passive-interface
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000 10 255 1 1500
+  exit-af-topology
+  network 10.169.0.0 0.0.31.255
+  network 10.169.96.0 0.0.15.255
+  network 10.186.130.64 0.0.0.63
+  nsf
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf L3CVX-GUEST autonomous-system 888
+  !
+  af-interface default
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel92.3405
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel93.3505
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface TenGigabitEthernet2/2/32.3509
+   no passive-interface
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000 10 255 1 1500
+  exit-af-topology
+  network 10.161.0.0 0.0.31.255
+  network 10.161.80.0 0.0.15.255
+  network 10.184.130.64 0.0.0.63
+  network 10.210.126.0 0.0.0.255
+  network 172.20.236.0 0.0.1.255
+  nsf
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf L3CVX-IND autonomous-system 884
+  !
+  af-interface default
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel92.3406
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel93.3506
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface TenGigabitEthernet2/2/32.3510
+   no passive-interface
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000 10 255 1 1500
+  exit-af-topology
+  network 10.178.64.0 0.0.7.255
+  network 10.178.88.0 0.0.3.255
+  network 10.190.130.64 0.0.0.63
+  nsf
+ exit-address-family
+ !
+ address-family ipv4 unicast vrf L3CVX-DEVICES autonomous-system 886
+  !
+  af-interface default
+   passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel92.3408
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface Port-channel93.3508
+   no passive-interface
+  exit-af-interface
+  !
+  af-interface TenGigabitEthernet2/2/32.3512
+   no passive-interface
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000 10 255 1 1500
+  exit-af-topology
+  network 10.176.64.0 0.0.7.255
+  network 10.176.88.0 0.0.3.255
+  network 10.188.130.64 0.0.0.63
+  nsf
+ exit-address-family
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip forward-protocol udp 5246
+ip forward-protocol udp 5247
+ip forward-protocol udp 12222
+ip forward-protocol udp 12223
+!
+no ip http server
+no ip http secure-server
+ip tftp source-interface Loopback0
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim rp-address 146.36.2.228 mcast-rp-sparse-lan override
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip route 136.171.168.0 255.255.254.0 146.36.163.6 name ETC.LAB.18
+ip route 146.36.127.128 255.255.255.224 146.36.2.126 name 146.36.127.128/27-EFIT-RM49164-RM49188
+ip route 146.36.127.160 255.255.255.224 146.36.2.126 name 146.36.127.160/27-EFIT-RM49066
+ip route 146.36.127.224 255.255.255.240 146.36.2.126 name 146.36.127.224/28-EFIT-RM49997
+ip route 146.36.127.240 255.255.255.240 146.36.2.126 name 146.36.127.240/28-EFIT-RM49019
+ip route 146.36.168.0 255.255.255.128 146.36.186.5 name ITC.RF.Lab
+ip route 146.36.168.128 255.255.255.224 146.36.186.5 name ITC.LTE.RF.Lab
+ip route 146.36.168.128 255.255.255.248 146.36.186.14 name ITC.LTE.Redline.UE
+ip route 146.36.168.248 255.255.255.248 146.36.186.5 name ITC.LTE.ESChat
+ip route 146.36.172.0 255.255.255.0 146.36.163.130 name PADC.FW.LAB.18
+ip route 146.36.183.128 255.255.255.128 146.36.163.6 name ETC_LAB.18
+ip route 146.36.191.0 255.255.255.192 146.36.163.6 name ETC_LAB.18
+ip route 146.36.191.64 255.255.255.192 146.36.163.6 name ETC.LAB.18
+ip route 146.36.191.224 255.255.255.224 146.36.163.6 name ETC_LAB.18
+ip route 146.36.222.0 255.255.255.192 146.36.176.5 name BRES-LAB_CVX300
+ip route 146.36.222.112 255.255.255.248 146.36.176.5 name BRES-LAB
+ip route 146.36.222.128 255.255.255.192 146.36.176.5 name BRES-LAB_DMZ3
+ip route 146.36.222.192 255.255.255.192 146.36.176.5 name BRES-LAB_DMZ4
+ip route 146.36.234.0 255.255.255.0 146.36.164.6 name ETC.LAB.19
+ip route 146.36.235.32 255.255.255.224 146.36.163.6 name ExaPilotLab
+ip route 146.36.235.64 255.255.255.192 146.36.163.6 name ETC.LAB.18
+ip route 146.36.235.128 255.255.255.192 146.36.235.250 name ETC.LAB.18
+ip route 146.36.248.128 255.255.255.224 146.36.2.126 name 146.36.248.128/27-EFIT-RM48164
+ip route 146.36.248.160 255.255.255.224 146.36.2.126 name 146.36.248.160/27-EFIT-RM48066
+ip route 146.36.248.192 255.255.255.224 146.36.2.126 name hou150fa40-av-lan-rm-30999
+ip route 146.36.248.224 255.255.255.240 146.36.2.126 name hou150fa40-av-lan-rm-25999
+ip route 146.41.119.0 255.255.255.0 146.36.2.90 250 name Te1/6.JFPM.Verification&Testing
+ip route 172.20.119.192 255.255.255.224 146.36.176.5 name BRES-UBMS-LAB-Comfort
+ip route vrf management 0.0.0.0 0.0.0.0 146.36.180.1
+ip tacacs source-interface Loopback0
+ip ssh time-out 90
+ip ssh source-interface Loopback0
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-rp-sparse-lan
+ permit 239.255.128.0 0.0.127.255
+ permit 239.193.128.0 0.0.127.255
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+ permit 224.0.0.0 7.255.255.255
+!
+ip access-list extended CBRES-METASYS
+ permit ip host 146.36.80.240 172.31.40.0 0.0.7.255
+ permit ip host 134.248.29.7 172.31.40.0 0.0.7.255
+ permit ip host 134.248.80.138 172.31.40.0 0.0.7.255
+ permit ip host 146.46.132.55 172.31.40.0 0.0.7.255
+ permit ip host 146.46.132.53 172.31.40.0 0.0.7.255
+ permit ip host 146.46.130.145 172.31.40.0 0.0.7.255
+ permit ip 136.171.124.0 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 172.31.40.0 0.0.3.255 172.31.40.0 0.0.7.255
+ permit ip 172.31.44.0 0.0.3.255 172.31.40.0 0.0.7.255
+ permit ip host 134.248.81.151 host 172.31.41.10
+ permit ip host 134.248.83.208 host 172.31.41.10
+ permit ip host 134.248.81.209 host 172.31.41.10
+ permit ip host 134.248.81.82 host 172.31.41.10
+ permit ip host 134.248.81.85 host 172.31.41.10
+ permit ip host 134.248.81.151 host 172.31.41.9
+ permit ip host 134.248.83.208 host 172.31.41.9
+ permit ip host 134.248.81.209 host 172.31.41.9
+ permit ip host 134.248.81.82 host 172.31.41.9
+ permit ip host 134.248.81.85 host 172.31.41.9
+ permit ip host 146.36.80.34 host 172.31.41.10
+ permit ip host 146.36.80.34 host 172.31.41.9
+ permit ip 134.248.29.0 0.0.0.63 172.31.40.0 0.0.7.255
+ deny   ip any any
+ip access-list extended acl-copp-match-igmp
+ permit igmp any any
+ip access-list extended acl-copp-match-pim-data
+ deny   pim any host 224.0.0.13
+ permit pim any any
+!
+!
+ip prefix-list static2eigrp seq 5 permit 146.36.127.128/27
+ip prefix-list static2eigrp seq 10 permit 146.36.127.160/27
+ip prefix-list static2eigrp seq 15 permit 146.36.127.224/28
+ip prefix-list static2eigrp seq 20 permit 146.36.127.240/28
+ip prefix-list static2eigrp seq 25 permit 146.36.183.128/25
+ip prefix-list static2eigrp seq 30 permit 146.36.191.0/26
+ip prefix-list static2eigrp seq 35 permit 146.36.191.64/26
+ip prefix-list static2eigrp seq 40 permit 146.36.191.192/27
+ip prefix-list static2eigrp seq 45 permit 146.36.191.224/27
+ip prefix-list static2eigrp seq 50 permit 146.36.234.0/24
+ip prefix-list static2eigrp seq 55 permit 146.36.235.32/27
+ip prefix-list static2eigrp seq 60 permit 146.36.235.64/26
+ip prefix-list static2eigrp seq 65 permit 146.36.235.128/26
+ip prefix-list static2eigrp seq 70 permit 146.36.248.128/27
+ip prefix-list static2eigrp seq 75 permit 146.36.248.160/27
+ip prefix-list static2eigrp seq 80 permit 146.36.248.192/27
+ip prefix-list static2eigrp seq 85 permit 146.36.248.224/28
+ip prefix-list static2eigrp seq 90 permit 146.41.119.0/24
+ip prefix-list static2eigrp seq 95 permit 136.171.168.0/23
+ip prefix-list static2eigrp seq 105 permit 146.24.179.8/30
+ip prefix-list static2eigrp seq 110 permit 146.36.168.0/25
+ip prefix-list static2eigrp seq 115 permit 146.36.172.0/24
+ip prefix-list static2eigrp seq 120 permit 146.36.168.128/27
+ip prefix-list static2eigrp seq 125 permit 146.36.168.248/29
+ip prefix-list static2eigrp seq 140 permit 146.36.222.0/26
+ip prefix-list static2eigrp seq 145 permit 146.36.222.112/29
+ip prefix-list static2eigrp seq 150 permit 146.36.222.128/26
+ip prefix-list static2eigrp seq 155 permit 146.36.222.192/26
+ip prefix-list static2eigrp seq 160 permit 172.20.119.192/27
+logging history size 10
+logging source-interface Loopback0
+logging host 146.27.95.122
+logging host 146.36.114.214
+logging host 139.65.140.22
+logging host 139.65.140.24
+logging host 139.65.140.25
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+route-map static2eigrp permit 10
+ match ip address prefix-list static2eigrp
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location HOU140 / 1400 Smith St, Houston, Texas / USA / Americas /US-NA-Utility-Campus-Metro/Criticality-High
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps chassis
+snmp-server enable traps module
+snmp-server enable traps transceiver all
+snmp-server enable traps tty
+snmp-server enable traps config-copy
+snmp-server enable traps config
+snmp-server enable traps event-manager
+snmp-server enable traps hsrp
+snmp-server enable traps ipmulticast
+snmp-server enable traps mac-notification move threshold
+snmp-server enable traps pim neighbor-change rp-mapping-change invalid-pim-message
+snmp-server enable traps slb real virtual csrp
+snmp-server enable traps bridge newroot topologychange
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps flex-links status
+snmp-server enable traps sonet
+snmp-server enable traps fru-ctrl ps-output-change status
+snmp-server enable traps entity
+snmp-server enable traps rsvp
+snmp-server enable traps srp
+snmp-server enable traps vtp
+snmp-server enable traps vlancreate
+snmp-server enable traps vlandelete
+snmp-server enable traps flash insertion removal
+snmp-server enable traps c6kxbar intbus-crcexcd intbus-crcrcvrd swbus
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps port-security
+snmp-server enable traps vlan-mac-limit
+snmp-server enable traps rf
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs-server host 139.65.136.58
+tacacs-server host 139.65.143.4
+tacacs-server timeout 10
+tacacs-server key 7 06031D344F4B1A1606041B08
+!
+!
+!
+!
+ipv6 access-list acl-copp-match-mld
+ permit icmp any any mld-report
+ permit icmp any any mld-query
+ permit icmp any any mld-reduction
+ permit icmp any any 143
+!
+ipv6 access-list acl-copp-match-ndv6
+ permit icmp any any nd-na
+ permit icmp any any nd-ns
+ permit icmp any any router-advertisement
+ permit icmp any any router-solicitation
+ permit icmp any any redirect
+!
+ipv6 access-list acl-copp-match-ndv6hl
+ permit icmp any any nd-na hoplimit
+ permit icmp any any nd-ns hoplimit
+ permit icmp any any router-advertisement hoplimit
+ permit icmp any any router-solicitation hoplimit
+ permit icmp any any redirect hoplimit
+!
+ipv6 access-list acl-copp-match-pimv6-data
+ deny 103 any host FF02::D
+ permit 103 any any
+!
+control-plane
+ service-policy input policy-default-autocopp
+!
+!
+vstack
+banner exec ^CC
+****************************************************
+WARNING:
+This is an External Access Router connecting Chevron
+to 3rd Party, Joint Venture or Partner networks. Any
+changes to Access Control Lists, or New connections
+to this router must be approved by the ITC Network
+Security Team.
+****************************************************
+^C
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ length 0
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+diagnostic bootup level minimal
+no event manager policy Mandatory.go_switchbus.tcl type system
+!
+!
+module provision switch 1
+ slot 1 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 17
+ slot 2 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 18
+ slot 3 slot-type 400 port-type 60 number 8 port-type 113 number 2 port-type 60 number 8 port-type 113 number 2  virtual-slot 19
+ slot 5 slot-type 152 port-type 31 number 48  virtual-slot 21
+ !
+module provision switch 2
+ slot 1 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 33
+ slot 2 slot-type 370 port-type 60 number 32 port-type 113 number 8  virtual-slot 34
+ slot 3 slot-type 400 port-type 60 number 8 port-type 113 number 2 port-type 60 number 8 port-type 113 number 2  virtual-slot 35
+ slot 5 slot-type 152 port-type 31 number 48  virtual-slot 37
+ 
+!
+
+end

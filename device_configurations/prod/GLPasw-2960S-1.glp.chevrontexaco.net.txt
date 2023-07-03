@@ -1,0 +1,1095 @@
+Building configuration...
+
+Current configuration : 36192 bytes
+!
+! Last configuration change at 15:45:05 UTC Sun Jun 18 2023 by svc-voy-itc-firewall
+! NVRAM config last updated at 15:45:03 UTC Sun Jun 18 2023 by svc-voy-itc-firewall
+!
+version 15.0
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname GLPasw-2960S-1
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 128000
+enable secret 5 $1$WZjb$E2OdRntcPRQtl.dTSTcoa/
+!
+username admin privilege 15 secret 5 $1$fQcq$XgqXCFCMDF8zUVOkwG54F1
+aaa new-model
+!
+!
+aaa group server radius AAA
+ server name HOU_RadiusVIP
+ server name LON_RadiusVIP
+ server name SIN_RadiusVIP
+!
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authentication dot1x default group AAA
+aaa authorization config-commands
+aaa authorization exec default group tacacs+ if-authenticated 
+aaa authorization commands 0 default group tacacs+ if-authenticated 
+aaa authorization commands 1 default group tacacs+ if-authenticated 
+aaa authorization commands 15 default group tacacs+ if-authenticated 
+aaa authorization network default group AAA 
+aaa authorization reverse-access default group tacacs+ if-authenticated 
+aaa accounting update newinfo
+aaa accounting dot1x default start-stop group AAA
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 1 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+aaa accounting network default start-stop group AAA
+aaa accounting connection default start-stop group tacacs+
+aaa accounting system default start-stop group tacacs+
+!
+!
+!
+!
+!
+aaa server radius dynamic-author
+!
+aaa session-id common
+clock timezone UTC -5 0
+switch 1 provision ws-c2960s-24ps-l
+authentication mac-move permit
+no ip source-route
+!
+!
+ip domain-name glp.chevrontexaco.net
+ip name-server 146.39.34.32
+ip name-server 146.39.34.34
+ip name-server 146.36.80.34
+ip device tracking probe delay 10
+ip device tracking
+ip accounting-threshold 50
+!
+device-sensor notify all-changes
+mls qos map policed-dscp  0 10 18 24 46 to 8
+mls qos map cos-dscp 0 8 16 24 32 46 48 56
+mls qos srr-queue output cos-map queue 1 threshold 3 4 5
+mls qos srr-queue output cos-map queue 2 threshold 1 2
+mls qos srr-queue output cos-map queue 2 threshold 2 3
+mls qos srr-queue output cos-map queue 2 threshold 3 6 7
+mls qos srr-queue output cos-map queue 3 threshold 3 0
+mls qos srr-queue output cos-map queue 4 threshold 3 1
+mls qos srr-queue output dscp-map queue 1 threshold 3 32 33 40 41 42 43 44 45
+mls qos srr-queue output dscp-map queue 1 threshold 3 46 47
+mls qos srr-queue output dscp-map queue 2 threshold 1 16 17 18 19 20 21 22 23
+mls qos srr-queue output dscp-map queue 2 threshold 1 26 27 28 29 30 31 34 35
+mls qos srr-queue output dscp-map queue 2 threshold 1 36 37 38 39
+mls qos srr-queue output dscp-map queue 2 threshold 2 24
+mls qos srr-queue output dscp-map queue 2 threshold 3 48 49 50 51 52 53 54 55
+mls qos srr-queue output dscp-map queue 2 threshold 3 56 57 58 59 60 61 62 63
+mls qos srr-queue output dscp-map queue 3 threshold 3 0 1 2 3 4 5 6 7
+mls qos srr-queue output dscp-map queue 4 threshold 1 8 9 11 13 15
+mls qos srr-queue output dscp-map queue 4 threshold 2 10 12 14
+mls qos queue-set output 1 threshold 1 100 100 50 200
+mls qos queue-set output 1 threshold 2 125 125 100 400
+mls qos queue-set output 1 threshold 3 100 100 100 400
+mls qos queue-set output 1 threshold 4 60 150 50 200
+mls qos queue-set output 1 buffers 15 25 40 20
+mls qos
+!
+crypto pki trustpoint TP-self-signed-2679731328
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2679731328
+ revocation-check none
+ rsakeypair TP-self-signed-2679731328
+!
+!
+crypto pki certificate chain TP-self-signed-2679731328
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 32363739 37333133 3238301E 170D3036 30313032 30303031 
+  35305A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 36373937 
+  33313332 3830819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  8100A193 B0FF4601 CB200B86 CE650F1D D3C6A3B7 69632CC2 83B61CE6 41265805 
+  8EADE8B0 EAA9A0AB 5B41132A 5AC420DA 197195DC 70D96E47 396CFB68 B792283B 
+  BAA01603 40AD7A2A C15A534E 5D1873EC F457A25E E8F3E2D0 FD86A2C2 D056A83A 
+  C3E600E3 F4D57B62 A5393AAF 62D4A18B CFE8A839 81814C01 FE7C75E7 8D26931E 
+  84350203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 147DA1D7 9FA3658D 41D6012C 6B0F0F00 FBD18679 AE301D06 
+  03551D0E 04160414 7DA1D79F A3658D41 D6012C6B 0F0F00FB D18679AE 300D0609 
+  2A864886 F70D0101 05050003 81810034 336443D0 97B03A1F 579A6AF3 14D749D1 
+  54AE5909 B99DA3D3 F033F8C9 818FBFE9 C3D46289 B9C56812 00F6213E 8C024F07 
+  C860B3AA FF1CF769 714C6C34 27FE313E B79457F2 9C28B701 ADAB2347 B4024B2A 
+  5C6C23AD D7D3A7E7 AEC8237B CFC27D4F B30D1CA9 844DEEDC 799455FD B414EEE0 
+  4E5A8661 89E050A8 F74A4E10 188C1B
+  	quit
+archive
+ path flash:
+ maximum 5
+dot1x system-auth-control
+dot1x critical eapol
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+!
+!
+!
+!
+!
+vlan internal allocation policy ascending
+!
+ip tcp path-mtu-discovery age-timer 10
+ip telnet source-interface Vlan10
+ip tftp source-interface Vlan10
+ip ssh time-out 90
+ip ssh authentication-retries 2
+ip ssh version 2
+ip scp server enable
+!
+class-map match-all AUTOQOS_VOIP_DATA_CLASS
+  match ip dscp ef 
+class-map match-all AUTOQOS_DEFAULT_CLASS
+  match access-group name AUTOQOS-ACL-DEFAULT
+class-map match-all AUTOQOS_VOIP_SIGNAL_CLASS
+  match ip dscp cs3 
+!
+policy-map AUTOQOS-SRND4-CISCOPHONE-POLICY
+ class AUTOQOS_VOIP_DATA_CLASS
+   set dscp ef
+  police 128000 8000 exceed-action policed-dscp-transmit
+ class AUTOQOS_VOIP_SIGNAL_CLASS
+   set dscp cs3
+  police 32000 8000 exceed-action policed-dscp-transmit
+ class AUTOQOS_DEFAULT_CLASS
+   set dscp default
+  police 10000000 8000 exceed-action policed-dscp-transmit
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0
+ no ip address
+!
+interface GigabitEthernet1/0/1
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/2
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/3
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/4
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/5
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/6
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/7
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/8
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/9
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/10
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/11
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/12
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/13
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/14
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/15
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/16
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/17
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/18
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/19
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/20
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/21
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/22
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/23
+ switchport access vlan 10
+ switchport mode access
+ switchport voice vlan 20
+ switchport port-security maximum 3
+ srr-queue bandwidth share 1 30 35 5
+ srr-queue bandwidth shape 10 0 0 0
+ priority-queue out 
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 10
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ mls qos trust device cisco-phone
+ mls qos trust cos
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ auto qos voip cisco-phone 
+ storm-control broadcast level 5.00
+ storm-control multicast level 5.00
+ spanning-tree portfast
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/0/24
+ description To_GLPrt1-G0/1
+ switchport trunk allowed vlan 10,20
+ switchport mode trunk
+!
+interface GigabitEthernet1/0/25
+ shutdown
+!
+interface GigabitEthernet1/0/26
+ shutdown
+!
+interface GigabitEthernet1/0/27
+ shutdown
+!
+interface GigabitEthernet1/0/28
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan10
+ description Management
+ ip address 146.39.37.66 255.255.255.240
+ no ip redirects
+ no ip proxy-arp
+ no ip route-cache
+!
+ip default-gateway 146.39.37.65
+no ip http server
+no ip http secure-server
+!
+ip tacacs source-interface Vlan10
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.42.255.132
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.140.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+ip access-list extended AUTOQOS-ACL-DEFAULT
+ permit ip any any
+logging source-interface Vlan10
+logging host 146.39.34.197
+logging host 146.39.34.199
+logging host 146.27.95.122
+logging host 199.103.13.209
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.141.24
+access-list 10 permit 146.22.71.201 log
+access-list 10 permit 146.23.102.220 log
+access-list 10 permit 146.22.9.201 log
+access-list 10 permit 199.103.13.209 log
+access-list 10 permit 199.103.13.208 log
+access-list 10 permit 146.22.8.18 log
+access-list 10 permit 146.22.44.10 log
+access-list 10 permit 146.22.44.13 log
+access-list 10 permit 146.36.80.81 log
+access-list 10 permit 146.27.124.18 log
+access-list 10 deny   any log
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 30 permit 146.34.7.179 log
+access-list 30 permit 146.34.6.179 log
+access-list 30 permit 146.34.5.179 log
+access-list 30 permit 146.34.4.179 log
+access-list 30 permit 146.22.71.201 log
+access-list 30 permit 146.22.9.201 log
+access-list 30 permit 146.36.80.131 log
+access-list 30 permit 146.36.80.142 log
+access-list 30 permit 146.36.80.139 log
+access-list 30 permit 146.36.80.149 log
+access-list 30 permit 146.27.67.84 log
+access-list 30 permit 146.27.66.46 log
+access-list 30 permit 146.22.0.0 0.1.255.255 log
+access-list 30 permit 146.24.0.0 0.7.255.255 log
+access-list 30 permit 146.32.0.0 0.7.255.255 log
+access-list 30 permit 146.44.0.0 0.1.255.255 log
+access-list 30 permit 146.46.0.0 0.0.255.255 log
+access-list 30 permit 136.171.0.0 0.0.255.255 log
+access-list 30 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1300 remark GESTION
+access-list 1300 permit 146.39.34.192 0.0.0.31 log
+access-list 1300 deny   any log
+access-list 1310 permit 146.22.71.201
+access-list 1310 permit 146.22.9.201
+access-list 1310 permit 139.65.136.196
+access-list 1310 permit 139.65.136.197
+access-list 1310 deny   any log
+access-list 1330 permit 146.34.7.179
+access-list 1330 permit 146.34.6.179
+access-list 1330 permit 146.34.5.179
+access-list 1330 permit 146.34.4.179
+access-list 1330 permit 146.34.11.179
+access-list 1330 permit 146.34.10.179
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.34.13.179
+access-list 1330 permit 146.34.12.179
+access-list 1330 permit 146.27.82.195
+access-list 1330 permit 146.27.166.11
+access-list 1330 permit 146.27.166.10
+access-list 1330 permit 146.23.102.220
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.36.80.134
+access-list 1330 permit 146.36.80.135
+access-list 1330 permit 146.36.80.131
+access-list 1330 permit 146.27.166.70
+access-list 1330 permit 146.39.37.252
+access-list 1330 permit 146.36.80.139
+access-list 1330 permit 146.36.80.159
+access-list 1330 permit 146.36.91.111
+access-list 1330 permit 146.39.34.30
+access-list 1330 permit 146.36.80.125
+access-list 1330 permit 146.36.80.81
+access-list 1330 permit 146.36.85.36
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.33.129.0 0.0.0.255
+access-list 1330 permit 146.36.193.0 0.0.0.255
+access-list 1330 permit 146.24.101.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 139.65.228.0 0.0.1.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.27.97.224 0.0.0.31
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1530 permit 199.103.13.219
+access-list 1530 permit 199.103.13.209
+access-list 1530 permit 199.103.13.208
+access-list 1530 permit 199.103.14.0 0.0.0.255
+access-list 1530 permit 199.103.13.0 0.0.0.255
+access-list 1530 deny   any log
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Vlan10
+snmp-server location GLP / Km 21 Carretera Cordialidad Atlantico, Galapa / Colombia / Americas /CO-NA-Utility-Wan-Remotes/Criticality-Low
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server host 139.65.136.12 version 3 priv cvx2021  config
+snmp-server host 139.65.136.12 version 3 priv cvx2022  config
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs-server host 139.65.136.58
+tacacs-server host 139.65.143.4
+tacacs-server timeout 10
+tacacs-server directed-request
+tacacs-server key 7 06031D344F4B1A1606041B08
+!
+radius-server dead-criteria time 5 tries 3
+radius-server timeout 60
+radius-server deadtime 480
+radius-server vsa send accounting
+radius-server vsa send authentication
+!
+radius server HOU_RadiusVIP
+ address ipv4 136.171.184.184 auth-port 1812 acct-port 1813
+ key 7 0476182421015E7B0B395C4E
+!
+radius server LON_RadiusVIP
+ address ipv4 146.38.86.23 auth-port 1812 acct-port 1813
+ key 7 143A01292224381E26086A6C
+!
+radius server SIN_RadiusVIP
+ address ipv4 146.40.1.23 auth-port 1812 acct-port 1813
+ key 7 09615D2B37250527092C5D73
+!
+!
+no vstack join-window mode auto
+no vstack
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ length 0
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+ntp source Vlan10
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.40.10.21
+ntp server 146.22.70.251
+end

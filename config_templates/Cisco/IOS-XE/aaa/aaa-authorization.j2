@@ -1,0 +1,20 @@
+! AAA group configuration
+! Variables
+! {{ aaa.tacacs_group | default ("tacacs+") }} = group name of the TACACS group
+!
+aaa authorization config-commands
+aaa authorization exec default group {{ aaa.tacacs_group }} if-authenticated
+aaa authorization commands 0 default group {{ aaa.tacacs_group }} if-authenticated 
+aaa authorization commands 1 default group {{ aaa.tacacs_group }} if-authenticated 
+aaa authorization commands 15 default group {{ aaa.tacacs_group }} if-authenticated 
+!
+aaa authorization reverse-access default group {{ aaa.tacacs_group }} if-authenticated 
+!
+aaa accounting update newinfo
+aaa accounting dot1x default start-stop group {{ aaa.tacacs_group }}
+aaa accounting exec default start-stop group {{ aaa.tacacs_group }}
+aaa accounting commands 0 default start-stop group {{ aaa.tacacs_group }}
+aaa accounting commands 1 default start-stop group {{ aaa.tacacs_group }}
+aaa accounting commands 15 default start-stop group {{ aaa.tacacs_group }}
+aaa accounting connection default start-stop group {{ aaa.tacacs_group }}
+aaa accounting system default start-stop group {{ aaa.tacacs_group }}

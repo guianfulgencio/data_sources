@@ -1,0 +1,15 @@
+! Call Home through Chevron on-prem server
+! Variables
+! {{ host.mgmt_ifname | default ("Loopback0")}} = Management interface of the device
+!
+call-home
+ contact-email-addr nmbtcon@chevron.com
+ no http secure server-identity-check
+ profile "CSSM"
+  reporting smart-licensing-data
+  destination transport-method http
+  no destination transport-method email
+  destination address http http://cssm.chevron.net/Transportgateway/services/DeviceRequestHandler
+!
+ip http client source-interface {{ host.mgmt_ifname }}
+service call-home

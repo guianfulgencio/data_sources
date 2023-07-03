@@ -1,0 +1,784 @@
+Building configuration...
+
+
+Current configuration : 23396 bytes
+!
+! Last configuration change at 21:32:02 UTC Sun Jun 18 2023 by jvtc
+! NVRAM config last updated at 21:32:03 UTC Sun Jun 18 2023 by jvtc
+!
+version 16.12
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+!
+hostname R-NBLX-LIBERTY-DMVPN-1
+!
+boot-start-marker
+boot system bootflash:ir1101-universalk9.16.12.01.SPA.bin
+boot-end-marker
+!
+!
+vrf definition INET1
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition NBLX_ICS
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging discriminator HPNA facility includes CONFIG_I 
+logging count
+logging buffered 128000
+logging persistent size 1000000 filesize 8192
+logging rate-limit 30 except warnings
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name HOU2_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authentication ppp default if-needed local
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+vtp mode transparent
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+  no destination transport-method email
+no ip source-route
+ip arp proxy disable
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip domain name nblenergy.com
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+! 
+! 
+!
+!
+!
+chat-script lte "" "AT!CALL" TIMEOUT 60 "OK"
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+crypto pki trustpoint TP-self-signed-529603219
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-529603219
+ revocation-check none
+ rsakeypair TP-self-signed-529603219
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+crypto pki certificate chain TP-self-signed-529603219
+ certificate self-signed 01
+  3082032E 30820216 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  30312E30 2C060355 04031325 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 35323936 30333231 39301E17 0D323030 31323932 31303330 
+  385A170D 33303031 30313030 30303030 5A303031 2E302C06 03550403 1325494F 
+  532D5365 6C662D53 69676E65 642D4365 72746966 69636174 652D3532 39363033 
+  32313930 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 82010A02 
+  82010100 AC7E8864 B1702A91 1A2CCF12 EDF59D29 574A8A5E 9E1DEC83 2ADBE355 
+  75E508FA 21DB2189 C7779185 FCB64B2F D38C4BE7 81596425 50BB815B C723B983 
+  1B905721 01D8AA67 ACC2AED1 0CAA4B27 07E97157 D085593B 2737842A 17B59D55 
+  3CA8738D 5037A7F1 DED9E91C 83A2131E 21E79406 65534D8E 1FB1899B 914C3A2D 
+  6423F58A 3C1C0E57 75336293 FC95D4F6 73F28CE8 28A7841F 62FC8B9E 45188DD8 
+  9F304067 211AC4B0 F0452758 E56CF368 ECEBFF9B 9F36FA03 CFAF1226 2757D7FE 
+  BA11B60E E9D2E8F6 9F4BD435 E55F118C 21A2B2FC 8C338852 ECAD34EA 4D93AEB7 
+  0D059BFF 8A787040 76651591 77BBDBDB F05FFD40 5EA00F02 C2330731 573220C6 
+  C6AD6825 02030100 01A35330 51300F06 03551D13 0101FF04 05300301 01FF301F 
+  0603551D 23041830 168014D8 6CD9A270 5AF410AF A53F1D52 C068E373 98F85930 
+  1D060355 1D0E0416 0414D86C D9A2705A F410AFA5 3F1D52C0 68E37398 F859300D 
+  06092A86 4886F70D 01010505 00038201 010063E4 FE8F2206 E3ED890B 8F57DC22 
+  479F4350 8865E043 7C40316E 56F73C97 D90B33A2 83E50F91 DE6768FF 922B79B5 
+  D4A79DC2 488CD9B2 DF9823C5 0B86D8BB 5167CE4B B9CF2BDE 9A294AF2 D7FD0997 
+  472DC5CB B4BAD718 93D82DF1 586579B2 84B566AC 26F2872D 2A7727C2 27570E65 
+  87F69E3B C231B708 D9990B5F C2CA4F46 4C3D1AE5 E18DEA2D 7AA24F25 DCBFA111 
+  64F1D4E2 5B94FDAD C3CB3A10 2DB9B2C4 8CBE8600 5B2124DE 9133E902 0B03DCF2 
+  224D792E D326E30A 9E76FB38 85706321 FFE3AEAA B9DE18B5 9D6A36B0 670B5EE6 
+  723DAA4E DC10171A 88920B1D A698213F D3350324 B11903BE BC2727C1 35E166F8 
+  7FB55758 4ECBE652 6CE05F2E 255267B3 E6FB
+  	quit
+!
+license udi pid IR1101-K9 sn FCW23370H09
+license smart reservation
+diagnostic bootup level minimal
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 1-4094 priority 61440
+archive
+ path flash:
+ maximum 5
+memory free low-watermark processor 50337
+!
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+!
+!
+!
+crypto ikev2 keyring INET_DMVPN
+ peer ANY
+  address 0.0.0.0 0.0.0.0
+  pre-shared-key rN5p5NnprtA3
+ !
+!
+!
+crypto ikev2 profile DMVPN_IKEv2_PROFILE
+ match fvrf INET1
+ match identity remote address 0.0.0.0 
+ authentication remote pre-share
+ authentication local pre-share
+ keyring local INET_DMVPN
+ dpd 10 2 periodic
+!
+!
+controller Cellular 0/1/0
+ profile id 1
+!
+!
+vlan internal allocation policy ascending
+!
+vlan 250
+ name WAN_EGRESS
+!
+vlan 1250
+ name ICS_WAN_EGRESS
+!
+!
+class-map match-all AF41
+ match dscp af41 
+class-map match-all EF
+ match dscp ef 
+class-map match-all AF21
+ match dscp af21 
+class-map match-all AF31
+ match dscp af31 
+class-map match-all AF11
+ match dscp af11 
+class-map match-all BE
+ match dscp default 
+class-map match-all BestEffort
+ match any 
+class-map type inspect match-any CLASS-OUTSIDE-TO-SELF-PASS
+ match access-group name ACL-ESP
+ match access-group name ACL-DHCP-IN
+ match access-group name ACL-GRE
+class-map type inspect match-any CLASS-SELF-TO-OUTSIDE-PASS
+ match access-group name ACL-ESP
+ match access-group name ACL-DHCP-OUT
+class-map match-all BusinessDataHigh-AF21
+ match access-group 155
+class-map type inspect match-any CLASS-OUTSIDE-TO-SELF-INSPECT
+ match access-group name ACL-IPSEC
+ match access-group name ACL-PING-SSH-TRACEROUTE
+class-map type inspect match-any CLASS-SELF-TO-OUTSIDE-INSPECT
+ match access-group name ACL-IPSEC
+ match access-group name ACL-ICMP
+class-map match-any Voice
+ match protocol rtp
+ match protocol skype
+ match access-group 141
+class-map match-all MissionCriticalHigh-AF31
+ match access-group 141
+ match access-group 140
+class-map match-all BusinessDataLow-AF11
+ match access-group 160
+class-map match-all Video-AF41
+ match access-group 150
+!
+policy-map EGRESS
+ class AF31
+  bandwidth remaining percent 30 
+ class EF
+  priority percent 50
+ class AF41
+  bandwidth remaining percent 20 
+ class AF21
+  bandwidth remaining percent 20 
+ class AF11
+  bandwidth remaining percent 1 
+ class BE
+  bandwidth remaining percent 28 
+policy-map type inspect POLICY-OUTSIDE-TO-SELF
+ class type inspect CLASS-OUTSIDE-TO-SELF-INSPECT
+  inspect
+ class type inspect CLASS-OUTSIDE-TO-SELF-PASS
+  pass
+ class class-default
+  drop
+policy-map QOS-OUT
+ class class-default
+  shape average 5000000   
+   service-policy EGRESS
+policy-map MARK
+ class Voice
+  set ip dscp ef
+ class Video-AF41
+  set ip dscp af41
+ class MissionCriticalHigh-AF31
+  set ip dscp af31
+ class BusinessDataHigh-AF21
+  set ip dscp af21
+ class BusinessDataLow-AF11
+  set ip dscp af11
+ class BestEffort
+  set ip dscp default
+policy-map type inspect POLICY-SELF-TO-OUTSIDE
+ class type inspect CLASS-SELF-TO-OUTSIDE-INSPECT
+  inspect
+ class type inspect CLASS-SELF-TO-OUTSIDE-PASS
+  pass
+ class class-default
+  drop
+!
+zone security OUTSIDE
+ description OUTSIDE Zone used for Internet Interface
+zone-pair security OUTSIDE-TO-SELF source OUTSIDE destination self
+ service-policy type inspect POLICY-OUTSIDE-TO-SELF
+zone-pair security SELF-TO-OUTSIDE source self destination OUTSIDE
+ service-policy type inspect POLICY-SELF-TO-OUTSIDE
+! 
+!
+!
+!
+crypto isakmp aggressive-mode disable
+!
+crypto ipsec security-association replay window-size 1024
+!
+crypto ipsec transform-set AES-SHA esp-aes esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN_IPSEC_PROFILE
+ set transform-set AES-SHA 
+ set ikev2-profile DMVPN_IKEv2_PROFILE
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Loopback0
+ description L3-CVX-MGMT
+ ip address 146.33.161.186 255.255.255.255
+!
+interface Loopback255
+ ip address 10.166.255.25 255.255.255.255
+ shutdown
+!
+interface Loopback1255
+ vrf forwarding NBLX_ICS
+ ip address 172.29.71.25 255.255.255.255
+!
+interface Tunnel100
+ bandwidth 5000
+ ip address 10.240.250.166 255.255.254.0
+ no ip redirects
+ ip mtu 1400
+ ip pim dr-priority 0
+ ip pim sparse-mode
+ ip nhrp authentication Kp1tcl0s
+ ip nhrp network-id 100
+ ip nhrp nhs 10.240.250.220 nbma 23.102.190.116 multicast priority 110
+ ip nhrp nhs 10.240.250.2 nbma 52.165.21.236 multicast priority 120
+ ip tcp adjust-mss 1360
+ delay 10000
+ nhrp group SPOKE-10Mbps
+ if-state nhrp
+ tunnel source Cellular0/1/0
+ tunnel mode gre multipoint
+ tunnel key 100
+ tunnel vrf INET1
+ tunnel protection ipsec profile DMVPN_IPSEC_PROFILE shared
+!
+interface Tunnel500
+ bandwidth 2500
+ vrf forwarding NBLX_ICS
+ ip address 172.28.16.91 255.255.252.0
+ no ip redirects
+ ip mtu 1400
+ ip pim sparse-mode
+ ip nhrp authentication Kp1tcl0s
+ ip nhrp network-id 500
+ ip nhrp nhs 172.28.16.1 nbma 70.37.50.212 multicast
+ ip nhrp nhs 172.28.16.4 nbma 40.69.168.35 multicast priority 100
+ ip tcp adjust-mss 1360
+ delay 10000
+ if-state nhrp
+ tunnel source Cellular0/1/0
+ tunnel mode gre multipoint
+ tunnel key 500
+ tunnel vrf INET1
+ tunnel protection ipsec profile DMVPN_IPSEC_PROFILE shared
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ media-type rj45
+!
+interface FastEthernet0/0/1
+ description **** TRUNK TO CORE SWITCH ****
+ switchport trunk native vlan 250
+ switchport trunk allowed vlan 250,1250
+ switchport mode trunk
+ duplex full
+!
+interface FastEthernet0/0/2
+ description **** TRUNK TO CORE SWITCH ****
+ switchport trunk native vlan 250
+ switchport trunk allowed vlan 250,1250
+ switchport mode trunk
+!
+interface FastEthernet0/0/3
+!
+interface FastEthernet0/0/4
+!
+interface Cellular0/1/0
+ vrf forwarding INET1
+ ip address negotiated
+ zone-member security OUTSIDE
+ dialer in-band
+ dialer idle-timeout 0
+ dialer watch-group 1
+ dialer-group 1
+ pulse-time 1
+ service-policy output QOS-OUT
+!
+interface Cellular0/1/1
+ no ip address
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan250
+ ip address 146.33.161.170 255.255.255.248
+ service-policy input MARK
+!
+interface Vlan1250
+ vrf forwarding NBLX_ICS
+ ip address 172.29.70.249 255.255.255.248
+!
+interface Async0/2/0
+ no ip address
+ encapsulation scada
+!
+interface Dialer1
+!
+!
+router eigrp NBL
+ !
+ address-family ipv4 unicast vrf NBLX_ICS autonomous-system 254
+  !
+  af-interface Tunnel500
+   stub-site wan-interface
+   summary-address 172.29.64.0 255.255.248.0
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000000 10 255 1 1500
+   distribute-list route-map NBLX_DMVPN_FILTER out Tunnel500
+  exit-af-topology
+  neighbor 172.29.70.254 Vlan1250
+  network 172.28.0.0 0.3.255.255
+  eigrp stub-site 254:17229640
+ exit-address-family
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  af-interface Tunnel100
+   stub-site wan-interface
+   summary-address 10.113.20.0 255.255.254.0
+   summary-address 146.33.161.128 255.255.255.192
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000000 10 255 1 1500
+   distribute-list route-map DMVPN_FILTER out Tunnel100
+  exit-af-topology
+  neighbor 146.33.161.169 Vlan250
+  network 10.0.0.0
+  network 146.33.161.128 0.0.0.63
+  eigrp stub-site 100:1016600
+ exit-address-family
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+ip tcp path-mtu-discovery
+no ip http server
+ip http authentication local
+no ip http secure-server
+ip route vrf INET1 0.0.0.0 0.0.0.0 Cellular0/1/0
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard VTY_FILTER
+ 10 deny   10.10.208.216
+ 20 deny   10.70.200.220
+ 30 deny   10.10.208.184
+ 40 deny   10.45.200.98
+ 50 deny   10.10.208.113
+ 60 deny   10.10.208.124
+ 70 deny   10.35.200.50
+ 80 deny   10.45.200.51
+ 90 permit 10.0.0.0 0.255.255.255
+ 100 permit 172.16.0.0 0.15.255.255
+ 110 permit 216.166.78.0 0.0.0.255
+ 120 permit 23.132.240.0 0.0.0.255
+ 130 permit 63.97.210.128 0.0.0.31
+ 140 permit 65.201.46.232 0.0.0.7
+ 150 permit 74.205.148.176 0.0.0.7
+ 160 permit 139.65.136.0 0.0.3.255
+ 170 permit 139.65.140.0 0.0.3.255
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 60 permit 146.40.2.8
+ 70 permit 146.40.2.11
+ 80 permit 146.40.2.12
+ 90 permit 146.40.2.13
+ 50 permit 146.40.2.7
+ 100 permit 146.42.255.132
+ 110 permit 139.65.136.0 0.0.3.255
+ 120 permit 139.65.140.0 0.0.3.255
+ 130 permit 139.65.0.0 0.0.255.255
+ 140 deny   any log
+!
+ip access-list extended ACL-DHCP-IN
+ 10 permit udp any eq bootps any eq bootpc
+ip access-list extended ACL-DHCP-OUT
+ 10 permit udp any eq bootpc any eq bootps
+ip access-list extended ACL-ESP
+ 10 permit esp any any
+ip access-list extended ACL-GRE
+ 10 permit gre any any
+ip access-list extended ACL-ICMP
+ 10 permit icmp any any
+ip access-list extended ACL-IPSEC
+ 10 permit udp any any eq non500-isakmp
+ 20 permit udp any any eq isakmp
+ip access-list extended ACL-PING-SSH-TRACEROUTE
+ 10 permit icmp any any echo
+ 20 permit icmp any any echo-reply
+ 30 permit icmp any any ttl-exceeded
+ 40 permit icmp any any port-unreachable
+ 50 permit udp any any range 33434 33463 ttl eq 1
+ 60 permit tcp 216.166.78.0 0.0.0.255 any eq 22
+ 70 permit tcp 63.97.210.128 0.0.0.3 any eq 22
+ 80 permit tcp 23.132.240.0 0.0.0.255 any eq 22
+ 90 permit tcp 63.97.210.128 0.0.0.31 any eq 22
+ 100 permit tcp 65.201.46.232 0.0.0.7 any eq 22
+ 110 permit tcp 74.205.148.176 0.0.0.7 any eq 22
+!
+!
+ip prefix-list DMVPN_FILTER seq 110 permit 10.113.20.0/23
+ip prefix-list DMVPN_FILTER seq 120 permit 146.33.161.128/26
+!
+ip prefix-list NBLX_DMVPN_FILTER seq 100 permit 172.29.64.0/21
+logging origin-id hostname
+logging host 139.65.140.24
+logging host 139.65.140.23
+logging host 139.65.140.25
+logging host 146.36.114.213
+logging host 146.36.114.214
+logging host 134.248.81.53
+ip access-list standard 20
+ 10 permit 10.0.0.0 0.63.255.255
+ 20 permit 10.128.0.0 0.7.255.255
+ 30 permit 10.254.0.0 0.0.255.255
+ 40 permit 146.22.0.0 0.1.255.255
+ 50 permit 146.24.0.0 0.7.255.255
+ 60 permit 146.32.0.0 0.7.255.255
+ 70 permit 146.40.0.0 0.3.255.255
+ 80 permit 146.44.0.0 0.1.255.255
+ 90 permit 146.46.0.0 0.0.255.255
+ 100 permit 136.171.0.0 0.0.255.255
+ 110 permit 139.65.136.0 0.0.3.255
+ 120 permit 139.65.140.0 0.0.3.255
+ 130 permit 139.65.0.0 0.0.255.255
+ 140 permit 134.248.0.0 0.0.255.255
+ 150 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 permit 146.40.10.21
+ 40 deny   any log
+ip access-list standard 80
+ 10 remark ***** SNMPv3 Hosts ****
+ 10 permit 10.70.200.160
+ 20 permit 10.62.200.213
+ 30 permit 10.10.196.160
+ 40 permit 10.10.196.161
+ 50 permit 10.8.200.160
+ 60 permit 10.8.200.161
+ 70 permit 10.20.196.160
+ 80 permit 10.70.200.251
+ 90 permit 10.10.201.74
+ 100 permit 10.10.202.108
+ 110 permit 10.10.196.23
+ 120 permit 10.10.202.28
+ip access-list extended 140
+ 10 remark **** Mission Critical-High Traffic ****
+ 10 remark **** NSIDE.NBLENERGY.COM ****
+ 10 permit ip 10.0.0.0 0.255.255.255 host 10.9.1.11
+ 20 remark **** ORACLE ****
+ 20 permit ip 10.0.0.0 0.255.255.255 129.155.0.0 0.0.255.255
+ 30 remark **** ALLEGRO ****
+ 30 permit ip 10.0.0.0 0.255.255.255 host 10.10.201.158
+ 40 permit ip 10.0.0.0 0.255.255.255 host 10.10.201.159
+ 50 remark **** SCCP traffic for VOIP ****
+ 50 permit tcp 10.0.0.0 0.255.255.255 10.0.0.0 0.255.255.255 eq 2000
+ 60 permit tcp 10.0.0.0 0.255.255.255 eq 2000 10.0.0.0 0.255.255.255
+ip access-list extended 141
+ 10 remark **** Deny SCCP ****
+ 10 deny   tcp 10.0.0.0 0.255.255.255 10.0.0.0 0.255.255.255 eq 2000
+ 20 deny   tcp 10.0.0.0 0.255.255.255 eq 2000 10.0.0.0 0.255.255.255
+ 30 remark **** Voice traffic RTP Ports ****
+ 30 permit udp any any range 16384 32767
+ip access-list extended 150
+ 10 remark **** Enterprise Multicast Traffic ****
+ 10 permit ip 239.195.100.0 0.0.0.255 any
+ 20 permit ip any 239.195.100.0 0.0.0.255
+ 30 permit icmp any host 10.8.200.160 echo-reply
+ 40 permit icmp any host 10.8.200.161 echo-reply
+ 50 permit icmp host 10.8.200.160 any echo
+ 60 permit icmp host 10.8.200.161 any echo
+ip access-list extended 155
+ 10 remark **** Email Servers Traffic ****
+ 10 permit tcp any eq 1352 any
+ 20 permit udp any eq 1352 any
+ 30 permit tcp any any eq 1352
+ 40 permit udp any any eq 1352
+ 50 remark **** DFS traffic for File Share access ****
+ 50 permit tcp any any eq 445
+ 60 permit udp any any range 135 netbios-ss
+ 70 permit udp any any eq 445
+ 80 permit tcp any eq 445 any
+ 90 permit udp any range 135 netbios-ss any
+ 100 permit udp any eq 445 any
+ 110 remark ****CUCM Replication traffic ****
+ 110 permit tcp any any eq 1500
+ 120 permit tcp any any eq 1501
+ 130 permit tcp any any eq 1510
+ 140 permit tcp any any eq 1511
+ 150 permit tcp any any eq 1515
+ 160 permit tcp any any eq 2552
+ 170 permit tcp any any eq 2551
+ 180 permit tcp any any eq 2555
+ 190 permit tcp any any eq 8500
+ 200 permit udp any any eq 8500
+ 210 permit tcp any any eq 2556
+ 220 permit tcp any any eq 4040
+ 230 permit tcp any any eq 5007
+ 240 permit tcp any any eq 7000
+ 250 permit tcp any any eq 7001
+ 260 permit tcp any any eq 7002
+ 270 permit tcp any any eq 7070
+ 280 permit tcp any any eq 8001
+ 290 permit tcp any any eq 8002
+ 300 permit tcp any any eq 8003
+ 310 permit tcp any any
+dialer watch-list 1 ip 5.6.7.8 0.0.0.0
+dialer watch-list 1 delay route-check initial 60
+dialer watch-list 1 delay connect 1
+dialer-list 1 protocol ip permit
+dialer-list 1 protocol ipv6 permit
+!
+!
+route-map DMVPN_FILTER permit 100 
+ match ip address prefix-list DMVPN_FILTER
+!
+route-map NBLX_DMVPN_FILTER permit 100 
+ match ip address prefix-list NBLX_DMVPN_FILTER
+!
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2022 v3 priv 
+snmp-server group NBLNetwork v3 priv read snmpread write snmpwrite access 80
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server view snmpread iso included
+snmp-server view snmpwrite iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location F09132 / 2315 West Dexter, Pecos, TX / USA / Americas /US-Noble-NA-Utility-WAN-Remotes/Criticality-Low
+snmp-server contact NOC: GlobalNetOps1@chevron.com
+snmp-server chassis-id R-NBLX-LIBERTY-DMVPN-1
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps license
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps memory bufferpeak
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp-server host 10.10.196.161 version 3 priv snmpread udp-port 9800 
+snmp ifmib ifindex persist
+!
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server HOU2_ACS
+ address ipv4 139.65.143.4
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+control-plane
+!
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+ speed 115200
+line 0/0/0
+line 0/2/0
+line vty 0 4
+ session-timeout 10 
+ access-class VTY_FILTER in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class VTY_FILTER in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+!
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+end

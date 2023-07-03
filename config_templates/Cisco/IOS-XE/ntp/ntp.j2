@@ -1,0 +1,17 @@
+! Variables
+! {{ ntp_server1 }}  = IP Address of the first NTP server (closest to the system)
+! {{ ntp_server2 }}  = IP Address of the second NTP server
+! {{ ntp_server3 }}  = IP Address of the third NTP server
+! {{ host.mgmt_ifname }} = Interface name to use as the source of the NTP requests (usually a loopback0)
+!
+ip access-list standard 40
+ 10 permit {{ ntp_server1 }}
+ 20 permit {{ ntp_server2 }}
+ 30 permit {{ ntp_server3 }}
+ 40 deny   any log
+!
+ntp source {{ host.mgmt_ifname }}
+ntp access-group peer 40
+ntp server {{ ntp_server1 }} prefer
+ntp server {{ ntp_server2 }}
+ntp server {{ ntp_server3 }}

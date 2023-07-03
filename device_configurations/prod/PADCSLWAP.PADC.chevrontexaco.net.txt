@@ -1,0 +1,666 @@
+Building configuration...
+
+Current configuration : 18007 bytes
+!
+! Last configuration change at 07:43:26 CST Fri Jun 16 2023 by admin
+! NVRAM config last updated at 07:44:05 CST Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.2
+service nagle
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname PADCSLWAP
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Vlan100
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network flexvpn local 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CST -6 0
+clock summer-time CST recurring
+system mtu routing 1500
+no ip source-route
+!
+ip dhcp relay information trust-all
+!
+!
+ip domain-name PADC.chevrontexaco.net
+ip name-server 146.36.80.34
+vtp domain PADC
+vtp mode transparent
+!
+!
+!
+!
+!
+udld aggressive
+
+ptp mode e2etransparent 
+!
+!
+table-map AUTOQOS-COS-DSCP-Table
+ map from  0 to 0
+ map from  1 to 8
+ map from  2 to 16
+ map from  3 to 24
+ map from  4 to 32
+ map from  5 to 46
+ map from  6 to 48
+ map from  7 to 56
+ default copy
+table-map AUTOQOS-Trust-DSCP-Table
+ default copy
+!
+!
+!
+license boot level lanbase
+archive
+ path flash:cvx_134041
+ maximum 5
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge default
+spanning-tree portfast edge bpduguard default
+spanning-tree extend system-id
+spanning-tree backbonefast
+errdisable recovery cause udld
+auto qos srnd4
+!
+alarm profile defaultPort
+ alarm not-operating 
+ syslog not-operating 
+ notifies not-operating 
+!
+!
+
+!
+!
+transceiver type all
+!
+vlan 100
+ name 146.33.102.0_DATA
+!
+vlan 120
+ name 146.33.101.128/25.LAN2
+!
+vlan 200
+ name 146.34.228.0_VOICE
+!
+vlan 300
+ name 146.33.105.0/25.OCS_WLAN
+!
+vlan 999
+ name Unused_Native_VLAN
+!
+lldp run
+!
+class-map match-any AUTOQOS-SRND4-Egress-Class-2
+ match ip dscp default  1  2  3  4  5  6  7 
+class-map match-any AUTOQOS-SRND4-Egress-Class-0
+ match ip dscp cs5  41  42  43  44  45  ef  47 
+ match ip dscp cs4  33 
+class-map match-any AUTOQOS-SRND4-Egress-Class-1
+ match ip dscp cs2  17  af21  19  af22  21  af23  23 
+ match ip dscp cs3  af31  27  af32  29  af33  31 
+ match ip dscp af41  35  af42  37  af43  39 
+ match ip dscp cs6  49  50  51  52  53  54  55 
+ match ip dscp cs7  57  58  59  60  61  62  63 
+class-map match-all AUTOQOS_VOIP_DATA_CLASS
+ match ip dscp ef 
+class-map match-all AUTOQOS_DEFAULT_CLASS
+ match access-group name AUTOQOS-ACL-DEFAULT
+class-map match-all AUTOQOS_VOIP_SIGNAL_CLASS
+ match ip dscp cs3 
+!
+policy-map AUTOQOS-SRND4-Egress-Policy
+ class AUTOQOS-SRND4-Egress-Class-0
+  priority
+ class AUTOQOS-SRND4-Egress-Class-1
+  bandwidth remaining percent 43 
+ class AUTOQOS-SRND4-Egress-Class-2
+  bandwidth remaining percent 50 
+policy-map AUTOQOS-SRND4-CISCOPHONE-POLICY
+ class AUTOQOS_VOIP_DATA_CLASS
+  set dscp ef
+ class AUTOQOS_VOIP_SIGNAL_CLASS
+  set dscp cs3
+ class AUTOQOS_DEFAULT_CLASS
+  set dscp default
+policy-map AUTOQOS-Trust-COS-POLICY
+ class class-default
+  set dscp cos table AUTOQOS-COS-DSCP-Table
+policy-map AUTOQOS-Trust-DSCP-POLICY
+ class class-default
+  set dscp dscp table AUTOQOS-Trust-DSCP-Table
+!
+!
+!
+!
+!
+!
+interface Port-channel1
+ description Uplink
+ switchport trunk allowed vlan 100,120,200,300
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface GigabitEthernet1/1
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/2
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 120
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/3
+ switchport access vlan 120
+ switchport mode access
+!
+interface GigabitEthernet1/4
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/5
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/6
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/7
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 120
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/8
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/9
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ shutdown
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/10
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/11
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/12
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/13
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/14
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/15
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/16
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/17
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/18
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/19
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/20
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/21
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/22
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/23
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/24
+ description ***PUT DESCRIPTION HERE***
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ no snmp trap link-status
+ spanning-tree portfast edge
+ service-policy input AUTOQOS-SRND4-CISCOPHONE-POLICY
+!
+interface GigabitEthernet1/25
+ description Uplink
+ switchport trunk allowed vlan 100,120,200,300
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ auto qos trust 
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+ channel-group 1 mode active
+ service-policy input AUTOQOS-Trust-COS-POLICY
+ service-policy output AUTOQOS-SRND4-Egress-Policy
+!
+interface GigabitEthernet1/26
+ description Uplink
+ switchport trunk allowed vlan 100,120,200,300
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ auto qos trust 
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+ channel-group 1 mode active
+ service-policy input AUTOQOS-Trust-COS-POLICY
+ service-policy output AUTOQOS-SRND4-Egress-Policy
+!
+interface GigabitEthernet1/27
+!
+interface GigabitEthernet1/28
+!
+interface Vlan1
+ no ip address
+ no ip route-cache
+ shutdown
+!
+interface Vlan100
+ ip address 146.33.102.9 255.255.255.0
+ no ip redirects
+ no ip proxy-arp
+!
+ip default-gateway 146.33.102.1
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip tcp path-mtu-discovery
+ip telnet source-interface Vlan100
+no ip http server
+no ip http secure-server
+!
+ip tftp source-interface Vlan100
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+!
+logging history size 10
+logging source-interface Vlan100
+logging host 146.27.95.122
+logging host 146.36.114.214
+logging host 139.65.140.24
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 139.65.140.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+!
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Vlan100
+snmp-server location PADC / WEST 7TH STREET, Gate 1, Port Arthur, TX  / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Low
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps stackwise
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+no vstack
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ length 0
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+ntp source Vlan100
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

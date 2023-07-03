@@ -1,0 +1,456 @@
+Building configuration...
+
+
+  
+  
+Current configuration : 11881 bytes
+!
+! Last configuration change at 03:25:08 PDT Fri Jun 16 2023 by admin
+! NVRAM config last updated at 03:25:44 PDT Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.7
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname CHVPKRP1-MCAST
+!
+boot-start-marker
+boot system flash0:/c2900-universalk9-mz.SPA.157-3.M5.bin
+boot-end-marker
+!
+aqm-register-fnf
+!
+logging buffered 128000
+logging reload warnings
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone PST -8 0
+clock summer-time PDT recurring
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+ip flow-cache timeout inactive 10
+ip flow-cache timeout active 1
+ip domain lookup source-interface Loopback0
+ip domain name chvpk.chevrontexaco.net
+ip name-server 146.36.80.34
+ip multicast-routing 
+ip multicast route-limit 1000 900
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+cts logging verbose
+!
+!
+voice-card 0
+!
+!
+!
+!
+!
+!
+!
+!
+vxml logging-tag
+license udi pid CISCO2921/K9 sn FTX1848AKBN
+license boot module c2900 technology-package datak9
+hw-module pvdm 0/0
+!
+!
+!
+archive
+ path flash0:cvx_112236
+ maximum 5
+ write-memory
+ time-period 10080
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+!
+!
+!
+!
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 146.27.111.237 255.255.255.255
+ ip flow ingress
+ ip pim sparse-mode
+!
+interface Loopback10
+ description Anycast RP Sparse Hiwan+Global Scope
+ ip address 139.65.245.226 255.255.255.255
+ ip flow ingress
+ ip pim sparse-mode
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ description CHVPKRM1 Gi7/14
+ ip address 146.27.110.166 255.255.255.252
+ no ip proxy-arp
+ ip flow ingress
+ ip pim sparse-mode
+ load-interval 30
+ delay 100000
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ description CHVPKRM2 Gi7/14
+ ip address 146.27.110.170 255.255.255.252
+ no ip proxy-arp
+ ip flow ingress
+ ip pim sparse-mode
+ load-interval 30
+ delay 100000
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ no ip address
+ duplex auto
+ speed auto
+!
+!
+!
+router eigrp 109
+ timers graceful-restart purge-time 120
+ default-metric 2000 100 255 1 1500
+ network 139.65.0.0
+ network 146.27.0.0
+ redistribute static route-map STATIC-to-EIGRP
+ passive-interface default
+ no passive-interface GigabitEthernet0/0
+ no passive-interface GigabitEthernet0/1
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+no ip http server
+no ip http secure-server
+ip flow-export source Loopback0
+ip flow-export version 5
+!
+ip tftp source-interface Loopback0
+ip tftp blocksize 8192
+ip pim bidir-enable
+ip pim rp-address 139.65.245.224 mcast-rp-bidir-hiwan+global override bidir
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim rp-address 146.27.111.237 mcast-rp-sparse-lan override
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+ip msdp peer 146.36.2.228 connect-source Loopback0
+ip msdp cache-sa-state
+ip msdp originator-id Loopback0
+ip msdp mesh-group Enterprise-RP 146.36.2.228
+ip route 139.65.245.224 255.255.255.254 Loopback10 name BiDir-Hiwan+Global
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard PIM_TS
+ permit 239.194.193.0 0.0.0.255
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-rp-bidir-hiwan+global
+ permit 239.194.0.0 0.0.127.255
+ permit 239.195.0.0 0.0.127.255
+ip access-list standard mcast-rp-sparse-lan
+ permit 239.255.128.0 0.0.127.255
+ permit 239.193.128.0 0.0.127.255
+ permit 224.0.0.0 0.255.255.255
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+!
+!
+ip prefix-list STATIC-to-EIGRP seq 5 permit 139.65.245.224/31
+logging source-interface Loopback0
+logging host 146.27.95.122
+logging host 134.248.81.53
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+ipv6 ioam timestamp
+!
+route-map STATIC-to-EIGRP permit 10
+ match ip address prefix-list STATIC-to-EIGRP
+!
+!
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location CHVPKH / 6001 Bollinger Canyon Rd, San Ramon, California / USA / Americas/US-NA-Utility-Campus-Metro/Criticality-Low
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps eigrp
+snmp-server enable traps envmon
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps ipmulticast
+snmp-server enable traps msdp
+snmp-server enable traps pim neighbor-change invalid-pim-message
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1340 permit 146.27.95.126
+access-list 1340 permit 146.27.95.125
+access-list 1340 permit 146.27.88.28
+access-list 1340 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+access-list 2008 remark ----------------------------------------------------
+access-list 2008 remark Multicast Source Discovery Protocol (MSDP) SA Filter
+access-list 2008 remark Domain-local applications
+access-list 2008 remark --------- 224.0.2.2 Sun RPC
+access-list 2008 deny   ip any host 224.0.2.2
+access-list 2008 remark --------- 224.0.1.3 Rwhod
+access-list 2008 deny   ip any host 224.0.1.3
+access-list 2008 remark --------- 224.0.1.24 Microsoft-ds 
+access-list 2008 deny   ip any host 224.0.1.24
+access-list 2008 remark --------- 224.0.1.22 SVRLOC
+access-list 2008 deny   ip any host 224.0.1.22
+access-list 2008 remark --------- 224.0.1.2 SGI-Dogfight
+access-list 2008 deny   ip any host 224.0.1.2
+access-list 2008 remark --------- 224.0.1.35 SVRLOC-DA
+access-list 2008 deny   ip any host 224.0.1.35
+access-list 2008 remark --------- 224.0.1.60 hp-device-disc
+access-list 2008 deny   ip any host 224.0.1.60
+access-list 2008 remark Auto-RP groups
+access-list 2008 deny   ip any host 224.0.1.39
+access-list 2008 deny   ip any host 224.0.1.40
+access-list 2008 remark RFC 1918 and Loopback
+access-list 2008 deny   ip 10.0.0.0 0.255.255.255 any
+access-list 2008 deny   ip 127.0.0.0 0.255.255.255 any
+access-list 2008 deny   ip 172.16.0.0 0.15.255.255 any
+access-list 2008 deny   ip 192.168.0.0 0.0.255.255 any
+access-list 2008 remark Default SSM-range
+access-list 2008 deny   ip any 232.0.0.0 0.255.255.255
+access-list 2008 permit ip any any
+!
+!
+!
+control-plane
+!
+ !
+ !
+ !
+ !
+!
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+!
+!
+!
+!
+!
+!
+gatekeeper
+ shutdown
+!
+banner login ^CC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ no exec
+ transport preferred none
+ transport input telnet
+ stopbits 1
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output lat pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp source Loopback0
+ntp access-group peer 40
+ntp update-calendar
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

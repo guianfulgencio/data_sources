@@ -1,0 +1,45 @@
+agent:
+  # http server listen addr
+  listen_addr: 127.0.0.1:8080
+  # Interval for health check
+  monitor_interval: 10s
+  # Time to flush out inactive apps
+  cleanup_timer: 15m
+  # Consul api addr for dynamic discovery
+  # consul_addr: https://consul
+  # interval to query consul for app discovery
+  # consul_query_interval: 5m
+
+bgp:
+  local_as: 65453
+  remote_as: {{remote-as}}
+  # override the peer IP to use instead of assuming the default gateway
+  # peer_ip: {{remote peer-ip}}
+  origin: igp
+
+# optional list of apps to register on startup
+apps:
+  - name: anycast-netflow
+    vip: 139.65.245.55/32
+    vip_config:
+      # additional per VIP BGP communities
+      bgp_communities: [ 65453:2055 ]
+    monitors: [ port:udp:2055 ]
+  - name: anycast-syslog
+    vip: 139.65.245.14/32
+    vip_config:
+      # additional per VIP BGP communities
+      bgp_communities: [ 65453:514 ]
+    monitors: [ port:udp:514 ]
+  - name: anycast-snmptrap
+    vip: 139.65.245.62/32
+    vip_config:
+      # additional per VIP BGP communities
+      bgp_communities: [ 65453:162 ]
+    monitors: [ port:udp:162 ]
+  - name: anycast-dhcp
+    vip: 139.65.245.67/32
+    vip_config:
+      # additional per VIP BGP communities
+      bgp_communities: [ 65453:67 ]
+    monitors: [ port:udp:67 ]

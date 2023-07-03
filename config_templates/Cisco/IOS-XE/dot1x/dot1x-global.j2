@@ -1,0 +1,24 @@
+! Dot1x Global Commands
+!
+aaa new-model
+aaa session-id common
+device-sensor accounting
+device-sensor notify all-changes
+device-tracking upgrade-cli force
+device-tracking tracking retry-interval 10
+device-tracking tracking
+!
+authentication mac-move permit 
+!
+dot1x system-auth-control
+dot1x critical eapol
+!
+device-tracking policy sisf_policy
+tracking enable
+!
+aaa authentication dot1x default group AAA
+aaa authorization network default group AAA
+aaa accounting network default start-stop group AAA
+aaa accounting dot1x default start-stop group AAA
+!
+authentication mac-move permit 

@@ -1,0 +1,23 @@
+! AAA TACACS servers
+! Variables
+! Defaults are for US hosted systems. See documentation for other ACS servers
+! {{ host.mgmt_ifname | default ("Loopback0") }} = Management interface
+! {{ aaa.tacacs_server1_name | default ("HOU_ACS") }} = AAA Server 1 name 
+! {{ aaa.tacacs_server1_ip | default("139.65.136.58") )}} = AAA Server 2 IP
+! {{ aaa.tacacs_server2_name | default("NADC_ACS") }} = AAA Server 2 name
+! {{ aaa.tacacs_server2_ip | default(" 139.65.137.60") }} = AAA Server 2 IP
+!
+tacacs server {{ aaa.tacacs_server1_name }}
+ address ipv4 {{ aaa.tacacs_server1_ip }} 
+ key <Shared Secret>
+ timeout 10
+!
+tacacs server {{ aaa.tacacs_server2_name }}
+ address ipv4 {{ aaa.tacacs_server2_ip }}
+ key <Shared Secret>
+ timeout 10
+!
+aaa group server tacacs+ {{ aaa.tacacs_group }}
+ server name {{ aaa.tacacs_server1_name }}
+ server name {{ aaa.tacacs_server2_name }}
+!ip tacacs source-interface {{ host.mgmt_ifname }}

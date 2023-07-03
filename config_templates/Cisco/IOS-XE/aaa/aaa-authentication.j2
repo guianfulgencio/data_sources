@@ -1,0 +1,8 @@
+! AAA group configuration
+! Variables
+! {{ aaa.tacacs_group | default ("tacacs+") }} = group name of the TACACS group
+!
+aaa authentication login default group {{ aaa.tacacs_group }} local
+aaa authentication enable default group {{ aaa.tacacs_group }} enable
+!
+aaa session-id common

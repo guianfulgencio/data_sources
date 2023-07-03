@@ -1,0 +1,2167 @@
+Building configuration...
+
+Current configuration : 53748 bytes
+!
+! Last configuration change at 10:49:02 UTC Fri Jun 16 2023
+! NVRAM config last updated at 16:47:23 UTC Wed Apr 19 2023 by svc-voy-ansible
+!
+version 15.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+service counters max age 10
+!
+hostname HOU150-09MDA-M79-MR03
+!
+boot-start-marker
+boot system flash bootflash:cat4500-e-ios-promupgrade-150-1r-SG11
+boot system flash bootflash:cat4500e-universalk9.SPA.03.08.09.E.152-4.E9.bin
+boot-end-marker
+!
+!
+vrf definition mgmtVrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging snmp-authfail
+logging buffered 128000
+no logging console
+logging event link-status global
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ acs
+ server 139.65.136.58
+ server 139.65.143.4
+ ip vrf forwarding mgmtVrf
+!
+aaa authentication login default group acs local
+aaa authentication enable default group acs enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group acs if-authenticated 
+aaa authorization commands 0 default group acs if-authenticated 
+aaa authorization commands 1 default group acs if-authenticated 
+aaa authorization commands 15 default group acs if-authenticated 
+aaa authorization reverse-access default group acs if-authenticated 
+aaa accounting update newinfo
+aaa accounting commands 0 default start-stop group acs
+aaa accounting commands 1 default start-stop group acs
+aaa accounting commands 15 default start-stop group acs
+aaa accounting network default start-stop group acs
+aaa accounting connection default start-stop group acs
+aaa accounting system default start-stop group acs
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+switch virtual domain 60
+ switch mode virtual
+ mac-address use-virtual
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+ip vrf OoB.ETC.HPC
+ rd 65076:218
+!
+ip vrf OoB.IRSM
+ rd 65076:212
+!
+ip vrf OoB.ITC.DC
+ rd 65076:213
+!
+ip vrf OoB.ITC.Network
+ rd 65076:217
+!
+ip vrf OoB.ITC.Servers
+ rd 65076:215
+!
+ip vrf OoB.ITC.Storage
+ rd 65076:214
+!
+no ip domain-lookup
+ip domain-name hou150.chevrontexaco.net
+!
+!
+vtp mode transparent
+!
+!
+errdisable recovery cause udld
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause sfp-config-mismatch
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause port-mode-failure
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause pppoe-ia-rate-limit
+errdisable recovery cause mac-limit
+errdisable recovery cause unicast-flood
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause inline-power
+errdisable recovery cause arp-inspection
+errdisable recovery cause link-monitor-failure
+errdisable recovery cause oam-remote-failure
+errdisable recovery cause psp
+errdisable recovery interval 30
+power redundancy-mode combined
+!
+mac access-list extended VSL-BPDU
+ permit any 0180.c200.0000 0000.0000.0003
+mac access-list extended VSL-CDP
+ permit any host 0100.0ccc.cccc
+mac access-list extended VSL-DOT1x
+ permit any any 0x888E
+mac access-list extended VSL-GARP
+ permit any host 0180.c200.0020
+mac access-list extended VSL-LLDP
+ permit any host 0180.c200.000e
+mac access-list extended VSL-MGMT
+ permit any 0022.bdcd.d200 0000.0000.00ff
+ permit 0022.bdcd.d200 0000.0000.00ff any
+mac access-list extended VSL-SSTP
+ permit any host 0100.0ccc.cccd
+archive
+ path bootflash:cvx_113832
+ maximum 5
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+spanning-tree vlan 1-100,1007-1115,2001-2012,2105-2184,3001-3003 priority 8192
+spanning-tree vlan 3010-3012,3020,3212 priority 8192
+!
+redundancy
+ mode sso
+!
+vlan internal allocation policy ascending
+!
+vlan 2
+ name test
+!
+vlan 212
+ name 134.248.208.220/30.OoB.IRSM 
+!
+vlan 213
+ name 134.248.208.216/30.OoB.ITC.DC
+!
+vlan 214
+ name 134.248.208.224/30.OoB.ITC.Stora
+!
+vlan 215
+ name 134.248.208.212/30.OoB.ITC.Serve
+!
+vlan 217
+ name 134.248.208.208/30.OoB.ITC.Netwo
+!
+vlan 218
+ name 134.248.208.228/30.OoB.ETC.HPC
+!
+vlan 1007
+ name 10.7.192.0/21.HPC.Blade.Pod1
+!
+vlan 1008
+ name 10.7.200.0/21.HPC.Blade.Pod2
+!
+vlan 1100
+ name 10.5.246.0/23.ITC.Servers.Lab
+!
+vlan 1101
+ name 10.5.248.0/23.ITC.Servers.P01
+!
+vlan 1102
+ name 10.5.250.0/23.ITC.Servers.P02
+!
+vlan 1103
+ name 10.5.252.0/23.ITC.Servers.P03
+!
+vlan 2001
+ name 10.7.168.0/21.HPC.cluster.Pod1
+!
+vlan 2002
+ name 10.7.176.0/21.HPC.Blade.Pod2
+!
+vlan 2003
+ name 10.7.184.0/21.HPC.Blade.Pod3
+!
+vlan 2004
+ name 10.7.208.0/21.HPC.cluster.Pod5
+!
+vlan 2005
+ name 10.7.192.0/21.HPC.Other.Pod1
+!
+vlan 2006
+ name 10.7.200.0/21.Storage.HPC
+!
+vlan 2007
+ name 10.7.160.0/21.HPC.Other.Pod2
+!
+vlan 3002
+ name 134.248.214.0/24.OoB.MS
+!
+vlan 3003
+ name 134.248.209.0/24.OoB.Nexus
+!
+vlan 3010
+ name 10.1.24.0/21.PDUs
+!
+vlan 3020
+ name 10.3.248.0/21.OoB.ITC.Storage
+!
+vlan 3212
+ name 134.248.212.0/24.OOB.IRSM
+!
+vlan 3216
+ name 134.248.202.0/26.IRSM.DMZ
+!
+vlan 3218
+ name 134.248.213.0/24.OOB.ETC.HPC
+!
+vlan 4068
+ name 10.0.0.0/16.Legacy.UNIX.OOB
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface FastEthernet1
+!
+class-map match-any VSL-MGMT-PACKETS
+ match access-group name VSL-MGMT
+class-map match-any VSL-DATA-PACKETS
+ match any 
+class-map match-any VSL-L2-CONTROL-PACKETS
+ match access-group name VSL-DOT1x
+ match access-group name VSL-BPDU
+ match access-group name VSL-CDP
+ match access-group name VSL-LLDP
+ match access-group name VSL-SSTP
+ match access-group name VSL-GARP
+class-map match-any VSL-L3-CONTROL-PACKETS
+ match access-group name VSL-IPV4-ROUTING
+ match access-group name VSL-BFD
+ match access-group name VSL-DHCP-CLIENT-TO-SERVER
+ match access-group name VSL-DHCP-SERVER-TO-CLIENT
+ match access-group name VSL-DHCP-SERVER-TO-SERVER
+ match access-group name VSL-IPV6-ROUTING
+class-map match-any VSL-MULTIMEDIA-TRAFFIC
+ match dscp af41 
+ match dscp af42 
+ match dscp af43 
+ match dscp af31 
+ match dscp af32 
+ match dscp af33 
+ match dscp af21 
+ match dscp af22 
+ match dscp af23 
+class-map match-any VSL-VOICE-VIDEO-TRAFFIC
+ match dscp ef 
+ match dscp cs4 
+ match dscp cs5 
+class-map match-any VSL-SIGNALING-NETWORK-MGMT
+ match dscp cs2 
+ match dscp cs3 
+ match dscp cs6 
+ match dscp cs7 
+!
+policy-map VSL-Queuing-Policy
+ class VSL-MGMT-PACKETS
+  bandwidth percent 5 
+ class VSL-L2-CONTROL-PACKETS
+  bandwidth percent 5 
+ class VSL-L3-CONTROL-PACKETS
+  bandwidth percent 5 
+ class VSL-VOICE-VIDEO-TRAFFIC
+  bandwidth percent 30 
+ class VSL-SIGNALING-NETWORK-MGMT
+  bandwidth percent 10 
+ class VSL-MULTIMEDIA-TRAFFIC
+  bandwidth percent 20 
+ class VSL-DATA-PACKETS
+  bandwidth percent 20 
+ class class-default
+  bandwidth percent 5 
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip vrf forwarding OoB.ITC.Network
+ ip address 134.248.208.250 255.255.255.255
+!
+interface Port-channel1
+ description VSL Link
+ switchport
+ switchport mode trunk
+ switchport nonegotiate
+ switch virtual link 1
+!
+interface Port-channel2
+ description VSL Link
+ switchport
+ switchport mode trunk
+ switchport nonegotiate
+ switch virtual link 2
+!
+interface Port-channel11
+ description HOU150FHS01A Inside Leg
+ switchport
+ switchport trunk allowed vlan 212-215,217,218
+ switchport mode trunk
+!
+interface Port-channel12
+ description HOU150FHS01B Inside Leg
+ switchport
+ switchport trunk allowed vlan 212-215,217,218
+ switchport mode trunk
+!
+interface Port-channel105
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel109
+ description HOU150-09MDA-M79-MS18 Port-Channel
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel113
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel117
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel121
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel125
+ description HOU150-11PKI-K97-MS39
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel127
+ description HOU150-08Lab-P68-MS22
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel131
+ switchport
+ switchport trunk allowed vlan 1000-3999,4068
+ switchport mode trunk
+!
+interface Port-channel135
+ description HOU150-08P02E-L104-MS39
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel137
+ description HOU150-08P02E-N107-MS39
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel139
+ description HOU150-08P02E-R111-MS39
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel141
+ description HOU150-RTSN-9K84-MS31
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel143
+ description HOU150-08P03-P79-MS12
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel147
+ description ETC Storage Pod OOB Switch 9Q32
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel149
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel151
+ description ETC OOB Switch Pod1 11/CCC22
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel153
+ description ETC OOB Switch Pod2 11/CCC37
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel155
+ description ETC OOB Switch
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel157
+ description ETC OOB Switch 11DDD58
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel159
+ description ETC OOB Switch
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel161
+ description 9WW71 ETC
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel165
+ description ETC 9VV82  A
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel167
+ description ETC 9VV82  B 
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel169
+ description HOU150-09PBUA-QQ109-MS35
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel173
+ description HOU150-09PBUB-RR114-MS35
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel179
+ description temp DMZ connection to HL
+ switchport
+ switchport trunk allowed vlan 3216
+ switchport mode trunk
+!
+interface Port-channel201
+ description HOU150-09P01-F49-MS37
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel203
+ description HOU150-09P01-E52-MS37
+ switchport
+ switchport trunk allowed vlan 215,1000-3999
+ switchport mode trunk
+!
+interface Port-channel209
+ description HOU150-09-M57-MS35
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel211
+ description HOU150-08-L37-MS41
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel213
+ description HOU150-11-R14-MS32
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel215
+ description HOU150-11-K33-MS39
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel217
+ description HOU150-11-M40-MS33
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel219
+ description HOU150-09-H18-MS33
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel221
+ description HOU150-09-J60-MS36
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel223
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel227
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel229
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface Port-channel231
+ description Rack CC114 Mgmt Switch
+ switchport
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface FastEthernet1
+ vrf forwarding mgmtVrf
+ ip address 146.36.4.200 255.255.255.240
+ no ip proxy-arp
+ speed auto
+ duplex auto
+!
+interface GigabitEthernet1/1/1
+ description HOU150FHS01A Port 17
+ switchport trunk allowed vlan 212-215,217,218
+ switchport mode trunk
+ channel-group 11 mode on
+!
+interface GigabitEthernet1/1/2
+!
+interface GigabitEthernet1/1/3
+ description HOU150FHS01B Port 17
+ switchport trunk allowed vlan 212-215,217,218
+ switchport mode trunk
+ channel-group 12 mode on
+!
+interface GigabitEthernet1/1/4
+!
+interface GigabitEthernet1/1/5
+ description HOU150-09P08-G95-MS40 Gi1/49
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 105 mode active
+!
+interface GigabitEthernet1/1/6
+!
+interface GigabitEthernet1/1/7
+ switchport access vlan 3002
+!
+interface GigabitEthernet1/1/8
+!
+interface GigabitEthernet1/1/9
+ description HOU150-09MDA-M79-MS18 Gi1/3
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 109 mode active
+!
+interface GigabitEthernet1/1/10
+!
+interface GigabitEthernet1/1/11
+ description HOU150-09MDA-M79-MC21 Port 1
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/1/12
+!
+interface GigabitEthernet1/1/13
+ description HOU150-09MDA-M74-MS18 Gi1/3
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 113 mode active
+!
+interface GigabitEthernet1/1/14
+!
+interface GigabitEthernet1/1/15
+ description HOU150-09MDA-M74-MC21 Port 1
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/1/16
+!
+interface GigabitEthernet1/1/17
+ description HOU150-11P01A-E77-MS12 Gi1/3
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 117 mode active
+!
+interface GigabitEthernet1/1/18
+!
+interface GigabitEthernet1/1/19
+ description HOU150-11P01A-E77-MC10 Port 1
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/1/20
+!
+interface GigabitEthernet1/1/21
+ description HOU150-11P01B-E73-MS12 Gi1/3
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 121 mode active
+!
+interface GigabitEthernet1/1/22
+!
+interface GigabitEthernet1/1/23
+ description HOU150-11P01B-E73-MC10 Port 1
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/1/24
+!
+interface GigabitEthernet1/1/25
+ description HOU150-11PKI-K97-MS39 Gi1/3
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 125 mode active
+!
+interface GigabitEthernet1/1/26
+!
+interface GigabitEthernet1/1/27
+ description HOU150-08Lab-P68-MS22 Gi1/3
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 127 mode active
+!
+interface GigabitEthernet1/1/28
+!
+interface GigabitEthernet1/1/29
+ description HOU150-08Lab-P68-MC10
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/1/30
+!
+interface GigabitEthernet1/1/31
+ description HOU150-11P02-E70-MS12 Gi1/3
+ switchport trunk allowed vlan 1000-3999,4068
+ switchport mode trunk
+ channel-group 131 mode active
+!
+interface GigabitEthernet1/1/32
+!
+interface GigabitEthernet1/1/33
+ description HOU150-11P02-E70-MC10 Port 1
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/1/34
+!
+interface GigabitEthernet1/1/35
+ description HOU150-08P02E-L104-MS39 Gi1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 135 mode active
+!
+interface GigabitEthernet1/1/36
+!
+interface GigabitEthernet1/1/37
+ description HOU150-08P02E-N107-MS39 Gi1/1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 137 mode active
+!
+interface GigabitEthernet1/1/38
+!
+interface GigabitEthernet1/1/39
+ description HOU150-08P02E-R111-MS39 Gi1/1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 139 mode active
+!
+interface GigabitEthernet1/1/40
+!
+interface GigabitEthernet1/1/41
+ description HOU150-RTSN-9K84-MS31 Gi1/1/3
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 141 mode active
+!
+interface GigabitEthernet1/1/42
+!
+interface GigabitEthernet1/1/43
+ description HOU150-08P03-P79-MS12 Gi1/1/3
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 143 mode passive
+!
+interface GigabitEthernet1/1/44
+!
+interface GigabitEthernet1/1/45
+ description HOU150-08P03-P79-MC10 Port 1
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/1/46
+!
+interface GigabitEthernet1/1/47
+ description ETC Storage Pod OOB Switch 9Q32
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 147 mode active
+!
+interface GigabitEthernet1/1/48
+!
+interface GigabitEthernet1/1/49
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 149 mode active
+!
+interface GigabitEthernet1/1/50
+!
+interface GigabitEthernet1/1/51
+ description ***   HOU150-ETC-11CCC22-MS
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 151 mode active
+!
+interface GigabitEthernet1/1/52
+!
+interface GigabitEthernet1/1/53
+ description ETC OOB Switch Pod2 11/CCC37
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 153 mode active
+!
+interface GigabitEthernet1/1/54
+!
+interface GigabitEthernet1/1/55
+ description ETC OOB Switch
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+!
+interface GigabitEthernet1/1/56
+!
+interface GigabitEthernet1/1/57
+ description ETC OOB Switch 11DDD58
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 157 mode active
+!
+interface GigabitEthernet1/1/58
+!
+interface GigabitEthernet1/1/59
+ description ETC OOB Switch
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 159 mode active
+!
+interface GigabitEthernet1/1/60
+!
+interface GigabitEthernet1/1/61
+ description ETC 9WW71
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 161 mode active
+!
+interface GigabitEthernet1/1/62
+!
+interface GigabitEthernet1/1/63
+ description reserved for hou150 bu pod
+!
+interface GigabitEthernet1/1/64
+!
+interface GigabitEthernet1/1/65
+ description ETC 9VV82  A 
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 165 mode active
+!
+interface GigabitEthernet1/1/66
+!
+interface GigabitEthernet1/1/67
+ description ETC 9VV82  B 
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 167 mode active
+!
+interface GigabitEthernet1/1/68
+!
+interface GigabitEthernet1/1/69
+ description HOU150-09PBUA-QQ109-MS35 Gi1/1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 169 mode passive
+!
+interface GigabitEthernet1/1/70
+!
+interface GigabitEthernet1/1/71
+ description HOU150-09PBUA-QQ109-MC34
+ switchport access vlan 3002
+!
+interface GigabitEthernet1/1/72
+!
+interface GigabitEthernet1/1/73
+ description HOU150-09PBUB-RR114-MS35 Gi1/1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 173 mode passive
+!
+interface GigabitEthernet1/1/74
+!
+interface GigabitEthernet1/1/75
+ switchport access vlan 3002
+!
+interface GigabitEthernet1/1/76
+!
+interface GigabitEthernet1/1/77
+ description Temp connection to JUNOOB for UNIX OOB VLAN
+ switchport access vlan 1102
+ shutdown
+!
+interface GigabitEthernet1/1/78
+!
+interface GigabitEthernet1/1/79
+ description temp DMZ connection to HL
+ switchport trunk allowed vlan 3216
+ switchport mode trunk
+ channel-group 179 mode active
+!
+interface GigabitEthernet1/1/80
+!
+interface GigabitEthernet1/2/1
+ description HOU150-09P01-F49-MS37
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 201 mode active
+!
+interface GigabitEthernet1/2/2
+!
+interface GigabitEthernet1/2/3
+ description HOU150-09P01-E52-MS37
+ switchport trunk allowed vlan 215,1000-3999
+ switchport mode trunk
+ channel-group 203 mode active
+!
+interface GigabitEthernet1/2/4
+!
+interface GigabitEthernet1/2/5
+ description HOU150-09P01-F49-MC36
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/2/6
+!
+interface GigabitEthernet1/2/7
+ description HOU150-09P01-E52-MC36
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/2/8
+!
+interface GigabitEthernet1/2/9
+ description HOU150-09-M57-MS35 Gi1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 209 mode active
+!
+interface GigabitEthernet1/2/10
+!
+interface GigabitEthernet1/2/11
+ description HOU150-08-L37-MS41 Gi1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 211 mode active
+!
+interface GigabitEthernet1/2/12
+!
+interface GigabitEthernet1/2/13
+ description HOU150-11-R14-MS32 Gi1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 213 mode active
+!
+interface GigabitEthernet1/2/14
+!
+interface GigabitEthernet1/2/15
+ description HOU150-11-K33-MS39 Gi1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 215 mode active
+!
+interface GigabitEthernet1/2/16
+!
+interface GigabitEthernet1/2/17
+ description HOU150-11-M40-MS33 Gi1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 217 mode active
+!
+interface GigabitEthernet1/2/18
+!
+interface GigabitEthernet1/2/19
+ description HOU150-09-H18-MS33 Gi0/15
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 219 mode active
+!
+interface GigabitEthernet1/2/20
+!
+interface GigabitEthernet1/2/21
+ description HOU150-09-J60-MS36 Gi1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 221 mode active
+!
+interface GigabitEthernet1/2/22
+!
+interface GigabitEthernet1/2/23
+ description HOU150-09P09-E67-MS37
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 223 mode active
+!
+interface GigabitEthernet1/2/24
+!
+interface GigabitEthernet1/2/25
+ description HOU150-09P08-E67-MC38 
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/2/26
+!
+interface GigabitEthernet1/2/27
+ description HOU150-09P07-QQ109-MS24
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 227 mode active
+!
+interface GigabitEthernet1/2/28
+!
+interface GigabitEthernet1/2/29
+ description HOU150-09P07-RR114-MS24
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 229 mode active
+!
+interface GigabitEthernet1/2/30
+!
+interface GigabitEthernet1/2/31
+ description Rack CC114 Mgmt Gi1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 231 mode active
+!
+interface GigabitEthernet1/2/32
+!
+interface GigabitEthernet1/2/33
+!
+interface GigabitEthernet1/2/34
+!
+interface GigabitEthernet1/2/35
+!
+interface GigabitEthernet1/2/36
+!
+interface GigabitEthernet1/2/37
+!
+interface GigabitEthernet1/2/38
+!
+interface GigabitEthernet1/2/39
+!
+interface GigabitEthernet1/2/40
+!
+interface GigabitEthernet1/2/41
+!
+interface GigabitEthernet1/2/42
+!
+interface GigabitEthernet1/2/43
+!
+interface GigabitEthernet1/2/44
+!
+interface GigabitEthernet1/2/45
+!
+interface GigabitEthernet1/2/46
+!
+interface GigabitEthernet1/2/47
+!
+interface GigabitEthernet1/2/48
+!
+interface GigabitEthernet1/2/49
+!
+interface GigabitEthernet1/2/50
+!
+interface GigabitEthernet1/2/51
+!
+interface GigabitEthernet1/2/52
+!
+interface GigabitEthernet1/2/53
+!
+interface GigabitEthernet1/2/54
+!
+interface GigabitEthernet1/2/55
+!
+interface GigabitEthernet1/2/56
+!
+interface GigabitEthernet1/2/57
+!
+interface GigabitEthernet1/2/58
+!
+interface GigabitEthernet1/2/59
+!
+interface GigabitEthernet1/2/60
+!
+interface GigabitEthernet1/2/61
+!
+interface GigabitEthernet1/2/62
+!
+interface GigabitEthernet1/2/63
+!
+interface GigabitEthernet1/2/64
+!
+interface GigabitEthernet1/2/65
+!
+interface GigabitEthernet1/2/66
+!
+interface GigabitEthernet1/2/67
+!
+interface GigabitEthernet1/2/68
+!
+interface GigabitEthernet1/2/69
+!
+interface GigabitEthernet1/2/70
+!
+interface GigabitEthernet1/2/71
+!
+interface GigabitEthernet1/2/72
+!
+interface GigabitEthernet1/2/73
+!
+interface GigabitEthernet1/2/74
+!
+interface GigabitEthernet1/2/75
+!
+interface GigabitEthernet1/2/76
+!
+interface GigabitEthernet1/2/77
+!
+interface GigabitEthernet1/2/78
+!
+interface GigabitEthernet1/2/79
+!
+interface GigabitEthernet1/2/80
+!
+interface TenGigabitEthernet1/3/1
+ switchport mode trunk
+ switchport nonegotiate
+ no cdp enable
+ no lldp transmit
+ no lldp receive
+ channel-group 1 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet1/3/2
+ switchport mode trunk
+ switchport nonegotiate
+ no cdp enable
+ no lldp transmit
+ no lldp receive
+ channel-group 1 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet1/3/3
+!
+interface TenGigabitEthernet1/3/4
+!
+interface GigabitEthernet2/1/1
+ description HOU150FHS01A Port 18
+ switchport trunk allowed vlan 212-215,217,218
+ switchport mode trunk
+ channel-group 11 mode on
+!
+interface GigabitEthernet2/1/2
+!
+interface GigabitEthernet2/1/3
+ description HOU150FHS01B Port 18
+ switchport trunk allowed vlan 212-215,217,218
+ switchport mode trunk
+ channel-group 12 mode on
+!
+interface GigabitEthernet2/1/4
+!
+interface GigabitEthernet2/1/5
+ description HOU150-09P08-G95-MS40 Gi1/50
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 105 mode active
+!
+interface GigabitEthernet2/1/6
+!
+interface GigabitEthernet2/1/7
+ switchport access vlan 3002
+!
+interface GigabitEthernet2/1/8
+!
+interface GigabitEthernet2/1/9
+ description HOU150-09MDA-M79-MS18 Gi1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 109 mode active
+!
+interface GigabitEthernet2/1/10
+!
+interface GigabitEthernet2/1/11
+ description HOU150-09MDA-M79-MC21 Port 2
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/1/12
+!
+interface GigabitEthernet2/1/13
+ description HOU150-09MDA-M74-MS18 Gi1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 113 mode active
+!
+interface GigabitEthernet2/1/14
+!
+interface GigabitEthernet2/1/15
+ description HOU150-09MDA-M74-MC21 Port 2
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/1/16
+!
+interface GigabitEthernet2/1/17
+ description HOU150-11P01A-E77-MS12 Gi1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 117 mode active
+!
+interface GigabitEthernet2/1/18
+!
+interface GigabitEthernet2/1/19
+ description HOU150-11P01A-E77-MC10 Port 2
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/1/20
+!
+interface GigabitEthernet2/1/21
+ description HOU150-11P01B-E73-MS12 Gi1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 121 mode active
+!
+interface GigabitEthernet2/1/22
+!
+interface GigabitEthernet2/1/23
+ description HOU150-11P01B-E73-MC10 Port 2
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/1/24
+!
+interface GigabitEthernet2/1/25
+ description HOU150-11PKI-K97-MS39 Gi1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 125 mode active
+!
+interface GigabitEthernet2/1/26
+!
+interface GigabitEthernet2/1/27
+ description HOU150-08Lab-P68-MS22 Gi1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 127 mode active
+!
+interface GigabitEthernet2/1/28
+!
+interface GigabitEthernet2/1/29
+!
+interface GigabitEthernet2/1/30
+!
+interface GigabitEthernet2/1/31
+ description HOU150-11P02-E70-MS12 Gi1/4
+ switchport trunk allowed vlan 1000-3999,4068
+ switchport mode trunk
+ channel-group 131 mode active
+!
+interface GigabitEthernet2/1/32
+!
+interface GigabitEthernet2/1/33
+ description HOU150-11P02-E70-MC10 Port 2
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/1/34
+!
+interface GigabitEthernet2/1/35
+ description HOU150-08P02E-L104-MS39 Gi1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 135 mode active
+!
+interface GigabitEthernet2/1/36
+!
+interface GigabitEthernet2/1/37
+ description HOU150-08P02E-N107-MS39 Gi1/1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 137 mode active
+!
+interface GigabitEthernet2/1/38
+!
+interface GigabitEthernet2/1/39
+ description HOU150-08P02E-R111-MS39 Gi1/1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 139 mode active
+!
+interface GigabitEthernet2/1/40
+!
+interface GigabitEthernet2/1/41
+ description HOU150-RTSN-9K84-MS31 Gi1/1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 141 mode active
+!
+interface GigabitEthernet2/1/42
+!
+interface GigabitEthernet2/1/43
+ description HOU150-08P03-P79-MS12 Gi1/1/4
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 143 mode passive
+!
+interface GigabitEthernet2/1/44
+!
+interface GigabitEthernet2/1/45
+ description HOU150-08P03-P79-MC10 Port 2
+ switchport access vlan 2
+ switchport mode access
+ shutdown
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/1/46
+!
+interface GigabitEthernet2/1/47
+ description ETC Storage Pod OOB Switch 9Q32
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 147 mode active
+!
+interface GigabitEthernet2/1/48
+!
+interface GigabitEthernet2/1/49
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 149 mode active
+!
+interface GigabitEthernet2/1/50
+!
+interface GigabitEthernet2/1/51
+ description ETC OOB Switch Pod1 11/CCC22
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 151 mode active
+!
+interface GigabitEthernet2/1/52
+!
+interface GigabitEthernet2/1/53
+ description ETC OOB Switch Pod2 11/CCC37
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 153 mode active
+!
+interface GigabitEthernet2/1/54
+!
+interface GigabitEthernet2/1/55
+ description ETC OOB Switch
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 155 mode active
+!
+interface GigabitEthernet2/1/56
+!
+interface GigabitEthernet2/1/57
+ description ETC OOB Switch 11DDD58
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 157 mode active
+!
+interface GigabitEthernet2/1/58
+!
+interface GigabitEthernet2/1/59
+ description ETC OOB Switch
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 159 mode active
+!
+interface GigabitEthernet2/1/60
+!
+interface GigabitEthernet2/1/61
+ description ETC 9WW71
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 161 mode active
+!
+interface GigabitEthernet2/1/62
+!
+interface GigabitEthernet2/1/63
+ description reserved for hou150 bu pod
+!
+interface GigabitEthernet2/1/64
+!
+interface GigabitEthernet2/1/65
+ description ETC 9VV82  A 
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 165 mode active
+!
+interface GigabitEthernet2/1/66
+!
+interface GigabitEthernet2/1/67
+ description ETC 9VV82  B 
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 167 mode active
+!
+interface GigabitEthernet2/1/68
+!
+interface GigabitEthernet2/1/69
+ description HOU150-09PBUA-QQ109-MS35 Gi1/1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 169 mode passive
+!
+interface GigabitEthernet2/1/70
+!
+interface GigabitEthernet2/1/71
+ switchport access vlan 3002
+!
+interface GigabitEthernet2/1/72
+!
+interface GigabitEthernet2/1/73
+ description HOU150-09PBUB-RR114-MS35 Gi1/1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 173 mode passive
+!
+interface GigabitEthernet2/1/74
+!
+interface GigabitEthernet2/1/75
+ switchport access vlan 3002
+!
+interface GigabitEthernet2/1/76
+!
+interface GigabitEthernet2/1/77
+!
+interface GigabitEthernet2/1/78
+!
+interface GigabitEthernet2/1/79
+ description temp DMZ connection to HL
+ switchport trunk allowed vlan 3216
+ switchport mode trunk
+ channel-group 179 mode active
+!
+interface GigabitEthernet2/1/80
+!
+interface GigabitEthernet2/2/1
+ description HOU150-09P01-F49-MS37
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 201 mode active
+!
+interface GigabitEthernet2/2/2
+!
+interface GigabitEthernet2/2/3
+ description HOU150-09P01-E52-MS37
+ switchport trunk allowed vlan 215,1000-3999
+ switchport mode trunk
+ channel-group 203 mode active
+!
+interface GigabitEthernet2/2/4
+!
+interface GigabitEthernet2/2/5
+ description HOU150-09P01-F49-MC36
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/2/6
+!
+interface GigabitEthernet2/2/7
+ description HOU150-09P01-E52-MC36
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/2/8
+!
+interface GigabitEthernet2/2/9
+ description HOU150-09-M57-MS35 Gi1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 209 mode active
+!
+interface GigabitEthernet2/2/10
+!
+interface GigabitEthernet2/2/11
+ description HOU150-08-L37-MS41 Gi1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 211 mode active
+!
+interface GigabitEthernet2/2/12
+!
+interface GigabitEthernet2/2/13
+ description HOU150-11-R14-MS32 Gi1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 213 mode active
+!
+interface GigabitEthernet2/2/14
+!
+interface GigabitEthernet2/2/15
+ description HOU150-11-K33-MS39 Gi1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 215 mode active
+!
+interface GigabitEthernet2/2/16
+!
+interface GigabitEthernet2/2/17
+ description HOU150-11-M40-MS33 Gi1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 217 mode active
+!
+interface GigabitEthernet2/2/18
+!
+interface GigabitEthernet2/2/19
+ description HOU150-09-H18-MS33 Gi0/16
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 219 mode active
+!
+interface GigabitEthernet2/2/20
+!
+interface GigabitEthernet2/2/21
+ description HOU150-09-J60-MS36 Gi1/2
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 221 mode active
+!
+interface GigabitEthernet2/2/22
+!
+interface GigabitEthernet2/2/23
+ description HOU150-09P09-E67-MS37
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 223 mode active
+!
+interface GigabitEthernet2/2/24
+!
+interface GigabitEthernet2/2/25
+ description HOU150-09P08-E67-MC38 
+ switchport access vlan 3002
+ switchport mode access
+ spanning-tree portfast edge
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet2/2/26
+!
+interface GigabitEthernet2/2/27
+ description HOU150-09P07-QQ109-MS24
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 227 mode active
+!
+interface GigabitEthernet2/2/28
+!
+interface GigabitEthernet2/2/29
+ description HOU150-09P07-RR114-MS24
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 229 mode active
+!
+interface GigabitEthernet2/2/30
+!
+interface GigabitEthernet2/2/31
+ description Rack CC114 Mgmt Gi1/1
+ switchport trunk allowed vlan 1000-3999
+ switchport mode trunk
+ channel-group 231 mode active
+!
+interface GigabitEthernet2/2/32
+!
+interface GigabitEthernet2/2/33
+!
+interface GigabitEthernet2/2/34
+!
+interface GigabitEthernet2/2/35
+!
+interface GigabitEthernet2/2/36
+!
+interface GigabitEthernet2/2/37
+!
+interface GigabitEthernet2/2/38
+!
+interface GigabitEthernet2/2/39
+!
+interface GigabitEthernet2/2/40
+!
+interface GigabitEthernet2/2/41
+!
+interface GigabitEthernet2/2/42
+!
+interface GigabitEthernet2/2/43
+!
+interface GigabitEthernet2/2/44
+!
+interface GigabitEthernet2/2/45
+!
+interface GigabitEthernet2/2/46
+!
+interface GigabitEthernet2/2/47
+!
+interface GigabitEthernet2/2/48
+!
+interface GigabitEthernet2/2/49
+!
+interface GigabitEthernet2/2/50
+!
+interface GigabitEthernet2/2/51
+!
+interface GigabitEthernet2/2/52
+!
+interface GigabitEthernet2/2/53
+!
+interface GigabitEthernet2/2/54
+!
+interface GigabitEthernet2/2/55
+!
+interface GigabitEthernet2/2/56
+!
+interface GigabitEthernet2/2/57
+!
+interface GigabitEthernet2/2/58
+!
+interface GigabitEthernet2/2/59
+!
+interface GigabitEthernet2/2/60
+!
+interface GigabitEthernet2/2/61
+!
+interface GigabitEthernet2/2/62
+!
+interface GigabitEthernet2/2/63
+!
+interface GigabitEthernet2/2/64
+!
+interface GigabitEthernet2/2/65
+!
+interface GigabitEthernet2/2/66
+!
+interface GigabitEthernet2/2/67
+!
+interface GigabitEthernet2/2/68
+!
+interface GigabitEthernet2/2/69
+!
+interface GigabitEthernet2/2/70
+!
+interface GigabitEthernet2/2/71
+!
+interface GigabitEthernet2/2/72
+!
+interface GigabitEthernet2/2/73
+!
+interface GigabitEthernet2/2/74
+!
+interface GigabitEthernet2/2/75
+!
+interface GigabitEthernet2/2/76
+!
+interface GigabitEthernet2/2/77
+!
+interface GigabitEthernet2/2/78
+!
+interface GigabitEthernet2/2/79
+!
+interface GigabitEthernet2/2/80
+!
+interface TenGigabitEthernet2/3/1
+ switchport mode trunk
+ switchport nonegotiate
+ no cdp enable
+ no lldp transmit
+ no lldp receive
+ channel-group 2 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet2/3/2
+ switchport mode trunk
+ switchport nonegotiate
+ no cdp enable
+ no lldp transmit
+ no lldp receive
+ channel-group 2 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet2/3/3
+!
+interface TenGigabitEthernet2/3/4
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan2
+ ip address 192.168.0.6 255.255.255.0
+ no ip proxy-arp
+!
+interface Vlan212
+ description OoB Mgmt DMZ Uplink for IRSM
+ ip vrf forwarding OoB.IRSM
+ ip address 134.248.208.221 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan213
+ description OoB Mgmt DMZ Uplink for ITC DC PDU
+ ip vrf forwarding OoB.ITC.DC
+ ip address 134.248.208.217 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan214
+ description OoB Mgmt DMZ Uplink for ITC Storage
+ ip vrf forwarding OoB.ITC.Storage
+ ip address 134.248.208.226 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan215
+ description OoB Mgmt DMZ Uplink for ITC Server
+ ip vrf forwarding OoB.ITC.Servers
+ ip address 134.248.208.213 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan217
+ description OoB Mgmt DMZ Uplink for ITC Network
+ ip vrf forwarding OoB.ITC.Network
+ ip address 134.248.208.209 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan218
+ description ETC HPC Network OOB
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 134.248.208.229 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan1100
+ description ITC Servers 8th floor lab # 10.5.246.0/23
+ ip vrf forwarding OoB.ITC.Servers
+ ip address 10.5.246.1 255.255.254.0
+ ip helper-address 134.248.200.20 
+ no ip proxy-arp
+!
+interface Vlan1101
+ description ITC Servers 11th floor Pod 01 # 10.5.248.0/23
+ ip vrf forwarding OoB.ITC.Servers
+ ip address 10.5.248.1 255.255.254.0
+ ip helper-address 134.248.200.20 
+ no ip proxy-arp
+!
+interface Vlan1102
+ description ITC Servers 11th floor Pod 02 # 10.5.250.0/23
+ ip vrf forwarding OoB.ITC.Servers
+ ip address 10.0.0.1 255.255.0.0 secondary
+ ip address 10.5.250.1 255.255.254.0
+ ip helper-address 134.248.200.20 
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan1103
+ description ITC Servers 11th floor Pod 03 # 10.5.252.0/23
+ ip vrf forwarding OoB.ITC.Servers
+ ip address 10.5.252.1 255.255.254.0
+ no ip proxy-arp
+!
+interface Vlan2001
+ description OOB for servers HPC.cluster.Pod1
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 10.7.168.1 255.255.248.0
+ no ip proxy-arp
+!
+interface Vlan2002
+ description OOB for servers HPC.Blade.Pod2-9th floor
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 10.7.176.1 255.255.248.0
+ no ip proxy-arp
+!
+interface Vlan2003
+ description OOB for servers HPC.Blade.Pod3-9th floor
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 10.7.184.1 255.255.248.0
+ no ip proxy-arp
+!
+interface Vlan2004
+ description OOB for servers HPC.cluster.Pod5
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 10.7.208.1 255.255.248.0
+ no ip proxy-arp
+!
+interface Vlan2005
+ description OOB for blade pod1
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 10.7.192.1 255.255.248.0
+ no ip proxy-arp
+!
+interface Vlan2006
+ description OOB for Storage Pod 9Q32 ETc HPC
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 10.7.200.1 255.255.248.0
+ no ip proxy-arp
+!
+interface Vlan2007
+ description OOB for pod2 11CCC37
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 10.7.160.1 255.255.248.0
+ no ip proxy-arp
+!
+interface Vlan3002
+ description Network OoB MC
+ ip vrf forwarding OoB.ITC.Network
+ ip address 134.248.214.1 255.255.255.0
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan3003
+ description Network OoB Nexus
+ ip vrf forwarding OoB.ITC.Network
+ ip address 134.248.209.1 255.255.255.0
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan3010
+ ip vrf forwarding OoB.ITC.DC
+ ip address 10.1.24.1 255.255.248.0
+ no ip proxy-arp
+!
+interface Vlan3020
+ description OoB.ITC.Storage
+ ip vrf forwarding OoB.ITC.Storage
+ ip address 10.3.248.1 255.255.248.0
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan3212
+ description 134.248.212.0/24.OoB.IRSM
+ ip vrf forwarding OoB.IRSM
+ ip address 134.248.212.1 255.255.255.0
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan3218
+ description ETC HPC OOB Network
+ ip vrf forwarding OoB.ETC.HPC
+ ip address 134.248.213.1 255.255.255.0
+ no ip redirects
+ no ip proxy-arp
+!
+router bgp 65076
+ bgp router-id 134.248.208.250
+ bgp log-neighbor-changes
+ !
+ address-family ipv4 vrf OoB.ETC.HPC
+  network 10.7.0.0 mask 255.255.0.0
+  network 10.7.160.0 mask 255.255.248.0
+  network 10.7.168.0 mask 255.255.248.0
+  network 10.7.176.0 mask 255.255.248.0
+  network 10.7.184.0 mask 255.255.248.0
+  network 10.7.192.0 mask 255.255.248.0
+  network 10.7.200.0 mask 255.255.248.0
+  network 10.7.208.0 mask 255.255.248.0
+  network 134.248.208.228 mask 255.255.255.252
+  network 134.248.213.0 mask 255.255.255.0
+  neighbor 134.248.208.230 remote-as 65074
+  neighbor 134.248.208.230 description Mgmt-FW
+  neighbor 134.248.208.230 activate
+  neighbor 134.248.208.230 send-community
+  neighbor 134.248.208.230 soft-reconfiguration inbound
+ exit-address-family
+ !
+ address-family ipv4 vrf OoB.IRSM
+  network 134.248.208.220 mask 255.255.255.252
+  network 134.248.212.0 mask 255.255.255.0
+  neighbor 134.248.208.222 remote-as 65074
+  neighbor 134.248.208.222 description Mgmt-FW
+  neighbor 134.248.208.222 activate
+  neighbor 134.248.208.222 send-community
+  neighbor 134.248.208.222 soft-reconfiguration inbound
+ exit-address-family
+ !
+ address-family ipv4 vrf OoB.ITC.DC
+  network 10.1.24.0 mask 255.255.248.0
+  network 134.248.208.216 mask 255.255.255.252
+  neighbor 134.248.208.218 remote-as 65074
+  neighbor 134.248.208.218 description Mgmt-FW
+  neighbor 134.248.208.218 activate
+  neighbor 134.248.208.218 send-community
+  neighbor 134.248.208.218 soft-reconfiguration inbound
+  neighbor 134.248.208.218 route-map OoB.ITC.DC out
+ exit-address-family
+ !
+ address-family ipv4 vrf OoB.ITC.Network
+  network 134.248.208.208 mask 255.255.255.252
+  network 134.248.208.250 mask 255.255.255.255
+  network 134.248.209.0 mask 255.255.255.0
+  network 134.248.214.0 mask 255.255.255.0
+  neighbor 134.248.208.210 remote-as 65074
+  neighbor 134.248.208.210 description Mgmt-FW
+  neighbor 134.248.208.210 activate
+  neighbor 134.248.208.210 send-community
+  neighbor 134.248.208.210 soft-reconfiguration inbound
+ exit-address-family
+ !
+ address-family ipv4 vrf OoB.ITC.Servers
+  network 10.0.0.0 mask 255.255.0.0
+  network 10.5.246.0 mask 255.255.254.0
+  network 10.5.248.0 mask 255.255.254.0
+  network 10.5.250.0 mask 255.255.254.0
+  network 10.5.252.0 mask 255.255.254.0
+  network 10.5.254.0 mask 255.255.255.192
+  network 134.248.208.212 mask 255.255.255.252
+  neighbor 134.248.208.214 remote-as 65074
+  neighbor 134.248.208.214 description Mgmt-FW
+  neighbor 134.248.208.214 activate
+  neighbor 134.248.208.214 send-community
+  neighbor 134.248.208.214 soft-reconfiguration inbound
+  neighbor 134.248.208.214 route-map OoB.ITC.Servers out
+ exit-address-family
+ !
+ address-family ipv4 vrf OoB.ITC.Storage
+  network 10.3.248.0 mask 255.255.248.0
+  network 134.248.208.224 mask 255.255.255.252
+  neighbor 134.248.208.225 remote-as 65074
+  neighbor 134.248.208.225 description Mgmt-FW
+  neighbor 134.248.208.225 activate
+  neighbor 134.248.208.225 send-community
+  neighbor 134.248.208.225 soft-reconfiguration inbound
+  neighbor 134.248.208.225 route-map OoB.ITC.Storage out
+ exit-address-family
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+no ip http server
+no ip http secure-server
+!
+ip tftp source-interface FastEthernet1
+ip route 10.5.0.0 255.255.0.0 Null0 name BGP.Seed.OoB.ITC.Serversend
+ip route vrf mgmtVrf 0.0.0.0 0.0.0.0 146.36.4.193
+ip route vrf OoB.IRSM 0.0.0.0 0.0.0.0 134.248.208.222 250
+ip route vrf OoB.ITC.Storage 134.248.200.0 255.255.255.192 134.248.208.225 250 name Mgmt.DMZ.Common.Services
+ip route vrf OoB.ITC.Storage 134.248.201.128 255.255.255.192 134.248.208.225 250 name Mgmt.DMZ.Data.Hosting
+ip tacacs source-interface FastEthernet1
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+ip access-list extended VSL-BFD
+ permit udp any any eq 3784
+ip access-list extended VSL-DHCP-CLIENT-TO-SERVER
+ permit udp any eq bootpc any eq bootps
+ip access-list extended VSL-DHCP-SERVER-TO-CLIENT
+ permit udp any eq bootps any eq bootpc
+ip access-list extended VSL-DHCP-SERVER-TO-SERVER
+ permit udp any eq bootps any eq bootps
+ip access-list extended VSL-IPV4-ROUTING
+ permit ip any 224.0.0.0 0.0.0.255
+!
+!
+ip prefix-list OoB.ITC.DC seq 1 deny 0.0.0.0/0
+ip prefix-list OoB.ITC.DC seq 5 permit 10.1.0.0/16 le 28
+!
+ip prefix-list OoB.ITC.DC.FW.UPLINK seq 1 deny 0.0.0.0/0
+ip prefix-list OoB.ITC.DC.FW.UPLINK seq 5 permit 134.248.208.216/30
+!
+ip prefix-list OoB.ITC.Servers seq 1 deny 0.0.0.0/0
+ip prefix-list OoB.ITC.Servers seq 5 permit 10.5.0.0/16 le 28
+ip prefix-list OoB.ITC.Servers seq 10 permit 10.0.0.0/16 le 28
+!
+ip prefix-list OoB.ITC.Servers.FW.UPLINK seq 1 deny 0.0.0.0/0
+ip prefix-list OoB.ITC.Servers.FW.UPLINK seq 5 permit 134.248.208.212/30
+!
+ip prefix-list OoB.ITC.Storage seq 1 deny 0.0.0.0/0
+ip prefix-list OoB.ITC.Storage seq 5 permit 10.3.0.0/16 le 28
+!
+ip prefix-list OoB.ITC.Storage.FW.UPLINK seq 1 deny 0.0.0.0/0
+ip prefix-list OoB.ITC.Storage.FW.UPLINK seq 5 permit 134.248.208.224/30
+logging source-interface FastEthernet1 vrf mgmtVrf
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+access-list 1530 permit 199.103.13.0 0.0.0.255
+access-list 1530 permit 199.103.14.0 0.0.0.255
+access-list 1530 deny   any log
+!
+route-map OoB.ITC.DC permit 5
+ match ip address prefix-list OoB.ITC.DC.FW.UPLINK
+!
+route-map OoB.ITC.DC permit 10
+ match ip address prefix-list OoB.ITC.DC
+ set community no-advertise
+!
+route-map OoB.ITC.Storage permit 5
+ match ip address prefix-list OoB.ITC.Storage.FW.UPLINK
+!
+route-map OoB.ITC.Storage permit 10
+ match ip address prefix-list OoB.ITC.Storage
+ set community no-advertise
+!
+route-map OoB.ITC.Servers permit 5
+ match ip address prefix-list OoB.ITC.Servers.FW.UPLINK
+!
+route-map OoB.ITC.Servers permit 10
+ match ip address prefix-list OoB.ITC.Servers
+ set community no-advertise
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source FastEthernet1
+snmp-server location HOU150 / 1500 Louisiana Street, Houston,TX  / USA /Americas /US-NA-Utility-Data-center/Criticality-High
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps transceiver all
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+!
+tftp-server bootflash:n6000-uk9-kickstart.7.1.4.N1.1.bin
+tftp-server bootflash:n6000-uk9-kickstart.7.3.3.N1.1.bin
+tftp-server bootflash:n6000-uk9.7.3.3.N1.1.bin
+tacacs-server host 139.65.136.58
+tacacs-server host 139.65.143.4
+tacacs-server timeout 10
+tacacs-server key 7 06031D344F4B1A1606041B08
+!
+!
+!
+ipv6 access-list VSL-IPV6-ROUTING
+ permit ipv6 any FF02::/124
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred ssh
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred ssh
+ transport input ssh
+!
+!
+module provision switch 1
+ chassis-type 68 base-mac 5897.BD35.6180
+ slot 1 slot-type 396 base-mac 54A2.742D.D090
+ slot 2 slot-type 396 base-mac 54A2.742D.D0E0
+ slot 3 slot-type 390 base-mac 5897.BD35.6180
+ !
+module provision switch 2
+ chassis-type 68 base-mac 5897.BDE9.EDC0
+ slot 1 slot-type 396 base-mac E865.4916.28C0
+ slot 2 slot-type 396 base-mac 54A2.742D.CC80
+ slot 3 slot-type 390 base-mac 5897.BDE9.EDC0
+ 
+!
+
+ ntp source FastEthernet1
+ ntp access-group peer 40
+ ntp server vrf mgmtVrf 146.38.37.9
+ ntp server 146.38.37.9
+ ntp server vrf mgmtVrf 146.22.70.251
+ ntp server 146.22.70.251
+ ntp server vrf mgmtVrf 146.40.10.21
+ ntp server 146.40.10.21
+ !
+end

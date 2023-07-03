@@ -1,0 +1,3426 @@
+Building configuration...
+
+Current configuration : 84912 bytes
+!
+! Last configuration change at 16:52:15 CDT Sun Jun 18 2023 by jvtc
+! NVRAM config last updated at 16:52:15 CDT Sun Jun 18 2023 by jvtc
+!
+version 17.3
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service internal
+service call-home
+no platform punt-keepalive disable-kernel-core
+!
+hostname bchrl01-vss
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name HOU2_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group AAA 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CST -6 0
+clock summer-time CDT recurring
+switch 1 provision c9606r
+    provision slot 1 C9600-LC-48YL
+    provision slot 2 C9600-LC-48YL
+    provision slot 3 C9600-SUP-1
+    provision slot 5 C9600-LC-48YL
+    provision slot 6 C9600-LC-48YL
+switch 2 provision c9606r
+    provision slot 1 C9600-LC-48YL
+    provision slot 2 C9600-LC-48YL
+    provision slot 3 C9600-SUP-1
+    provision slot 5 C9600-LC-48YL
+    provision slot 6 C9600-LC-48YL
+boot system bootflash:packages.conf
+power redundancy-mode switch 1 combined
+power redundancy-mode switch 2 combined
+stackwise-virtual
+ domain 10
+!
+ip multicast-routing 
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast route-limit 1000 900
+ip name-server 146.36.80.34 146.25.65.14
+ip domain lookup source-interface Loopback0
+ip domain name bch.chevrontexaco.net
+ip accounting-threshold 100
+ip dhcp excluded-address 146.25.17.1 146.25.17.10
+!
+ip dhcp pool 1
+ network 146.25.17.0 255.255.255.0
+ default-router 146.25.17.1 
+ domain-name bch.chevrontexaco.net
+ dns-server 146.25.65.30 146.36.80.34 
+ netbios-node-type h-node
+ option 43 ip 146.25.17.4 
+ option 60 ascii ArubaAP
+ lease 30
+!
+!
+!
+login on-failure log
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+vtp domain BCH
+vtp mode transparent
+no device-tracking logging theft
+!
+key chain EIGRPAuth
+ key 0
+  key-string 7 1216041C0204050A3E090700
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+crypto pki trustpoint TP-self-signed-2353510196
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2353510196
+ revocation-check none
+ rsakeypair TP-self-signed-2353510196
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+crypto pki certificate chain TP-self-signed-2353510196
+!
+crypto pki certificate pool
+ cabundle nvram:ios_core.p7b
+!
+!
+license boot level network-advantage addon dna-advantage
+!
+!
+diagnostic bootup level complete
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge bpduguard default
+spanning-tree extend system-id
+spanning-tree backbonefast
+spanning-tree vlan 100,160,170,182,200,400-401,700,990 priority 24576
+archive
+ log config
+  logging enable
+ path bootflash:cvx_030128
+ maximum 5
+memory free low-watermark processor 193607
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode sso
+!
+!
+!
+!
+!
+!
+transceiver type all
+ monitoring
+vlan dot1q tag native 
+!
+vlan 2,12,25 
+!
+vlan 100
+ name 146.25.72.0/23.Data
+!
+vlan 105
+ name Weight_scale_network
+!
+vlan 160
+ name IOT
+!
+vlan 170
+ name 146.25.17.0/24_BCHWLC
+!
+vlan 182
+ name 146.25.82.0/23_BCHNRWIFI
+!
+vlan 200
+ name Voice-Vlan
+!
+vlan 300
+ name 146.25.76.0/25.BCHWLAN.Bus
+!
+vlan 310 
+!
+vlan 400
+ name 146.25.74.0/24
+!
+vlan 700
+ name 146.25.75.0/25_Printers
+!
+vlan 888
+ name Internet_Anywhere
+!
+vlan 900
+ name Native-VLAN
+!
+vlan 907
+ name BCHASA-FO-INT
+!
+vlan 908
+ name BCHASA-ST-FO
+!
+vlan 990
+ name 146.25.75.128/26
+!
+vlan 999
+ name Native-Vlan
+!
+vlan 2001
+ name BCHRA1-Datacenter-280-BCHRL01-VS
+!
+vlan 2002
+ name BCHRA2-Mini-POD-BCHRL01-VSS
+lldp run
+!
+!
+class-map match-any system-cpp-police-ewlc-control
+  description EWLC Control 
+class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data packets, LOGGING, Transit Traffic
+class-map match-any system-cpp-default
+  description EWLC Data, Inter FED Traffic 
+class-map match-any system-cpp-police-sys-data
+  description Openflow, Exception, EGR Exception, NFL Sampled Data, RPF Failed
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any LAN-MARK-DEFAULT-VLAN
+ match access-group name MARK-DSCP-DEFAULT-VLAN
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-high-rate-app
+  description High Rate Applications 
+class-map match-any system-cpp-police-multicast
+  description MCAST Data
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+  description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any LAN-CS3
+ match ip dscp cs3  af31 
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual OOB
+class-map match-any LAN-MARK-AF1-VLAN
+ match access-group name MARK-DSCP-AF11-VLAN
+class-map match-any LAN-MARK-AF2-VLAN
+ match access-group name MARK-DSCP-AF21-VLAN
+class-map match-any non-client-nrt-class
+class-map match-any LAN-MARK-AF4-VLAN
+ match access-group name MARK-DSCP-AF41-VLAN
+class-map match-any system-cpp-police-routing-control
+  description Routing control and Low Latency
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any LAN-EF
+ match ip dscp ef 
+class-map match-any system-cpp-police-ios-routing
+  description L2 control, Topology control, Routing control, Low Latency
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+class-map match-any system-cpp-police-ios-feature
+  description ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed
+!
+policy-map SETDSCP-VLAN
+ class LAN-EF
+ class LAN-CS3
+ class LAN-MARK-AF4-VLAN
+ class LAN-MARK-AF2-VLAN
+ class LAN-MARK-AF1-VLAN
+  police cir 10000000000 conform-action set-dscp-transmit af11 exceed-action transmit 
+ class LAN-MARK-DEFAULT-VLAN
+  police cir 10000000000 conform-action set-dscp-transmit default exceed-action set-dscp-transmit default
+ class class-default
+policy-map system-cpp-policy
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 146.25.75.249 255.255.255.255
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+ load-interval 30
+!
+interface Port-channel1
+ description VSS System Port Channel - DO NOT DELETE OR AMEND!!!!!
+ no switchport
+ no ip address
+!
+interface Port-channel2
+ description VSS System Port Channel - DO NOT DELETE OR AMEND!!!!!
+ no switchport
+ no ip address
+!
+interface Port-channel3
+ description BCHWC-01
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+!
+interface Port-channel10
+ description *** Uplink to BCHSL1 (Admin 154) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,160,170,182,200,400,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel11
+ description *** Uplink to BCHSL2 (Admin 257) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,160,170,182,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel12
+ description *** Uplink to BCHSL3 (B & S) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel13
+ description *** Uplink to BCHSL4 (CCR) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel14
+ description *** Uplink to BCHSL5 (Cogen) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel15
+ description *** Uplink to BCHSL6 (Contractor Shed) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel16
+ description *** Uplink to BCHSL7 (Ecology) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel17
+ description *** Uplink to  BCHSL8_Filter***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel18
+ description *** Uplink to BCHSL9 (Fuel Blends) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel19
+ description *** Uplink to BCHSL10 (Gate C) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel21
+ description *** Uplink to BCHSL12 (Gate 3) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel22
+ description *** Uplink to BCHSL13 (Lab 1st Floor) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel23
+ description *** Uplink to BCHSL14 (Lab 3rd Floor) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel24
+ description *** Uplink to BCHSL15 (Maint - First Aid) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel25
+ description *** Uplink to BCHSL16 (Maint - StoreRm) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel26
+ description *** Uplink to BCHSL17 (I & E Shop) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel27
+ description *** Uplink to BCHSL18 (OPLC) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel28
+ description *** Uplink to BCHSL19 (PIB) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,170,200,400,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel29
+ description *** BCHSL20 ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel30
+ description *** Uplink to BCHSL21 (Reliability) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel31
+ description *** Uplink to BCHSL22 (Tank Truck) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,105,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel32
+ description *** Uplink to BCHSL23 (Tech 223) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel33
+ description *** Uplink to BCHSL24 (Tool Room) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel34
+ description *** Uplink to BCHSL25 (Utilities) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel35
+ description *** Uplink to BCHSL26 (Drumming) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel36
+ description *** Uplink to BCHSL27 (Mixer) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel37
+ description *** Uplink to BCHSL28 (RIE) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel38
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ shutdown
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel39
+ description *** Uplink to BCHSL31 (Building 142) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel40
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel41
+ description *** Downlink to BCHSL41-MCC54 Po1 ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel43
+ description *** Downlink to BCHSL40-Hot-Oil Po1 ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel50
+ description *** Uplink to BCHSS1 (Rack 1) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel51
+ description *** Uplink to BCHSS3 (Rack 3) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel52
+ description *** Uplink to BCHSS4 (Rack 5) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel53
+ description *** Uplink to BCHSS5 (Rack 8) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,200,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel54
+ description *** Uplink to BCHSS5 (Rack 8) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,200,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel55
+ description *** Uplink to BCHSS6 (Rack 5) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel56
+ description *** Uplink to BCHSS4 (Rack 5) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel57
+ description *** Uplink to BCHLS43-MIXER ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface Port-channel100
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+!
+interface Port-channel101
+ description BCHFPC50B_CVX_AE1
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+ spanning-tree portfast edge trunk
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ ip address 146.36.4.113 255.255.255.128
+ no ip proxy-arp
+ negotiation auto
+!
+interface TwentyFiveGigE1/1/0/1
+ description *** Uplink to BCHSS1 (Rack 1) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 50 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/1/0/2
+ no switchport
+ no ip address
+!
+interface TwentyFiveGigE1/1/0/3
+ description *** Uplink to BCHSS3 (Rack 3) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 51 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/1/0/4
+ description Spare
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ shutdown
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/1/0/5
+ description *** Uplink to BCHSS5 (Rack 8) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,200,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 53 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/1/0/6
+ description *** Uplink to BCHSS6 (Rack 5) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 55 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/1/0/7
+ description *** Uplink to BCHSS4 (Rack 5) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 52 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/1/0/8
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/1/0/9
+!
+interface TwentyFiveGigE1/1/0/10
+!
+interface TwentyFiveGigE1/1/0/11
+!
+interface TwentyFiveGigE1/1/0/12
+!
+interface TwentyFiveGigE1/1/0/13
+!
+interface TwentyFiveGigE1/1/0/14
+!
+interface TwentyFiveGigE1/1/0/15
+!
+interface TwentyFiveGigE1/1/0/16
+!
+interface TwentyFiveGigE1/1/0/17
+!
+interface TwentyFiveGigE1/1/0/18
+!
+interface TwentyFiveGigE1/1/0/19
+!
+interface TwentyFiveGigE1/1/0/20
+!
+interface TwentyFiveGigE1/1/0/21
+!
+interface TwentyFiveGigE1/1/0/22
+!
+interface TwentyFiveGigE1/1/0/23
+!
+interface TwentyFiveGigE1/1/0/24
+!
+interface TwentyFiveGigE1/1/0/25
+!
+interface TwentyFiveGigE1/1/0/26
+ stackwise-virtual dual-active-detection
+ description * VSS Fast-Hello Link - Do Not Modify * TwG2/1/0/48
+!
+interface TwentyFiveGigE1/1/0/27
+ description bchfpc50a_eth1/20_cvx
+ switchport mode access
+!
+interface TwentyFiveGigE1/1/0/28
+ description BCH50FPC50A_AE1
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+!
+interface TwentyFiveGigE1/1/0/29
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+ channel-group 100 mode active
+!
+interface TwentyFiveGigE1/1/0/30
+ description BAD
+ shutdown
+!
+interface TwentyFiveGigE1/1/0/31
+ description bchfpc50a_cvx_ae1
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+!
+interface TwentyFiveGigE1/1/0/32
+ description bchfpc50a_cvx_ae1
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+!
+interface TwentyFiveGigE1/1/0/33
+!
+interface TwentyFiveGigE1/1/0/34
+!
+interface TwentyFiveGigE1/1/0/35
+!
+interface TwentyFiveGigE1/1/0/36
+!
+interface TwentyFiveGigE1/1/0/37
+!
+interface TwentyFiveGigE1/1/0/38
+!
+interface TwentyFiveGigE1/1/0/39
+!
+interface TwentyFiveGigE1/1/0/40
+!
+interface TwentyFiveGigE1/1/0/41
+!
+interface TwentyFiveGigE1/1/0/42
+!
+interface TwentyFiveGigE1/1/0/43
+!
+interface TwentyFiveGigE1/1/0/44
+!
+interface TwentyFiveGigE1/1/0/45
+!
+interface TwentyFiveGigE1/1/0/46
+!
+interface TwentyFiveGigE1/1/0/47
+ stackwise-virtual link 1
+ description *** Stackwise Virtual Link to TwentyFiveGigE2/1/0/47 ***
+!
+interface TwentyFiveGigE1/1/0/48
+!
+interface TwentyFiveGigE1/2/0/1
+ description VSS Dual-Active Detection -  DO NOT DELETE OR AMEND!!!!!
+ no switchport
+ no ip address
+ no cdp enable
+!
+interface TwentyFiveGigE1/2/0/2
+ description UMI
+ no switchport
+ no ip address
+ no ip redirects
+ no ip proxy-arp
+ ip cgmp
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/3
+ description *** Uplink to BCHSL1 (Admin 154) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,160,170,182,200,400,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 10 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/4
+ description *** Uplink to BCHSL2 (Admin 257) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,160,170,182,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 11 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/5
+ description *** Uplink to BCHSL3 (B & S) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 12 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/6
+ description *** Uplink to BCHSL4 (CCR) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 13 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/7
+ description *** Uplink to BCHSL5 (Cogen) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 14 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/8
+ description *** Uplink to BCHSL23 (Tech 223) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 32 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/9
+ description *** Uplink to BCHSL7 (Ecology) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 16 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/10
+ description *** Uplink to BCHSL_Temp (Filter/Control group) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ shutdown
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/11
+ description *** Uplink to BCHSL9 (Fuel Blends) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 18 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/12
+ description *** Uplink to BCHSL10 (Gate C) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 19 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/13
+ description *** Uplink to BCHSL11 (Gate 2) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/14
+ description *** Uplink to BCHSL12 (Gate 3) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 21 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/15
+ description *** Uplink to BCHSL13 (Lab 1st Floor) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 22 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/16
+ description *** Uplink to BCHSL14 (Lab 3rd Floor) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 23 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/17
+ description *** Uplink to BCHSL15 (Maint - First Aid) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 24 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/18
+ description ***Uplink to BCHSL18-OLPC (G1/1/1)***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 27 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/19
+ description *** Uplink to BCHSL17 (I & E Shop) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 26 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/20
+ description *** Uplink to BCHSL8_Filter ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 17 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/21
+ description *** Uplink to BCHSL19 (PIB) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,170,200,400,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 28 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/22
+ description *** Uplink to BCHSL20 (Purchasing) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 29 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/23
+ description *** Uplink to BCHSL21 (Reliability) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 30 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/24
+ description *** Uplink to BCHSl43-MIXER, Gi1/1 ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 57 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/2/0/25
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/26
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/27
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/28
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/29
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/30
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/31
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/32
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/33
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/34
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/35
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/36
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/37
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/38
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/39
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/40
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/41
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/42
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/43
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/44
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/45
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/46
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/2/0/47
+ description BCHFPC50A_ETH1/13_ETH1/14_CVX_AEz
+!
+interface TwentyFiveGigE1/2/0/48
+ description BCHFPC50A_ETH1/13_ETH1/14_CVX_AEz
+!
+interface TwentyFiveGigE1/5/0/1
+ description *** Uplink to BCHSL23 (Tech 223) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 32 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/2
+ description *** BCHRA1-Datacenter-280  Gi0/0 ***
+ switchport trunk native vlan 900
+ switchport trunk allowed vlan 2001
+ switchport mode trunk
+ load-interval 30
+!
+interface TwentyFiveGigE1/5/0/3
+ description *** Uplink to BCHSL25 (Utilities) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 34 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/4
+ description *** Uplink to BCHSL26 (Drumming) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 35 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/5
+ description *** Uplink to BCHSL27 (Mixer) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 36 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/6
+ description *** Uplink to BCHSL28 (RIE) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 37 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/7
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/8
+ description SPARE
+ switchport access vlan 100
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/9
+ description Randy_packetcap_temp
+ switchport access vlan 100
+ switchport mode access
+ shutdown
+ spanning-tree portfast edge
+!
+interface TwentyFiveGigE1/5/0/10
+ description UMI - SPARE
+ no switchport
+ no ip address
+ no ip proxy-arp
+!
+interface TwentyFiveGigE1/5/0/11
+ description *** Downlink to BCHSL40-Hot-Oil ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 43 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/12
+ description *** Downlink to BCHSL41-MCC54 ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 41 mode active
+!
+interface TwentyFiveGigE1/5/0/13
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/14
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/15
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/16
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/17
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/18
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/19
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/20
+ description *** Uplink to BCHSL15 (Maint - First Aid) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 24 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/21
+ description *** Uplink to BCHSL16 (Maint - StoreRm) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 25 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/22
+ description *** Uplink to BCHSL20 (Purchasing) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 29 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/5/0/23
+ description Bchadcmipfpca_eth1/17 to bchrl01-vss_twe1/5/0/23
+ switchport mode access
+!
+interface TwentyFiveGigE1/5/0/24
+ description VSS Dual-Active Detection -  DO NOT DELETE OR AMEND!!!!!
+ no switchport
+ no ip address
+ no cdp enable
+!
+interface TwentyFiveGigE1/5/0/25
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/26
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/27
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/28
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+ no cdp enable
+ channel-group 1 mode on
+!
+interface TwentyFiveGigE1/5/0/29
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+ no cdp enable
+ channel-group 1 mode on
+!
+interface TwentyFiveGigE1/5/0/30
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/31
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/32
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/33
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/34
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/35
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/36
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/37
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/38
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/39
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/40
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/41
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/42
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/43
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/44
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/45
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/46
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/5/0/47
+ description BCHFI101_S1P1_Mirror
+!
+interface TwentyFiveGigE1/5/0/48
+ description US-LA-BCHADC-WC01
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 170,182,4060,4070,4080,4090
+ switchport mode trunk
+!
+interface TwentyFiveGigE1/6/0/1
+ description BCHEYE01
+ switchport access vlan 100
+!
+interface TwentyFiveGigE1/6/0/2
+ description SPARE
+ switchport access vlan 100
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/3
+ description SPARE
+ switchport access vlan 100
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/4
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/5
+ description BCHFHS01_vlan 888
+ switchport access vlan 888
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/6
+ description BCHFHS01 - INTERNET ANYWHERE FIREWALL
+ switchport access vlan 100
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/7
+ description SPARE
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/8
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/9
+ description BCH0WC-01 P1
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+ udld port
+ channel-group 3 mode on
+!
+interface TwentyFiveGigE1/6/0/10
+ description BCH0WC-01 P2
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+ udld port
+ channel-group 3 mode on
+!
+interface TwentyFiveGigE1/6/0/11
+ description BCH0WC-01 P3
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+ udld port
+ channel-group 3 mode on
+!
+interface TwentyFiveGigE1/6/0/12
+ description BCH0WC-01 P4
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+ udld port
+ channel-group 3 mode on
+!
+interface TwentyFiveGigE1/6/0/13
+ description RANDY_TEMP
+ switchport access vlan 100
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/14
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/15
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/16
+ description Spare
+ switchport access vlan 100
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/17
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/18
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/19
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/20
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/21
+ description ***BCHVGA1***
+ switchport access vlan 200
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/22
+ description ***BCHVGA2***
+ switchport access vlan 200
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/23
+ description ***BCHVGA3***
+ switchport access vlan 200
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/24
+ description ***BCHVGA4***
+ switchport access vlan 200
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/25
+ description SPARE
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/26
+ description ***IPS Management Interface***
+ switchport access vlan 400
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/27
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/28
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/29
+ description ARUBA-WLC-TEMP
+ switchport access vlan 170
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/30
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/31
+ description Spare
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/32
+ description Spare
+ switchport mode access
+ no logging event link-status
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/33
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/34
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/35
+ description ***TEMP CONNECTION FOR ASA3***
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/36
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/37
+ switchport access vlan 25
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/38
+ description BCHILOSMS1
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/39
+ description SPARE
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/40
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/41
+ description BCHCRAC1
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/42
+ description BCHCRAC2
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/43
+ description *** BCH-5500 ***
+ switchport trunk allowed vlan 300,310
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE1/6/0/44
+ description ***BCHASA3 Inside Interface***
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/45
+ description SPARE
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/46
+ description SPARE
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE1/6/0/47
+ description Bchadcmipfpc50a_ha1  bchrl01-vss_twe1/6/0/47
+ switchport access vlan 12
+ switchport mode access
+!
+interface TwentyFiveGigE1/6/0/48
+ description Bchadcmipfpc50a_mgmt0 - bchrl01-vss_twe1/6/0/48
+ switchport access vlan 990
+ switchport mode access
+!
+interface TwentyFiveGigE2/1/0/1
+ description *** Uplink to BCHSS1 (Rack 1) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 50 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/1/0/2
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/1/0/3
+ description *** Uplink to BCHSS3 (Rack 3) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 51 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/1/0/4
+ description Spare
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ shutdown
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/1/0/5
+ description *** Uplink to BCHSS5 (Rack 8) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,200,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 53 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/1/0/6
+ shutdown
+!
+interface TwentyFiveGigE2/1/0/7
+ description *** Uplink to BCHSS4 (Rack 5) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,400,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 52 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/1/0/8
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/1/0/9
+!
+interface TwentyFiveGigE2/1/0/10
+!
+interface TwentyFiveGigE2/1/0/11
+!
+interface TwentyFiveGigE2/1/0/12
+!
+interface TwentyFiveGigE2/1/0/13
+!
+interface TwentyFiveGigE2/1/0/14
+!
+interface TwentyFiveGigE2/1/0/15
+!
+interface TwentyFiveGigE2/1/0/16
+!
+interface TwentyFiveGigE2/1/0/17
+!
+interface TwentyFiveGigE2/1/0/18
+!
+interface TwentyFiveGigE2/1/0/19
+!
+interface TwentyFiveGigE2/1/0/20
+!
+interface TwentyFiveGigE2/1/0/21
+!
+interface TwentyFiveGigE2/1/0/22
+!
+interface TwentyFiveGigE2/1/0/23
+!
+interface TwentyFiveGigE2/1/0/24
+!
+interface TwentyFiveGigE2/1/0/25
+!
+interface TwentyFiveGigE2/1/0/26
+ stackwise-virtual dual-active-detection
+ description *** BCHRL01-VSS, Stackwise Dad, DO NOT MODIDY ****
+!
+interface TwentyFiveGigE2/1/0/27
+ description bchfcp50b_cvx_ae1
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ spanning-tree portfast edge trunk
+!
+interface TwentyFiveGigE2/1/0/28
+ description bchfcp50b_cvx_ae1
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+ channel-group 101 mode active
+ spanning-tree portfast edge trunk
+!
+interface TwentyFiveGigE2/1/0/29
+ description bchfcp50b_cvx_ae1
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+ channel-group 101 mode active
+ spanning-tree portfast edge trunk
+!
+interface TwentyFiveGigE2/1/0/30
+ description bchfcp50b_cvx_ae1
+ switchport trunk allowed vlan 1
+ switchport mode trunk
+ shutdown
+ channel-group 101 mode active
+ spanning-tree portfast edge trunk
+!
+interface TwentyFiveGigE2/1/0/31
+!
+interface TwentyFiveGigE2/1/0/32
+!
+interface TwentyFiveGigE2/1/0/33
+!
+interface TwentyFiveGigE2/1/0/34
+!
+interface TwentyFiveGigE2/1/0/35
+!
+interface TwentyFiveGigE2/1/0/36
+!
+interface TwentyFiveGigE2/1/0/37
+!
+interface TwentyFiveGigE2/1/0/38
+!
+interface TwentyFiveGigE2/1/0/39
+!
+interface TwentyFiveGigE2/1/0/40
+!
+interface TwentyFiveGigE2/1/0/41
+!
+interface TwentyFiveGigE2/1/0/42
+!
+interface TwentyFiveGigE2/1/0/43
+!
+interface TwentyFiveGigE2/1/0/44
+!
+interface TwentyFiveGigE2/1/0/45
+ description US-LA-BCHMP-WC01
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 170,182,4060,4070,4080,4090
+ switchport mode trunk
+!
+interface TwentyFiveGigE2/1/0/46
+!
+interface TwentyFiveGigE2/1/0/47
+ stackwise-virtual link 1
+!
+interface TwentyFiveGigE2/1/0/48
+!
+interface TwentyFiveGigE2/2/0/1
+ description VSS Dual-Active Detection -  DO NOT DELETE OR AMEND!!!!!
+ no switchport
+ no ip address
+ no cdp enable
+!
+interface TwentyFiveGigE2/2/0/2
+ description *** BCHSL18-OLPC, G1/1/2 ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 27 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/3
+ description *** Uplink to BCHSL1 (Admin 154) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,160,170,182,200,400,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 10 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/4
+ description *** Uplink to BCHSL2 (Admin 257) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 1,100,160,170,182,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 11 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/5
+ description *** Uplink to BCHSL3 (B & S) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 12 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/6
+ description *** Uplink to BCHSL4 (CCR) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 13 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/7
+ description *** Uplink to BCHSL5 (Cogen) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 14 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/8
+ description *** Uplink to BCHSL6 (Contractor Shed) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 15 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/9
+ description *** Uplink to BCHSL7 (Ecology) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 16 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/10
+ description *** Uplink to BCHSL_Temp (Filter/Control group) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/11
+ description *** Uplink to BCHSL9 (Fuel Blends) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 18 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/12
+ description *** Uplink to BCHSL31 (Building 142 perhaps) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 39 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/13
+ description spare
+ switchport access vlan 100
+ shutdown
+!
+interface TwentyFiveGigE2/2/0/14
+ description *** Uplink to BCHSL12 (Gate 3) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 21 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/15
+ description *** Uplink to BCHSL13 (Lab 1st Floor) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,888,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 22 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/16
+ description *** Uplink to BCHSL15 (Maint - First Aid) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 24 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/17
+ description SPARE
+ no switchport
+ no ip address
+!
+interface TwentyFiveGigE2/2/0/18
+ description *** Uplink to BCHSL16 (Maint - StoreRm) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 25 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/19
+ description *** Uplink to BCHSL17 (I & E Shop) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 26 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/20
+ description *** Uplink to BCHSL8_Filter ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,182,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 17 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/21
+ description *** Uplink to BCHSL19 (PIB) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,170,200,400,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 28 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/22
+ description *** Uplink to BCHSL20 (Purchasing) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 29 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/23
+ description *** Uplink to BCHSL21 (Reliability) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 30 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/24
+ description *** Uplink to BCHSL22 (Tank Truck) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,105,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 31 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/2/0/25
+!
+interface TwentyFiveGigE2/2/0/26
+!
+interface TwentyFiveGigE2/2/0/27
+!
+interface TwentyFiveGigE2/2/0/28
+!
+interface TwentyFiveGigE2/2/0/29
+!
+interface TwentyFiveGigE2/2/0/30
+!
+interface TwentyFiveGigE2/2/0/31
+!
+interface TwentyFiveGigE2/2/0/32
+!
+interface TwentyFiveGigE2/2/0/33
+!
+interface TwentyFiveGigE2/2/0/34
+!
+interface TwentyFiveGigE2/2/0/35
+!
+interface TwentyFiveGigE2/2/0/36
+!
+interface TwentyFiveGigE2/2/0/37
+!
+interface TwentyFiveGigE2/2/0/38
+!
+interface TwentyFiveGigE2/2/0/39
+!
+interface TwentyFiveGigE2/2/0/40
+!
+interface TwentyFiveGigE2/2/0/41
+!
+interface TwentyFiveGigE2/2/0/42
+!
+interface TwentyFiveGigE2/2/0/43
+!
+interface TwentyFiveGigE2/2/0/44
+!
+interface TwentyFiveGigE2/2/0/45
+!
+interface TwentyFiveGigE2/2/0/46
+!
+interface TwentyFiveGigE2/2/0/47
+!
+interface TwentyFiveGigE2/2/0/48
+!
+interface TwentyFiveGigE2/5/0/1
+ description BCHSL29-WHARF
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/2
+ description *** Uplink to BCHSL25 (Utilities) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 34 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/3
+ description *** Uplink to BCHSL25 (Utilities) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,400,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 34 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/4
+ description *** Uplink to BCHSL26 (Drumming) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ shutdown
+ channel-group 35 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/5
+ description *** Uplink to BCHSL27 (Mixer) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 36 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/6
+ description *** Uplink to BCHSL28 (RIE) ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,170,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 37 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/7
+ description Spare
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,200,401,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ shutdown
+ channel-group 38 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/8
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/9
+ description BCH0WC-01 P5
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+ udld port
+ channel-group 3 mode on
+!
+interface TwentyFiveGigE2/5/0/10
+ description BCH0WC-01 P6
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+ udld port
+ channel-group 3 mode on
+!
+interface TwentyFiveGigE2/5/0/11
+ description BCH0WC-01 P7
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+ udld port
+ channel-group 3 mode on
+!
+interface TwentyFiveGigE2/5/0/12
+ description BCH0WC-01 P8
+ switchport trunk allowed vlan 182,300,310
+ switchport mode trunk
+ udld port
+ channel-group 3 mode on
+!
+interface TwentyFiveGigE2/5/0/13
+ description BCHWA-PIB-13
+ switchport access vlan 100
+!
+interface TwentyFiveGigE2/5/0/14
+ description BCHWAP70
+ switchport access vlan 100
+!
+interface TwentyFiveGigE2/5/0/15
+ description BCHWHARFWA066
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,160,200,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/16
+ description AP
+ switchport access vlan 100
+!
+interface TwentyFiveGigE2/5/0/17
+ description *** Uplink ***
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 100,182,200,401,700,990
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+!
+interface TwentyFiveGigE2/5/0/18
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/19
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/20
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/21
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/22
+ description *** BCHRA2-MiniPod  Gi0/2 ***
+ switchport trunk native vlan 900
+ switchport trunk allowed vlan 2002
+ switchport mode trunk
+ spanning-tree portfast edge trunk
+!
+interface TwentyFiveGigE2/5/0/23
+ description Bchadcmipfpcb_eth1/20 to bchrl01-vss_twe2/5/0/23
+ switchport mode access
+!
+interface TwentyFiveGigE2/5/0/24
+ description VSS Dual-Active Detection -  DO NOT DELETE OR AMEND!!!!!
+ no switchport
+ no ip address
+ no cdp enable
+!
+interface TwentyFiveGigE2/5/0/25
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/26
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/27
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/28
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 2 mode on
+!
+interface TwentyFiveGigE2/5/0/29
+ no switchport
+ no ip address
+ no cdp enable
+ channel-group 2 mode on
+!
+interface TwentyFiveGigE2/5/0/30
+!
+interface TwentyFiveGigE2/5/0/31
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/32
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/33
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/34
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/35
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/36
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/37
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/38
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/39
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/40
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/41
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/42
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/43
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/44
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/45
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/46
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/5/0/47
+!
+interface TwentyFiveGigE2/5/0/48
+!
+interface TwentyFiveGigE2/6/0/1
+ description *** MiniPod Power Supply ***
+ switchport access vlan 100
+ switchport mode access
+!
+interface TwentyFiveGigE2/6/0/2
+ description *** MGMT ASA ***
+ switchport mode access
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/3
+ description SPARE
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/4
+ description ***IPS Management Interface***
+ switchport access vlan 400
+ switchport mode access
+!
+interface TwentyFiveGigE2/6/0/5
+ description ***IPS Management Interface***
+ switchport access vlan 400
+ switchport mode access
+!
+interface TwentyFiveGigE2/6/0/6
+ description test port
+ switchport access vlan 100
+ switchport mode access
+!
+interface TwentyFiveGigE2/6/0/7
+ description Mini Pod PDU
+ switchport access vlan 100
+ switchport mode access
+!
+interface TwentyFiveGigE2/6/0/8
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/9
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/10
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/11
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/12
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/13
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/14
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/15
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/16
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/17
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/18
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/19
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/20
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/21
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/22
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/23
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/24
+ description *** BCHMINIPODUPS ***
+ switchport access vlan 160
+ switchport mode access
+ switchport nonegotiate
+!
+interface TwentyFiveGigE2/6/0/25
+ description *** BCHMINIPOD UPS ***
+ switchport access vlan 160
+ switchport mode access
+ switchport nonegotiate
+!
+interface TwentyFiveGigE2/6/0/26
+ description *** BCHFI102 ***
+ switchport access vlan 400
+ switchport mode access
+!
+interface TwentyFiveGigE2/6/0/27
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/28
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/29
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/30
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/31
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/32
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/33
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/34
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/35
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/36
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/37
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/38
+ description Spare
+ switchport access vlan 100
+!
+interface TwentyFiveGigE2/6/0/39
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/40
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/41
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/42
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/43
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/44
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/45
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/46
+ description Spare
+ no switchport
+ no ip address
+ shutdown
+!
+interface TwentyFiveGigE2/6/0/47
+ description Bchadcmipfpc50b_ha1  bchrl01-vss_twe2/6/0/47
+ switchport access vlan 12
+ switchport mode access
+!
+interface TwentyFiveGigE2/6/0/48
+ description Bchadcmipfpc50b_mgmt0 - bchrl01-vss_twe2/6/0/48
+ switchport access vlan 990
+ switchport mode access
+ spanning-tree portfast edge
+!
+interface TenGigabitEthernet0/1
+ vrf forwarding Mgmt-vrf
+ no ip address
+ negotiation auto
+!
+interface Vlan1
+ description *** Original PIN Network ****
+ ip address 146.25.64.1 255.255.252.0
+ ip helper-address 146.25.65.14
+ ip helper-address 146.25.74.40
+ ip helper-address 146.36.82.34
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan12
+ description bchadcmipfpc50a_ha_vlan
+ ip address 12.0.0.1 255.255.255.248
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Vlan30
+ no ip address
+!
+interface Vlan100
+ description *** PIN Network ****
+ ip address 146.25.72.1 255.255.254.0 secondary
+ ip address 146.25.68.1 255.255.252.0
+ ip helper-address 146.25.74.40
+ ip helper-address 146.25.65.14
+ ip helper-address 146.36.82.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan105
+ no ip address
+ shutdown
+!
+interface Vlan160
+ description *** BCH IOT NETWORK *** 
+ ip address 146.25.16.1 255.255.255.0
+ ip helper-address 146.25.65.14
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan170
+ description *** BCH ARUBA WLC NETWORK ***
+ ip address 146.25.17.1 255.255.255.0
+ ip helper-address 146.25.17.1
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan182
+ description *** BCHNRWIFI CLIENTS ***
+ ip address 146.25.82.1 255.255.254.0
+ ip helper-address 146.25.65.14
+ ip helper-address 146.25.65.34
+ ip helper-address 146.25.74.40
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan200
+ description *** VoIP Network ****
+ ip address 146.41.168.1 255.255.252.0
+ ip helper-address 146.25.65.14
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan300
+ description *** BCH AP VLAN ***
+ ip address 146.25.76.1 255.255.255.128
+ ip helper-address 146.25.65.14
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan310
+ description BCH WLC
+ ip address 146.25.76.225 255.255.255.248
+ ip helper-address 146.25.65.14
+ ip helper-address 146.36.82.34
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan400
+ description *** Data Center Network ****
+ ip address 146.25.74.1 255.255.255.0
+ ip helper-address 146.25.65.14
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan401
+ description *** CCTV Network ****
+ no ip address
+ ip helper-address 146.25.65.14
+ shutdown
+!
+interface Vlan700
+ description *** Printer network ****
+ ip address 146.25.75.1 255.255.255.128
+ ip helper-address 146.25.65.14
+ ip helper-address 146.25.65.34
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan888
+ ip address 172.20.110.158 255.255.255.224
+ ip helper-address 172.20.110.129
+ no ip proxy-arp
+!
+interface Vlan990
+ description *** Network Mgmt Network ****
+ ip address 146.25.75.129 255.255.255.192
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan2001
+ ip address 146.25.75.227 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip summary-address eigrp 65055 146.25.16.0 255.255.255.0
+ ip summary-address eigrp 65055 146.25.17.0 255.255.255.0
+ ip summary-address eigrp 65055 146.25.64.0 255.255.252.0
+ ip summary-address eigrp 65055 146.25.68.0 255.255.252.0
+ ip summary-address eigrp 65055 146.25.72.0 255.255.252.0
+ ip summary-address eigrp 65055 146.25.75.128 255.255.255.192
+ ip summary-address eigrp 65055 146.25.76.0 255.255.255.128
+ ip summary-address eigrp 65055 146.25.82.0 255.255.254.0
+ ip summary-address eigrp 65055 146.41.168.0 255.255.252.0
+!
+interface Vlan2002
+ ip address 146.25.75.237 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip summary-address eigrp 65055 146.25.16.0 255.255.255.0
+ ip summary-address eigrp 65055 146.25.17.0 255.255.255.0
+ ip summary-address eigrp 65055 146.25.64.0 255.255.252.0
+ ip summary-address eigrp 65055 146.25.68.0 255.255.252.0
+ ip summary-address eigrp 65055 146.25.72.0 255.255.252.0
+ ip summary-address eigrp 65055 146.25.75.128 255.255.255.192
+ ip summary-address eigrp 65055 146.25.76.0 255.255.255.128
+ ip summary-address eigrp 65055 146.25.82.0 255.255.254.0
+ ip summary-address eigrp 65055 146.41.168.0 255.255.252.0
+!
+interface Vlan3137
+ description BCHWLAN.GUEST
+ no ip address
+ no ip redirects
+ no ip proxy-arp
+!
+!
+router eigrp 65055
+ default-metric 2000 100 255 1 1500
+ network 146.0.0.0 0.63.255.255
+ passive-interface default
+ no passive-interface Vlan2001
+ no passive-interface Vlan2002
+ eigrp router-id 146.25.75.249
+!
+ip default-gateway 146.36.4.1
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+no ip http server
+no ip http secure-server
+ip tftp source-interface Loopback0
+ip route 172.31.120.0 255.255.255.0 146.25.64.4
+ip route vrf Mgmt-vrf 0.0.0.0 0.0.0.0 146.36.4.1
+ip tacacs source-interface Loopback0 
+ip ssh source-interface GigabitEthernet0/0
+ip ssh version 2
+ip scp server enable
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 50 permit 146.40.2.8
+ 60 permit 146.40.2.11
+ 70 permit 146.40.2.12
+ 80 permit 146.40.2.13
+ 90 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.0.0 0.0.255.255
+ 150 deny   any log
+ip access-list standard mcast-boundary-site-campus
+ 10 remark Campus
+ 10 deny   239.193.0.0 0.0.255.255
+ 20 remark SSM Campus
+ 20 deny   239.232.253.0 0.0.0.255
+ 30 remark Site
+ 30 deny   239.255.0.0 0.0.255.255
+ 40 remark Permit everything else
+ 40 permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-boundary-site-campus-high
+ 10 remark Campus
+ 10 deny   239.193.0.0 0.0.255.255
+ 20 remark SSM Campus
+ 20 deny   239.232.253.0 0.0.0.255
+ 30 remark Site
+ 30 deny   239.255.0.0 0.0.255.255
+ 40 remark High-Speed WAN
+ 40 deny   239.194.0.0 0.0.255.255
+ 50 remark Permit everything else
+ 50 permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-limit-global-max512kbps
+ 10 permit 239.195.192.0 0.0.0.255
+ip access-list standard mcast-limit-hi-gt1Mbps
+ 10 permit 239.194.193.0 0.0.0.255
+ip access-list standard mcast-limit-hi-max1mbps
+ 10 permit 239.194.192.0 0.0.0.255
+ip access-list standard mcast-rp-sparse-wan
+ 10 permit 239.194.128.0 0.0.127.255
+ 20 permit 239.195.128.0 0.0.127.255
+ 30 permit 239.200.0.0 0.7.255.255
+ 40 permit 224.0.0.0 7.255.255.255
+!
+ip access-list extended MARK-DSCP-AF11-VLAN
+ 10 remark * * * Mark LAN received traffic to DSCP AF11 (bulk traffic) * * *
+ 10 permit ip any any dscp af11
+ip access-list extended MARK-DSCP-AF21-VLAN
+ 10 remark * * * Mark LAN received traffic to DSCP AF21 (transactional traffic) * * *
+ 10 permit ip any any dscp af21
+ip access-list extended MARK-DSCP-AF41-VLAN
+ 10 remark * * * Mark LAN received traffic to DSCP AF41 (video) * * *
+ 10 permit ip any any dscp af41
+ip access-list extended MARK-DSCP-DEFAULT-VLAN
+ 10 remark * * * Force LAN received traffic to DSCP ZERO (no microflow) * * *
+ 10 permit ip any any dscp default
+ip access-list extended matt
+ 10 permit ip any host 146.25.65.14
+ 20 permit ip host 146.25.65.14 host 146.25.72.1
+ 30 permit ip host 146.25.65.14 any
+!
+logging source-interface Loopback0
+logging host 146.36.114.214
+logging host 146.38.53.162
+logging host 139.65.140.24
+logging host 139.65.140.25
+ip access-list standard 20
+ 10 permit 139.65.136.0 0.0.3.255
+ 20 permit 139.65.140.0 0.0.3.255
+ 30 permit 139.65.192.0 0.0.15.255
+ 40 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 permit 146.40.10.21
+ 40 deny   any log
+ip access-list standard 99
+ 10 permit 172.31.120.0 0.0.0.255
+ip access-list standard 1330
+ 10 permit 146.22.71.201
+ 20 permit 146.22.9.201
+ 30 permit 146.22.8.0 0.0.0.255
+ 40 permit 146.38.92.0 0.0.0.255
+ 50 permit 146.24.136.0 0.0.0.255
+ 60 permit 146.24.146.0 0.0.0.255
+ 70 permit 146.24.250.0 0.0.0.255
+ 80 permit 146.27.26.0 0.0.1.255
+ 90 permit 146.36.145.0 0.0.0.255
+ 100 permit 146.36.10.0 0.0.0.255
+ 110 permit 146.40.185.0 0.0.0.255
+ 120 permit 139.65.136.0 0.0.3.255
+ 130 permit 146.36.126.128 0.0.0.63
+ 140 permit 146.27.84.128 0.0.0.63
+ 150 permit 146.36.130.224 0.0.0.31
+ 160 deny   any log
+ip access-list standard 1420
+ 10 permit 146.33.44.0 0.0.0.255
+ 20 permit 146.24.70.0 0.0.0.127
+ 30 permit 146.25.37.0 0.0.0.127
+ 40 permit 146.33.97.128 0.0.0.127
+ 50 permit 146.24.66.0 0.0.0.255
+ 60 deny   any log
+ip access-list standard 1490
+ 10 permit 146.40.185.0 0.0.0.255
+ 20 deny   any log
+!
+route-map 99 permit 10 
+ match ip address 99
+!
+route-map BGP_TAG_65040 deny 10 
+ match tag 65040
+!
+route-map BGP_TAG_65040 permit 100 
+!
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view NMS_view system included
+snmp-server view NMS_view interfaces included
+snmp-server view NMS_view chassis included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server source-interface informs Loopback0
+snmp-server location BCH / 10285 Highway 23 South, Belle Chasse, Louisiana / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Medium
+snmp-server contact network operations 1-866-313-3907
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs-server directed-request
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server HOU2_ACS
+ address ipv4 139.65.143.4
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred ssh
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred ssh
+ transport input ssh
+!
+!
+monitor session 1 source vlan 1 - 4093
+monitor session 1 destination interface Twe1/5/0/47
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+ntp source Vlan990
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+!
+end

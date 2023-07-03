@@ -1,0 +1,1211 @@
+Building configuration...
+
+Current configuration : 32155 bytes
+!
+! Last configuration change at 12:43:58 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 12:44:37 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+!
+hostname RIC100RL-RLP-VSS
+!
+boot-start-marker
+boot system bootflash:/cat4500e-universalk9.SPA.03.08.09.E.152-4.E9.bin
+boot-end-marker
+!
+!
+vrf definition CVXGUEST
+ rd 64634:1
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-DEVICES
+ rd 64634:65017
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-GUEST
+ rd 64634:65006
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-IND
+ rd 64634:65007
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition L3CVX-USER
+ rd 64634:65016
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition mgmtVrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group tacacs+ if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+switch virtual domain 100
+ switch mode virtual
+ mac-address use-virtual
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+ip vrf management
+!
+ip multicast-routing 
+ip multicast heartbeat 239.194.128.31 5 10 180
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+no ip domain-lookup
+ip domain-name RIC100.chevrontexaco.net
+ip name-server 146.36.80.34
+ip dhcp relay information trust-all
+ip dhcp excluded-address 10.160.93.1 10.160.93.10
+ip dhcp excluded-address vrf CVXGUEST 192.168.134.129 192.168.134.140
+!
+ip dhcp pool RIC100LAN.GUEST
+ vrf L3CVX-GUEST
+ network 10.160.93.0 255.255.255.0
+ default-router 10.160.93.1 
+ dns-server 146.23.1.1 146.23.2.2 
+ domain-name ggn1.chevron.net
+ lease 0 4
+!
+!
+ip wccp 10 redirect-list SH-CIFS-WAN
+ip wccp 11 redirect-list SH-CIFS-SERVER
+vtp domain Richmond
+vtp mode transparent
+!
+flow record NETQOS-NDE
+ match ipv4 tos
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ match interface output
+ collect transport tcp flags
+ collect counter bytes
+ collect counter packets
+ collect timestamp sys-uptime first
+ collect timestamp sys-uptime last
+!
+!
+flow exporter NETQOS-EXPORTER
+ destination 139.65.136.77
+ transport udp 2055
+ template data timeout 300
+ option exporter-stats timeout 60
+!
+!
+flow monitor NETQOS-MONITOR
+ exporter NETQOS-EXPORTER
+ record NETQOS-NDE
+!
+!
+table-map cos-discard-class-map
+ map from  0 to 0
+ map from  1 to 8
+ map from  2 to 16
+ map from  3 to 24
+ map from  4 to 32
+ map from  5 to 40
+ map from  6 to 48
+ map from  7 to 56
+ default copy
+!
+!
+!
+power redundancy-mode redundant
+!
+mac access-list extended VSL-BPDU
+ permit any 0180.c200.0000 0000.0000.0003
+mac access-list extended VSL-CDP
+ permit any host 0100.0ccc.cccc
+mac access-list extended VSL-DOT1x
+ permit any any 0x888E
+mac access-list extended VSL-GARP
+ permit any host 0180.c200.0020
+mac access-list extended VSL-LLDP
+ permit any host 0180.c200.000e
+mac access-list extended VSL-MGMT
+ permit any 0022.bdcd.d200 0000.0000.00ff
+ permit 0022.bdcd.d200 0000.0000.00ff any
+mac access-list extended VSL-SSTP
+ permit any host 0100.0ccc.cccd
+archive
+ path bootflash:cvx_134107
+ maximum 5
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge bpduguard default
+spanning-tree extend system-id
+spanning-tree vlan 1-4094 priority 4096
+!
+redundancy
+ mode sso
+!
+vlan internal allocation policy ascending
+!
+vlan 148
+ name 146.28.148.0/23.RLP-LAN-Seg
+!
+vlan 265
+ name 146.34.48.0/25_IPT_RLP
+!
+vlan 888
+ name Internet_anywhere
+!
+vlan 930
+ name 172.31.20.192/26.OCS-WIRELESS
+!
+vlan 980
+ name RIC100RM01-Interconnect
+!
+vlan 982
+ name RIC100RM02-Interconnect
+!
+vlan 983
+ name RIC100RM01.Guest-Interconnect
+!
+vlan 984
+ name RIC100RM02.Guest-Interconnect
+!
+vlan 3413
+ name RIC100RM1-GUEST
+!
+vlan 3414
+ name RIC100RM1-IND
+!
+vlan 3415
+ name RIC100RM1-USER
+!
+vlan 3416
+ name RIC100RM1-DEVICES
+!
+vlan 3513
+ name RIC100RM2-GUEST
+!
+vlan 3514
+ name RIC100RM2-IND
+!
+vlan 3515
+ name RIC100RM2-USER
+!
+vlan 3516
+ name RIC100RM2-DEVICES
+!
+vlan 4060
+ name WLAN-L3CVX-GUEST
+!
+vlan 4070
+ name WLAN-L3CVX-IND
+!
+vlan 4080
+ name WLAN-L3CVX-USER
+!
+vlan 4090
+ name WLAN-L3CVX-DEVICES
+lldp run
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+!
+class-map match-any VSL-MGMT-PACKETS
+ match access-group name VSL-MGMT
+class-map match-any VSL-DATA-PACKETS
+ match any 
+class-map match-any class-copp-icmp-redirect-unreachable
+class-map match-all class-copp-glean
+class-map match-any VSL-L2-CONTROL-PACKETS
+ match access-group name VSL-DOT1x
+ match access-group name VSL-BPDU
+ match access-group name VSL-CDP
+ match access-group name VSL-LLDP
+ match access-group name VSL-SSTP
+ match access-group name VSL-GARP
+class-map match-any VSL-L3-CONTROL-PACKETS
+ match access-group name VSL-IPV4-ROUTING
+ match access-group name VSL-BFD
+ match access-group name VSL-DHCP-CLIENT-TO-SERVER
+ match access-group name VSL-DHCP-SERVER-TO-CLIENT
+ match access-group name VSL-DHCP-SERVER-TO-SERVER
+ match access-group name VSL-IPV6-ROUTING
+class-map match-any VSL-MULTIMEDIA-TRAFFIC
+ match dscp af41 
+ match dscp af42 
+ match dscp af43 
+ match dscp af31 
+ match dscp af32 
+ match dscp af33 
+ match dscp af21 
+ match dscp af22 
+ match dscp af23 
+class-map match-all class-copp-receive
+class-map match-all class-copp-options
+class-map match-all class-copp-broadcast
+class-map match-all class-copp-mcast-acl-bridged
+class-map match-all class-copp-slb
+class-map match-all class-copp-mtu-fail
+class-map match-all class-copp-ttl-fail
+class-map match-all class-copp-arp-snooping
+class-map match-any class-copp-mcast-copy
+class-map match-any class-copp-ip-connected
+class-map match-any VSL-VOICE-VIDEO-TRAFFIC
+ match dscp ef 
+ match dscp cs4 
+ match dscp cs5 
+class-map match-any class-copp-match-igmp
+ match access-group name acl-copp-match-igmp
+class-map match-all class-copp-unknown-protocol
+class-map match-any class-copp-vacl-log
+class-map match-all class-copp-mcast-ipv6-control
+class-map match-any class-copp-match-pimv6-data
+ match access-group name acl-copp-match-pimv6-data
+class-map match-any class-copp-mcast-punt
+class-map match-all class-copp-unsupp-rewrite
+class-map match-all class-copp-ucast-egress-acl-bridged
+class-map match-all class-copp-ip-admission
+class-map match-any class-copp-dpss-divert
+class-map match-all class-copp-service-insertion
+class-map match-any voice_control
+ match ip dscp cs3 
+class-map match-all class-copp-mac-pbf
+class-map match-any class-copp-match-mld
+ match access-group name acl-copp-match-mld
+class-map match-all class-copp-ucast-ingress-acl-bridged
+class-map match-all class-copp-dhcp-snooping
+class-map match-all class-copp-wccp
+class-map match-all class-copp-nd
+class-map match-any class-copp-ipv6-connected
+class-map match-all class-copp-mcast-rpf-fail
+class-map match-any class-copp-match-ndv6hl
+ match access-group name acl-copp-match-ndv6hl
+class-map match-any class-copp-ucast-rpf-fail
+class-map match-all class-copp-mcast-ip-control
+class-map match-any class-copp-match-pim-data
+ match access-group name acl-copp-match-pim-data
+class-map match-any class-copp-match-ndv6
+ match access-group name acl-copp-match-ndv6
+class-map match-all voice
+ match ip dscp ef 
+class-map match-any VSL-SIGNALING-NETWORK-MGMT
+ match dscp cs2 
+ match dscp cs3 
+ match dscp cs6 
+ match dscp cs7 
+class-map match-any class-copp-mcast-v4-data-on-routedPort
+class-map match-any class-copp-mcast-v6-data-on-routedPort
+!
+policy-map policy-default-autocopp
+ class class-copp-mcast-v4-data-on-routedPort
+ class class-copp-mcast-v6-data-on-routedPort
+ class class-copp-dpss-divert
+  police rate 1000 pps burst 1000 packets conform-action transmit  exceed-action drop 
+ class class-copp-match-mld
+ class class-copp-match-igmp
+ class class-copp-icmp-redirect-unreachable
+  police rate 100 pps burst 10 packets conform-action transmit  exceed-action drop 
+ class class-copp-ucast-rpf-fail
+  police rate 100 pps burst 10 packets conform-action transmit  exceed-action drop 
+ class class-copp-vacl-log
+  police rate 2000 pps burst 4 packets conform-action transmit  exceed-action drop 
+ class class-copp-mcast-punt
+  police rate 1000 pps burst 256 packets conform-action transmit  exceed-action drop 
+ class class-copp-mcast-copy
+  police rate 1000 pps burst 256 packets conform-action transmit  exceed-action drop 
+ class class-copp-ip-connected
+  police rate 1000 pps burst 256 packets conform-action transmit  exceed-action drop 
+ class class-copp-ipv6-connected
+  police rate 1000 pps burst 256 packets conform-action transmit  exceed-action drop 
+ class class-copp-match-pim-data
+  police rate 1000 pps burst 1000 packets conform-action transmit  exceed-action drop 
+ class class-copp-match-pimv6-data
+  police rate 1000 pps burst 1000 packets conform-action transmit  exceed-action drop 
+ class class-copp-match-ndv6hl
+policy-map VSL-Queuing-Policy
+ class VSL-MGMT-PACKETS
+  bandwidth percent 5 
+ class VSL-L2-CONTROL-PACKETS
+  bandwidth percent 5 
+ class VSL-L3-CONTROL-PACKETS
+  bandwidth percent 5 
+ class VSL-VOICE-VIDEO-TRAFFIC
+  bandwidth percent 30 
+ class VSL-SIGNALING-NETWORK-MGMT
+  bandwidth percent 10 
+ class VSL-MULTIMEDIA-TRAFFIC
+  bandwidth percent 20 
+ class VSL-DATA-PACKETS
+  bandwidth percent 20 
+ class class-default
+  bandwidth percent 5 
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 146.28.175.63 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+ ip igmp join-group 239.194.128.31
+!
+interface Port-channel2
+ description RIC100RM1
+ switchport
+ switchport trunk allowed vlan 148,265,888
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+!
+interface Port-channel3
+ description RIC100RM2
+ switchport
+ switchport trunk allowed vlan 148,265,888
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+!
+interface Port-channel5
+ description RIC100SL-RLP-SHIPPING
+ switchport
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ load-interval 30
+!
+interface Port-channel6
+ description RIC100SL-RLP-TRUCKRACK
+ switchport
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ load-interval 30
+!
+interface Port-channel7
+ description to RIC100SL-RLP-froom(2nd fl)
+ switchport
+ switchport trunk allowed vlan 148,265,930,4060,4070,4080,4090
+ switchport trunk native vlan 148
+ switchport mode trunk
+!
+interface Port-channel8
+ switchport
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+!
+interface Port-channel9
+ description RIC100SL-RLP-ADMIN
+ switchport
+ switchport trunk allowed vlan 148,265,888,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+!
+interface Port-channel10
+ switchport
+ switchport mode trunk
+ switchport nonegotiate
+ switch virtual link 1
+!
+interface Port-channel20
+ switchport
+ switchport mode trunk
+ switchport nonegotiate
+ switch virtual link 2
+!
+interface FastEthernet1
+ vrf forwarding mgmtVrf
+ no ip address
+ speed auto
+ duplex auto
+!
+interface TenGigabitEthernet1/1/1
+ description RIC100RM01 for 1/0/3
+ switchport trunk allowed vlan 980,983,3413-3416
+ switchport mode trunk
+ udld port
+!
+interface TenGigabitEthernet1/1/2
+ description RIC100SL-RLP-SHIPPING T1/1/5
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 5 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet1/1/3
+ description RIC100SL-RLP-TRUCKRACK.0/1
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 6 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet1/1/4
+ description to RIC100SL-RLP_LAB(2nd fl)
+ switchport trunk allowed vlan 148,265,930,4060,4070,4080,4090
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 7 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet1/1/5
+ description RIC100SL-RLP-BLEND
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 8 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet1/1/6
+ description RIC100SL-RLP-ADMIN
+ switchport trunk allowed vlan 148,265,888,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 9 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet1/1/7
+ description RIC100RLPWC01-Trunk
+ switchport trunk allowed vlan 148,265,4060,4070,4080,4090
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport block unicast
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree link-type point-to-point
+!
+interface TenGigabitEthernet1/1/8
+ switchport trunk allowed vlan 148,265
+ switchport trunk native vlan 148
+ switchport mode trunk
+ switchport block unicast
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast disable
+ spanning-tree link-type point-to-point
+!
+interface TenGigabitEthernet1/1/9
+!
+interface TenGigabitEthernet1/1/10
+!
+interface TenGigabitEthernet1/1/11
+!
+interface TenGigabitEthernet1/1/12
+!
+interface TenGigabitEthernet1/1/13
+!
+interface TenGigabitEthernet1/1/14
+!
+interface TenGigabitEthernet1/1/15
+ switchport mode trunk
+ switchport nonegotiate
+ no cdp enable
+ no lldp transmit
+ no lldp receive
+ channel-group 10 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet1/1/16
+ switchport mode trunk
+ switchport nonegotiate
+ no cdp enable
+ no lldp transmit
+ no lldp receive
+ channel-group 10 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet2/1/1
+ description RIC100RM02 for 1/0/2
+ switchport trunk allowed vlan 982,984,3513-3516
+ switchport mode trunk
+ udld port
+!
+interface TenGigabitEthernet2/1/2
+ description RIC100SL-RLP-SHIPPING T1/1/6
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 5 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet2/1/3
+ description RIC100SL-RLP-TRUCKRACK.0/1
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 6 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet2/1/4
+ description to RIC100SL-RLP_LAB(2nd fl)
+ switchport trunk allowed vlan 148,265,930,4060,4070,4080,4090
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 7 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet2/1/5
+ description RIC100SL-RLP-BLEND
+ switchport trunk allowed vlan 148,265,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 8 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet2/1/6
+ description RIC100SL-RLP-ADMIN
+ switchport trunk allowed vlan 148,265,888,930
+ switchport trunk native vlan 148
+ switchport mode trunk
+ logging event link-status
+ udld port
+ no snmp trap link-status
+ channel-group 9 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface TenGigabitEthernet2/1/7
+ description RIC100RLPWC02-Trunk
+ switchport trunk allowed vlan 148,265,4060,4070,4080,4090
+ switchport trunk native vlan 999
+ switchport mode trunk
+!
+interface TenGigabitEthernet2/1/8
+!
+interface TenGigabitEthernet2/1/9
+!
+interface TenGigabitEthernet2/1/10
+!
+interface TenGigabitEthernet2/1/11
+!
+interface TenGigabitEthernet2/1/12
+!
+interface TenGigabitEthernet2/1/13
+!
+interface TenGigabitEthernet2/1/14
+!
+interface TenGigabitEthernet2/1/15
+ switchport mode trunk
+ switchport nonegotiate
+ no cdp enable
+ no lldp transmit
+ no lldp receive
+ channel-group 20 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet2/1/16
+ description RIC100SL-RLP-ADMIN
+ switchport trunk allowed vlan 148,265,888,930
+ switchport mode trunk
+ switchport nonegotiate
+ logging event link-status
+ no cdp enable
+ channel-group 9 mode active
+ spanning-tree portfast edge
+ spanning-tree guard loop
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan148
+ description *** Richmond Lube Plaint (RLP) network ***
+ ip address 146.28.148.254 255.255.254.0
+ ip helper-address 146.28.158.34 
+ ip helper-address 146.28.194.34 
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 11 redirect in
+ ip pim sparse-mode
+!
+interface Vlan265
+ description RLP_IPT
+ ip address 146.34.48.1 255.255.255.128
+ ip helper-address 146.28.158.34 
+ ip helper-address 146.28.194.34 
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan888
+ description Wired Guest Internet 
+ vrf forwarding L3CVX-GUEST
+ ip address 10.160.93.1 255.255.255.0
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan980
+ description RIC100RM01 VLAN980
+ ip address 146.28.175.22 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 10 redirect in
+ ip pim sparse-mode
+ logging event link-status
+!
+interface Vlan982
+ description RIC100RM02 VLAN982
+ ip address 146.28.175.26 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip wccp 10 redirect in
+ ip pim sparse-mode
+ logging event link-status
+!
+interface Vlan983
+ vrf forwarding CVXGUEST
+ ip address 146.28.175.33 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ logging event link-status
+ shutdown
+!
+interface Vlan984
+ description RIC100RM02 CVXGUEST
+ vrf forwarding CVXGUEST
+ ip address 146.28.175.37 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ logging event link-status
+ shutdown
+!
+interface Vlan3413
+ description RIC100RM1-GUEST
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.2.15 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan3414
+ description RIC100RM1-IND
+ vrf forwarding L3CVX-IND
+ ip address 10.190.2.15 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan3415
+ description RIC100RM1-USER
+ vrf forwarding L3CVX-USER
+ ip address 10.186.2.15 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan3416
+ description RIC100RM1-DEVICES
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.2.15 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan3513
+ description RIC100RM2-GUEST
+ vrf forwarding L3CVX-GUEST
+ ip address 10.184.2.17 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan3514
+ description RIC100RM2-IND
+ vrf forwarding L3CVX-IND
+ ip address 10.190.2.17 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan3515
+ description RIC100RM2-USER
+ vrf forwarding L3CVX-USER
+ ip address 10.186.2.17 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan3516
+ description RIC100RM2-DEVICES
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.188.2.17 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan4060
+ description WLAN-L3CVX-GUEST
+ vrf forwarding L3CVX-GUEST
+ ip address 10.160.99.1 255.255.255.0
+ ip helper-address 146.22.1.10 
+ ip helper-address 146.22.5.10 
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4070
+ description WLAN-L3CVX-IND
+ vrf forwarding L3CVX-IND
+ ip address 10.178.58.129 255.255.255.128
+ ip helper-address 146.22.1.10 
+ ip helper-address 146.22.5.10 
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4080
+ description WLAN-L3CVX-USER
+ vrf forwarding L3CVX-USER
+ ip address 10.168.160.1 255.255.254.0
+ ip helper-address 146.22.1.10 
+ ip helper-address 146.22.5.10 
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan4090
+ description WLAN-L3CVX-DEVICES
+ vrf forwarding L3CVX-DEVICES
+ ip address 10.176.58.129 255.255.255.128
+ ip helper-address 146.22.1.10 
+ ip helper-address 146.22.5.10 
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+!
+router eigrp 109
+ !
+ address-family ipv4 vrf CVXGUEST autonomous-system 888
+  network 10.160.93.0 0.0.0.255
+  network 146.28.0.0
+  passive-interface default
+  no passive-interface Vlan983
+  no passive-interface Vlan984
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-GUEST autonomous-system 888
+  default-metric 10000 10 255 1 1500
+  network 10.160.93.0 0.0.0.255
+  network 10.160.99.0 0.0.0.255
+  network 10.184.2.0 0.0.0.63
+  passive-interface default
+  no passive-interface Vlan3413
+  no passive-interface Vlan3513
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-IND autonomous-system 884
+  default-metric 10000 10 255 1 1500
+  network 10.178.58.128 0.0.0.127
+  network 10.190.2.0 0.0.0.63
+  passive-interface default
+  no passive-interface Vlan3414
+  no passive-interface Vlan3514
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-USER autonomous-system 882
+  default-metric 10000 10 255 1 1500
+  network 10.168.160.0 0.0.1.255
+  network 10.186.2.0 0.0.0.63
+  passive-interface default
+  no passive-interface Vlan3415
+  no passive-interface Vlan3515
+ exit-address-family
+ !
+ address-family ipv4 vrf L3CVX-DEVICES autonomous-system 886
+  default-metric 10000 10 255 1 1500
+  network 10.176.58.128 0.0.0.127
+  network 10.188.2.0 0.0.0.63
+  passive-interface default
+  no passive-interface Vlan3416
+  no passive-interface Vlan3516
+ exit-address-family
+ network 146.28.0.0
+ network 146.34.0.0
+ network 172.31.0.0
+ redistribute static
+ passive-interface default
+ no passive-interface Vlan980
+ no passive-interface Vlan982
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+no ip http server
+no ip http secure-server
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+!
+ip tftp source-interface Loopback0
+ip route 146.28.136.128 255.255.255.192 146.28.148.10 name RIC100SL1DMZ-SAP-WLAN
+ip route 146.28.136.192 255.255.255.224 146.28.148.10 name RIC100SL1DMZ
+ip route 146.28.137.224 255.255.255.240 146.28.148.10 name RLP-(RIC100FA1)
+ip route 146.28.148.28 255.255.255.255 146.28.148.10 name RLP-(RIC100FA1)
+ip route 146.28.148.29 255.255.255.255 146.28.148.10 name RLP-(RIC100FA1)
+ip route 146.28.175.61 255.255.255.255 146.28.148.10 name RIC100SL1DMZ-Loopback
+ip route 146.28.175.62 255.255.255.255 146.28.148.10 name RIC100SL2DMZ-Loopback
+ip route 172.31.20.192 255.255.255.192 146.28.148.10 name RLP-(RIC100FA1)
+ip route 172.31.21.192 255.255.255.192 146.28.148.10 name RLP-(RIC100FA1)
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-boundary-site-campus
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ deny   any log
+ip access-list standard mcast-boundary-site-campus-high
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark High-Speed WAN
+ deny   239.194.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ deny   any log
+ip access-list standard mcast-limit-hi-max1mbps
+ permit 239.195.128.0 0.0.0.255
+ permit 239.194.128.0 0.0.0.255
+ permit 239.195.192.0 0.0.0.255
+ permit 239.194.192.0 0.0.0.255
+ deny   any log
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+ permit 224.0.0.0 7.255.255.255
+ deny   any log
+!
+ip access-list extended CBRES-METASYS
+ permit ip host 146.36.80.240 172.31.40.0 0.0.7.255
+ permit ip host 134.248.80.138 172.31.40.0 0.0.7.255
+ permit ip host 146.46.130.145 172.31.40.0 0.0.7.255
+ permit ip 136.171.124.0 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 146.27.3.160 0.0.0.31 172.31.40.0 0.0.7.255
+ permit ip 172.31.40.0 0.0.3.255 172.31.40.0 0.0.7.255
+ permit ip 172.31.44.0 0.0.3.255 172.31.40.0 0.0.7.255
+ deny   ip any any log
+ip access-list extended SH-CIFS-SERVER
+ deny   tcp any 146.28.158.0 0.0.1.255
+ deny   ip any any log
+ip access-list extended SH-CIFS-WAN
+ deny   ip any any log
+ip access-list extended VSL-BFD
+ permit udp any any eq 3784
+ deny   ip any any log
+ip access-list extended VSL-DHCP-CLIENT-TO-SERVER
+ permit udp any eq bootpc any eq bootps
+ deny   ip any any log
+ip access-list extended VSL-DHCP-SERVER-TO-CLIENT
+ permit udp any eq bootps any eq bootpc
+ deny   ip any any log
+ip access-list extended VSL-DHCP-SERVER-TO-SERVER
+ permit udp any eq bootps any eq bootps
+ deny   ip any any log
+ip access-list extended VSL-IPV4-ROUTING
+ permit ip any 224.0.0.0 0.0.0.255
+ deny   ip any any log
+ip access-list extended acl-copp-match-igmp
+ permit igmp any any
+ deny   ip any any log
+ip access-list extended acl-copp-match-pim-data
+ deny   pim any host 224.0.0.13
+ permit pim any any
+ deny   ip any any log
+!
+logging source-interface Loopback0
+logging host 139.65.140.24
+logging host 139.65.140.25
+logging host 146.36.114.214
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 139.65.140.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server group default v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location HOU150 / 1500 Lousiana Street  / Houston,TX  / USA  / Americas  / US-NA-Utility-Campus-Metro/Criticality-High
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp-server host 139.65.140.25 public  ipmulticast
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+!
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+ipv6 access-list VSL-IPV6-ROUTING
+ permit ipv6 any FF02::/124
+!
+ipv6 access-list acl-copp-match-mld
+ permit icmp any any mld-report
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input all
+ transport output none
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input all
+ transport output none
+!
+!
+module provision switch 1
+ chassis-type 70 base-mac 2894.0FAA.29B0
+ slot 1 slot-type 401 base-mac 2894.0FAA.29B0
+ !
+module provision switch 2
+ chassis-type 70 base-mac 2894.0FAA.28B0
+ slot 1 slot-type 401 base-mac 2894.0FAA.28B0
+ 
+!
+
+ ntp source Loopback0
+ ntp access-group peer 40
+ ntp server 146.38.37.9
+ ntp server 146.22.70.251
+ ntp server 146.40.10.21
+ !
+end

@@ -1,0 +1,771 @@
+Building configuration...
+
+Current configuration : 19532 bytes
+!
+! Last configuration change at 20:45:00 UTC Sun Jun 18 2023 by svc-voy-extranet
+! NVRAM config last updated at 13:49:52 UTC Tue Jan 3 2023 by svc-voy-extranet
+!
+version 12.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+!
+hostname CHVPKSSH2R5-38
+!
+boot-start-marker
+boot system flash bootflash:cat4500-entservicesk9-mz.122-31.SG.bin
+boot-end-marker
+!
+logging buffered 128000 debugging
+enable secret 5 $1$WZjb$E2OdRntcPRQtl.dTSTcoa/
+!
+username admin privilege 15 secret 5 $1$fQcq$XgqXCFCMDF8zUVOkwG54F1
+aaa new-model
+aaa authentication login default group tacacs+ line local
+aaa authentication enable default group tacacs+ enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group tacacs+ if-authenticated 
+aaa authorization commands 0 default group tacacs+ if-authenticated 
+aaa authorization commands 1 default group tacacs+ if-authenticated 
+aaa authorization commands 15 default group tacacs+ if-authenticated 
+aaa authorization reverse-access default group tacacs+ if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 0 default start-stop group tacacs+
+aaa accounting commands 1 default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group tacacs+
+aaa accounting system default start-stop group tacacs+
+!
+aaa session-id common
+udld enable
+
+ip subnet-zero
+no ip source-route
+ip tcp path-mtu-discovery
+ip telnet source-interface Vlan1
+ip domain-name chvpk.chevrontexaco.net
+ip name-server 146.36.80.34
+!
+ip tftp source-interface Vlan1
+ip ssh version 2
+vtp domain CHVPK
+vtp mode transparent
+!
+!
+!
+!
+!
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause unicast-flood
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause arp-inspection
+power redundancy-mode redundant
+no file verify auto
+!
+spanning-tree mode rapid-pvst
+spanning-tree logging
+spanning-tree portfast bpduguard default
+no spanning-tree optimize bpdu transmission
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+vlan 68
+ name 146.27.68.0/24.BRES
+!
+interface Port-channel1
+ switchport
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+!
+interface Port-channel2
+ switchport
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+!
+interface GigabitEthernet1/1
+ switchport trunk native vlan 68
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpdufilter enable
+!
+interface GigabitEthernet1/2
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/3
+ description CHVPKLNXBRESP4
+ switchport access vlan 67
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/4
+ description CHVPKLNXBRESP4ILO
+ switchport mode access
+ no logging event link-status
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/5
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/6
+ switchport access vlan 67
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/7
+ switchport access vlan 67
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/8
+ switchport access vlan 67
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/9
+ description TKT4547839
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/10
+ description TKT4547839
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/11
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/12
+ description CHVPKLNXBRESP4
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/13
+ description CHVPKW8NVRP11
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/14
+ description CHVPKW8NVRP11ILO
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/15
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+!
+interface GigabitEthernet1/16
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+!
+interface GigabitEthernet1/17
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/18
+ switchport mode access
+ no logging event link-status
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/19
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/20
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/21
+ description CHVPKW8NVRP2
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/22
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/23
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/24
+ switchport access vlan 67
+ switchport mode access
+ no logging event link-status
+ shutdown
+ speed 1000
+ duplex full
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/25
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/26
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/27
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/28
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/29
+ description CHVPKLNXBRESP4
+ switchport access vlan 67
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/30
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/31
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/32
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/33
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/34
+ description CHVPKLNXBRESP4
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/35
+ description CHVPKESXBRESP1
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/36
+ description CHVPKESXBRESP1ILO
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/37
+ description CHVPKESXBRESP2
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/38
+ description CHVPKESXBRESP2ILO
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+!
+interface GigabitEthernet1/39
+ description CHVPKESXBRESP1
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/40
+ description CHVPKESXBRESP1
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/41
+ description CHVPKESXBRESP1
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/42
+ description CHVPKW8ACSDBP1
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/43
+ description CHVPKW8ACSP1
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/44
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/45
+ switchport access vlan 68
+ switchport mode access
+ no logging event link-status
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/46
+ description CHVPKESXBRESP3
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/47
+ description CHVPKESXBRESP3
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface GigabitEthernet1/48
+ description CHVPKESXBRESP3
+ switchport access vlan 68
+ switchport mode access
+ switchport nonegotiate
+ no logging event link-status
+ load-interval 30
+ shutdown
+ udld port
+ no snmp trap link-status
+ spanning-tree portfast
+!
+interface TenGigabitEthernet1/49
+ description TO CHVPKRS4 T2/3
+ switchport access vlan 68
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 68
+ switchport trunk allowed vlan 67,68
+ switchport mode trunk
+ switchport nonegotiate
+ logging event link-status
+ shutdown
+ udld port
+!
+interface TenGigabitEthernet1/50
+ description to CHVPKRS3 T6/1
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 68
+ switchport trunk allowed vlan 67,68
+ switchport mode trunk
+ switchport nonegotiate
+ logging event link-status
+ shutdown
+ udld port
+!
+interface Vlan1
+ ip address 146.27.68.6 255.255.255.0
+ no ip proxy-arp
+!
+interface Vlan68
+ ip address 146.27.68.6 255.255.255.0
+ no ip proxy-arp
+ shutdown
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip route 0.0.0.0 0.0.0.0 146.27.68.1
+no ip http server
+no ip http secure-server
+!
+ip tacacs source-interface Vlan1
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.42.255.132
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.140.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+!
+logging history size 10
+logging history warnings
+logging source-interface Vlan1
+logging 146.27.145.4
+logging 146.27.145.68
+logging 146.27.145.132
+logging 146.27.95.122
+logging 134.248.81.53
+logging 146.36.114.214
+logging 139.65.140.24
+logging 139.65.140.25
+access-list 20 permit 10.0.0.0 0.63.255.255
+access-list 20 permit 10.128.0.0 0.7.255.255
+access-list 20 permit 10.254.0.0 0.0.255.255
+access-list 20 permit 146.22.0.0 0.1.255.255
+access-list 20 permit 146.24.0.0 0.7.255.255
+access-list 20 permit 146.32.0.0 0.7.255.255
+access-list 20 permit 146.40.0.0 0.3.255.255
+access-list 20 permit 146.44.0.0 0.1.255.255
+access-list 20 permit 146.46.0.0 0.0.255.255
+access-list 20 permit 136.171.0.0 0.0.255.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.0.0 0.0.255.255
+access-list 20 permit 134.248.0.0 0.0.255.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1340 permit 146.27.95.126
+access-list 1340 permit 146.27.95.125
+access-list 1340 permit 146.27.88.28
+access-list 1340 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+!
+snmp-server group CVX v3 auth notify *tv.00001000.00000000.00000000.000000000F 
+snmp-server group CVX v3 priv notify *tv.00001000.00000000.00000000.000000000F 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth notify *tv.00001000.00000000.00000000.000000000F 
+snmp-server group cvx2021 v3 priv notify *tv.00001000.00000000.00000000.000000000F 
+snmp-server group cvx2022 v3 priv notify *tv.FFFFFFFF.FFFFFFFF.FFFFFFFF.FFFFFFFF0F 
+snmp-server group cvx2023 v3 priv notify *tv.FFFFFFFF.FFFFFFFF.FFFFFFFF.FFFFFFFF0F 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap retry 2
+snmp-server trap-source Vlan1
+snmp-server location CHVPKS / 6001 Bollinger Canyon Rd, San Ramon, CA / USA / Americas /US-NA-Utility-Data-center/Criticality-High
+snmp-server contact network operations 1-866-313-3907
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps ipmulticast
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server host 139.65.136.12 version 3 priv CVX  config
+snmp-server host 139.65.136.12 version 3 priv CVX2  config
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+tacacs-server host 139.65.136.58
+tacacs-server host 139.65.143.4
+tacacs-server timeout 10
+tacacs-server directed-request
+tacacs-server key 7 06031D344F4B1A1606041B08
+radius-server source-ports 1645-1646
+!
+control-plane
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+ntp clock-period 17180816
+ntp source Vlan1
+ntp access-group peer 40
+ntp update-calendar
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+end

@@ -1,0 +1,1524 @@
+Building configuration...
+
+Current configuration : 42482 bytes
+!
+! Last configuration change at 10:58:08 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 10:58:45 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 17.3
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+no platform punt-keepalive disable-kernel-core
+!
+hostname MONCASL1
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server radius AAA
+ server name HOU_RadiusVIP
+ server name LON_RadiusVIP
+ server name SIN_RadiusVIP
+ ip radius source-interface Loopback0
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authentication dot1x default group AAA
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group AAA 
+aaa authorization network flexvpn local 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting dot1x default start-stop group AAA
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group AAA
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+boot system switch all flash:/packages.conf
+switch 1 provision c9300-48u
+!
+!
+!
+!
+ip routing
+!
+ip vrf L3CVX-DEVICES
+ rd 65055:65017
+!
+ip vrf L3CVX-GUEST
+ rd 65055:65006
+!
+ip vrf L3CVX-IND
+ rd 65055:65007
+!
+ip vrf L3CVX-USER
+ rd 65055:65016
+!
+!
+!
+!
+!
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast route-limit 1000 900
+ip name-server 146.36.80.34 146.36.82.34
+ip domain name monca.chevrontexaco.net
+ip dhcp excluded-address 146.26.3.36 146.26.3.38
+ip dhcp excluded-address 146.26.3.44 146.26.3.46
+!
+ip dhcp pool ArubaPTP
+ network 146.26.3.40 255.255.255.248
+ default-router 146.26.3.41 
+ dns-server 146.36.80.34 146.36.82.34 
+!
+ip dhcp pool ArubaAPs
+ network 146.26.3.32 255.255.255.248
+ default-router 146.26.3.33 
+ dns-server 146.36.80.34 146.36.82.34 
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+vtp domain MONCA
+vtp mode off
+no device-tracking logging theft
+!
+flow record FLOW4
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ collect interface output
+!
+!
+flow exporter Exporter-1
+ destination 139.65.140.12
+ source Loopback0
+ template data timeout 16
+!
+!
+flow monitor FLOW4-LAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-WAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-WAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-LAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor net-flow
+ exporter Exporter-1
+ record FLOW4
+!
+!
+table-map AutoQos-4.0-Trust-Cos-Table
+ default copy
+table-map policed-dscp
+ map from  0 to 8
+ map from  10 to 8
+ map from  18 to 8
+ map from  24 to 8
+ map from  46 to 8
+ default copy
+!
+!
+crypto pki trustpoint TP-self-signed-2858854509
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2858854509
+ revocation-check none
+ rsakeypair TP-self-signed-2858854509
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment terminal
+ revocation-check crl
+!
+!
+crypto pki certificate chain TP-self-signed-2858854509
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 32383538 38353435 3039301E 170D3230 31313133 31343332 
+  35325A17 0D333030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 38353838 
+  35343530 39308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100B9FA 4AD8BA55 AEAAE056 E33CB61F DF0C206D 5B05C178 85A088AD 
+  F92DE76E 66494AE4 6FFA2C7E 5A95D8C8 E2BB7E61 7BEE6F7B B9B81A51 4CC2BE78 
+  84001FA8 89BDC66E 5445AD94 B2F18129 B647295B FF02B096 9C70AD97 E75E03B3 
+  C40B1B41 0616C58C 339C1E11 E500EAA7 A48F0DBF 2F15ED41 C4E1DDE4 A3C7E074 
+  8407447D D14C9E82 EDEA2540 4849E6D2 9A2ED97E F46623FD CD6C98FF 198AD972 
+  1534E912 CCBAEBBB C7E57124 2D18786A D820E2FD 618F6960 995C8C23 6668CD2A 
+  FE484071 851FF79F EEA6057D 482BE0F9 A2CABE03 08FA8670 5C06842D 13F81FB1 
+  6E4AD12F CCC13E87 82018D54 86DA83CF FB585606 DAF4D85F 94EA8C64 4D99BE0F 
+  C602D485 9A430203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 1461682C B1B59D70 7D7CAA17 35C104EE 1CFC2325 
+  BA301D06 03551D0E 04160414 61682CB1 B59D707D 7CAA1735 C104EE1C FC2325BA 
+  300D0609 2A864886 F70D0101 05050003 82010100 27675B1A 2ED6AE49 B7B0FB6F 
+  AEAE564F 59521D3A 8D5544FA 0005B491 68477358 6CBFC5AE 65DAF2E1 1C23CA62 
+  53582BBB 82FF1499 48CD6E44 DE1E6D01 DBC948DA B63DB012 67062BCC 803CF177 
+  9D6CF334 215E1DE1 04B71CF6 4413CD69 0F52F08E 724F46BD 9EF361D2 FE3BB32B 
+  28AD79F9 E9CEC2AC B1ADDCDD 100C0930 2A61F588 A0E1A55E 9218001B 6D4D785B 
+  D5935560 7D6FE391 F3B24862 2518322C 0C8C0529 A1520624 D89A87E6 41671048 
+  C4F73980 6A97862C BA195C1E 6C555B92 473E007B F9F6EC52 51C8C208 C7387647 
+  93E7CA25 D829685D CEA976F5 4BA652AC 2C511C17 5CAC662D B0A1CE03 53355499 
+  0DC3B1BD 235EB7B6 B23DABFB CFF2299D C2D6E89C
+  	quit
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+!
+crypto pki certificate pool
+ cabundle nvram:ios_core.p7b
+!
+!
+license boot level network-advantage addon dna-advantage
+license smart url cslu https://cssm.chevron.net/cslu/v1/pi/Network%20Assets-1
+!
+!
+diagnostic bootup level minimal
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast bpduguard default
+spanning-tree extend system-id
+spanning-tree uplinkfast
+spanning-tree backbonefast
+spanning-tree vlan 100,200 priority 4096
+archive
+ path flash:cvx_115520
+ maximum 5
+ write-memory
+memory free low-watermark processor 134384
+!
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause gbic-invalid
+errdisable recovery cause psecure-violation
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause loopback
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode sso
+!
+!
+!
+!
+!
+!
+transceiver type all
+ monitoring
+!
+vlan 90
+ name PCN_Firewall_Net
+!
+vlan 100
+ name 146.26.43.0/25_LAN
+!
+vlan 200
+ name 146.34.251.192/27_IPT_Voice
+!
+vlan 300
+ name Aruba_Wireless
+!
+vlan 310
+ name Aruba_Mgt
+!
+vlan 400
+ name Cameras
+!
+vlan 500
+ name SmartBadge
+!
+vlan 701
+ name GUEST-Users-Data
+!
+vlan 702
+ name IND-Users-Data
+!
+vlan 703
+ name USER-Users-Data
+!
+vlan 704
+ name DEVICES-Users-Data
+!
+vlan 900
+ name Native-Vlan
+!
+vlan 2001
+ name MONCARL1-MONCARA1
+!
+vlan 2010
+ name MONCARL1-MONCARA2
+!
+vlan 3201
+ name L3CVX-GUEST
+!
+vlan 3202
+ name L3CVX-IND
+!
+vlan 3203
+ name L3CVX-USER
+!
+vlan 3204
+ name L3CVX-DEVICES
+!
+vlan 3205
+ name L3CVX-RED
+lldp run
+!
+!
+class-map match-any system-cpp-police-ewlc-control
+  description EWLC Control 
+class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data packets, LOGGING, Transit Traffic
+class-map match-any system-cpp-default
+  description EWLC Data, Inter FED Traffic 
+class-map match-any system-cpp-police-sys-data
+  description Openflow, Exception, EGR Exception, NFL Sampled Data, RPF Failed
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any DSCP-EF
+ match dscp ef 
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-high-rate-app
+  description High Rate Applications 
+class-map match-any system-cpp-police-multicast
+  description MCAST Data
+class-map match-any DSCP-CSx
+ match dscp cs3 
+ match dscp cs6 
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+  description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual OOB
+class-map match-any LAN-MARK-EF
+ match access-group name MARK-DSCP-EF
+class-map match-any non-client-nrt-class
+class-map match-any LAN-MARK-AF1
+ match access-group name MARK-DSCP-AF11
+class-map match-any system-cpp-police-routing-control
+  description Routing control and Low Latency
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+class-map match-any LAN-MARK-AF3
+ match access-group name MARK-DSCP-AF31
+class-map match-any DSCP-AF4x
+ match dscp af41 
+ match dscp af42 
+ match dscp af43 
+class-map match-any LAN-MARK-AF2
+ match access-group name MARK-DSCP-AF21
+class-map match-any DSCP-AF2x
+ match dscp af21 
+ match dscp af22 
+ match dscp af23 
+class-map match-any LAN-MARK-AF4
+ match access-group name MARK-DSCP-AF41
+class-map match-any DSCP-AF3x
+ match dscp af31 
+ match dscp af32 
+ match dscp af33 
+class-map match-any DSCP-AF1x
+ match dscp af11 
+ match dscp af12 
+ match dscp af13 
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any system-cpp-police-ios-routing
+  description L2 control, Topology control, Routing control, Low Latency
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+class-map match-any LAN-MARK-CS3
+ match access-group name MARK-DSCP-CS3
+class-map match-any system-cpp-police-ios-feature
+  description ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed
+!
+policy-map LANQOS-OUT
+ class DSCP-AF4x
+  bandwidth remaining percent 25 
+ class DSCP-AF3x
+  bandwidth remaining percent 5 
+ class DSCP-AF2x
+  bandwidth remaining percent 25 
+ class DSCP-AF1x
+  bandwidth remaining percent 15 
+ class DSCP-CSx
+  bandwidth remaining percent 5 
+ class DSCP-EF
+  priority level 1 percent 10
+ class class-default
+  bandwidth remaining percent 25 
+policy-map system-cpp-policy
+policy-map SETDSCP
+ class LAN-MARK-EF
+  set dscp ef
+ class LAN-MARK-AF4
+  set dscp af41
+ class LAN-MARK-CS3
+  set dscp cs3
+ class LAN-MARK-AF2
+  set dscp af21
+ class LAN-MARK-AF1
+  set dscp af11
+ class LAN-MARK-AF3
+  set dscp af31
+ class class-default
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 146.26.43.249 255.255.255.255
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet1/0/1
+ switchport access vlan 310
+ switchport mode access
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/2
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/3
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/4
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/5
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/6
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/7
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/8
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/9
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/10
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/11
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/12
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/13
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/14
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/15
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/16
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/17
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/18
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/19
+ description MONCASL2 Aruba AP515
+ switchport trunk native vlan 310
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/20
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/21
+ description MONCARA2 Gig 0 Cellular router
+ switchport trunk native vlan 900
+ switchport trunk allowed vlan 2010
+ switchport mode trunk
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/22
+ description *** E-Foundation , RACS connection PIX-FP1 E0 ***
+ no switchport
+ ip address 146.26.43.233 255.255.255.252
+ no ip proxy-arp
+ no logging event link-status
+ load-interval 30
+ speed 100
+ duplex full
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/23
+ description * * * PIX-FP1 MANAGEMENT INTERFACE * * *
+ no switchport
+ ip address 146.26.43.241 255.255.255.252
+ no ip proxy-arp
+ no logging event link-status
+ load-interval 30
+ speed 100
+ duplex full
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/24
+ description MONCARA1 gig0/0
+ switchport trunk native vlan 900
+ switchport trunk allowed vlan 90,310,400,500,2001
+ switchport mode trunk
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/25
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/26
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/27
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/28
+ switchport access vlan 90
+ switchport mode access
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/29
+ switchport access vlan 90
+ switchport mode access
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/30
+ switchport access vlan 90
+ switchport mode access
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/31
+ switchport access vlan 90
+ switchport mode access
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/32
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/33
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/34
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/35
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/36
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/37
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/38
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/39
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/40
+ description Reserved port for CCNG1
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/41
+ description Reserved port for CCNG1
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/42
+ description PCN_Firewall_Port
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/43
+ description PCN_Firewall_Port
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/44
+ description PCN_Firewall_Port
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/45
+ description PCN_Firewall_Port
+ switchport access vlan 100
+ switchport mode access
+ switchport nonegotiate
+ switchport voice vlan 200
+ no logging event link-status
+ load-interval 30
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/46
+ description Connected to US-CA-MONCA-RB01 port Gi0/0/2
+ no switchport
+ no ip address
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/46.3200
+ description L3CVX-CORP
+ encapsulation dot1Q 3200
+ ip address 146.26.3.229 255.255.255.252
+ no ip proxy-arp
+ ip ospf network point-to-point
+ ip ospf dead-interval 40
+ ip ospf 65001 area 0
+!
+interface GigabitEthernet1/0/46.3201
+ description L3CVX-GUEST
+ encapsulation dot1Q 3201
+ ip vrf forwarding L3CVX-GUEST
+ ip address 10.184.7.65 255.255.255.254
+ no ip proxy-arp
+ ip ospf network point-to-point
+ ip ospf dead-interval 40
+ ip ospf 65006 area 0
+!
+interface GigabitEthernet1/0/46.3202
+ description L3CVX-IND
+ encapsulation dot1Q 3202
+ ip vrf forwarding L3CVX-IND
+ ip address 10.190.7.65 255.255.255.254
+ no ip proxy-arp
+ ip ospf network point-to-point
+ ip ospf dead-interval 40
+ ip ospf 65007 area 0
+!
+interface GigabitEthernet1/0/46.3203
+ description L3CVX-USER
+ encapsulation dot1Q 3203
+ ip vrf forwarding L3CVX-USER
+ ip address 10.186.7.65 255.255.255.254
+ no ip proxy-arp
+ ip ospf network point-to-point
+ ip ospf dead-interval 40
+ ip ospf 65016 area 0
+!
+interface GigabitEthernet1/0/46.3204
+ description L3CVX-DEVICES
+ encapsulation dot1Q 3204
+ ip vrf forwarding L3CVX-DEVICES
+ ip address 10.188.7.65 255.255.255.254
+ no ip proxy-arp
+ ip ospf network point-to-point
+ ip ospf dead-interval 40
+ ip ospf 65017 area 0
+!
+interface GigabitEthernet1/0/47
+ description Connected to US-CA-MONCA-RB01 port Gi0/0/3
+ switchport mode access
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/48
+ description MONCASL2 G1/0/24 ARUBA387 AP  pt to pt
+ switchport trunk native vlan 310
+ switchport trunk allowed vlan 100,200,300,310,400,500,701-704,2001,2010
+ switchport mode trunk
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/1/1
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/1/2
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/1/3
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/1/4
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/1/1
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/1/2
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/1/3
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/1/4
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/1/5
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/1/6
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/1/7
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/1/8
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface FortyGigabitEthernet1/1/1
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface FortyGigabitEthernet1/1/2
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TwentyFiveGigE1/1/1
+!
+interface TwentyFiveGigE1/1/2
+!
+interface AppGigabitEthernet1/0/1
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan90
+ description PCN_Firewall_Net
+ ip address 146.26.3.9 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan100
+ ip address 146.26.43.1 255.255.255.128
+ ip helper-address 146.27.66.36
+ ip helper-address 136.171.184.187
+ ip helper-address 146.35.18.116
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan200
+ description Voice VLAN
+ ip address 146.34.251.193 255.255.255.224
+ ip helper-address 146.27.66.36
+ ip helper-address 136.171.184.187
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan300
+ ip address 146.26.3.33 255.255.255.248
+ no ip proxy-arp
+!
+interface Vlan310
+ ip address 146.26.3.41 255.255.255.248
+ no ip proxy-arp
+!
+interface Vlan400
+ description Cameras
+ ip address 146.26.43.209 255.255.255.248
+ no ip proxy-arp
+!
+interface Vlan500
+ description SmartBadge
+ ip address 146.26.43.217 255.255.255.248
+ no ip proxy-arp
+!
+interface Vlan701
+ description GUEST Users-Data
+ ip vrf forwarding L3CVX-GUEST
+ ip address 10.160.113.1 255.255.255.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Vlan702
+ description IND Users-Data
+ ip vrf forwarding L3CVX-IND
+ ip address 10.179.192.129 255.255.255.128
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Vlan703
+ description USER Users-Data
+ ip vrf forwarding L3CVX-USER
+ ip address 10.168.171.1 255.255.255.0
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Vlan704
+ description DEVICES Users-Data
+ ip vrf forwarding L3CVX-DEVICES
+ ip address 10.177.128.129 255.255.255.128
+ ip helper-address 146.22.1.10
+ ip helper-address 146.22.5.10
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+!
+interface Vlan2001
+ ip flow monitor FLOW4-LAN-IN input
+ ip address 146.26.43.226 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip summary-address eigrp 65055 146.34.251.192 255.255.255.192
+!
+interface Vlan2010
+ description MONCARA2 Interconnect
+ ip address 146.26.43.246 255.255.255.252
+ no ip proxy-arp
+ ip summary-address eigrp 65055 146.34.251.192 255.255.255.192
+!
+!
+router eigrp 65055
+ default-metric 2000 100 255 1 1500
+ network 146.0.0.0 0.63.255.255
+ redistribute static
+ passive-interface default
+ no passive-interface Vlan2001
+ no passive-interface Vlan2010
+ no passive-interface Vlan300
+ no passive-interface Vlan310
+ no passive-interface Vlan400
+ no passive-interface Vlan500
+ eigrp router-id 146.24.173.246
+ eigrp stub connected static summary
+!
+router ospf 65006 vrf L3CVX-GUEST
+ capability vrf-lite
+ redistribute connected
+ redistribute static
+ bfd all-interfaces
+!
+router ospf 65007 vrf L3CVX-IND
+ capability vrf-lite
+ redistribute connected
+ redistribute static
+ bfd all-interfaces
+!
+router ospf 65016 vrf L3CVX-USER
+ capability vrf-lite
+ redistribute connected
+ redistribute static
+ bfd all-interfaces
+!
+router ospf 65017 vrf L3CVX-DEVICES
+ capability vrf-lite
+ redistribute connected
+ redistribute static
+ bfd all-interfaces
+!
+router ospf 65001
+ redistribute connected
+ redistribute static
+ bfd all-interfaces
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip forward-protocol udp 5246
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim register-source Loopback0
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+no ip http server
+no ip http secure-server
+ip http client source-interface Loopback0
+ip tftp source-interface Loopback0
+ip route 146.26.43.128 255.255.255.192 146.26.3.11 name FPC51-NAT
+ip route 146.26.43.192 255.255.255.224 146.26.43.234
+ip ssh source-interface Loopback0
+ip ssh version 2
+ip scp server enable
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 60 permit 146.40.2.8
+ 70 permit 146.40.2.11
+ 80 permit 146.40.2.12
+ 90 permit 146.40.2.13
+ 50 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.0.0 0.0.255.255
+ 150 deny   any log
+ip access-list standard mcast-rp-sparse-wan
+ 10 permit 239.194.128.0 0.0.127.255
+ 20 permit 239.195.128.0 0.0.127.255
+ 30 permit 239.200.0.0 0.7.255.255
+ 40 permit 224.0.0.0 7.255.255.255
+!
+ip access-list extended MARK-DSCP-AF11
+ 10 permit ip any any dscp af11
+ 20 permit ip any any dscp af12
+ 30 permit ip any any dscp af13
+ 40 permit tcp any any eq smtp
+ 50 permit tcp any eq smtp any
+ 60 permit tcp any any eq 8080
+ 70 permit tcp any eq 8080 any
+ 80 permit tcp any any range 10565 10566
+ 90 permit tcp any range 10565 10566 any
+ 100 permit tcp any any eq 2051
+ip access-list extended MARK-DSCP-AF21
+ 10 permit udp any eq domain any
+ 20 permit udp any any eq domain
+ 30 permit udp any eq bootpc any
+ 40 permit udp any eq bootps any
+ 50 permit udp any any eq bootpc
+ 60 permit udp any any eq bootps
+ 70 permit tcp any range 22 telnet any
+ 80 permit udp any eq 88 any
+ 90 permit udp any any eq 88
+ 100 permit tcp any eq 88 any
+ 110 permit tcp any any eq 88
+ 120 permit udp any eq netbios-ns any
+ 130 permit udp any any eq netbios-ns
+ 140 permit tcp any eq 1494 any
+ 150 permit tcp any any eq 1494
+ 160 permit tcp any eq 3389 any
+ 170 permit tcp any any eq 3389
+ 180 permit udp any any eq tftp
+ 190 permit udp any eq tftp any
+ 200 permit tcp any any range 1521 1522
+ 210 permit tcp any range 1521 1522 any
+ 220 permit tcp any any eq 1433
+ 230 permit tcp any eq 1433 any
+ 240 permit udp any any eq 1434
+ 250 permit udp any eq 1434 any
+ 260 permit tcp any range 50040 50059 52.112.0.0 0.3.255.255
+ 270 permit tcp any range 50040 50059 13.107.64.0 0.0.63.255
+ 280 permit tcp any range 50040 50059 52.120.0.0 0.3.255.255
+ 290 permit tcp 52.112.0.0 0.3.255.255 any range 50040 50059
+ 300 permit tcp 13.107.64.0 0.0.63.255 any range 50040 50059
+ 310 permit tcp 52.120.0.0 0.3.255.255 any range 50040 50059
+ 320 permit udp any range 50040 50059 52.112.0.0 0.3.255.255
+ 330 permit udp any range 50040 50059 13.107.64.0 0.0.63.255
+ 340 permit udp any range 50040 50059 52.120.0.0 0.3.255.255
+ 350 permit udp 52.112.0.0 0.3.255.255 any range 50040 50059
+ 360 permit udp 13.107.64.0 0.0.63.255 any range 50040 50059
+ 370 permit udp 52.120.0.0 0.3.255.255 any range 50040 50059
+ 380 permit tcp any eq 40001 any
+ 390 permit tcp any any eq 40001
+ip access-list extended MARK-DSCP-AF31
+ 10 permit tcp any any range 2000 2002
+ 20 permit tcp any range 2000 2002 any
+ 30 permit tcp any any range 11000 11999
+ 40 permit tcp any range 11000 11999 any
+ip access-list extended MARK-DSCP-AF41
+ 10 permit tcp any range 50020 50039 52.112.0.0 0.3.255.255
+ 20 permit tcp any range 50020 50039 13.107.64.0 0.0.63.255
+ 30 permit tcp any range 50020 50039 52.120.0.0 0.3.255.255
+ 40 permit tcp 52.112.0.0 0.3.255.255 any range 50020 50039
+ 50 permit tcp 13.107.64.0 0.0.63.255 any range 50020 50039
+ 60 permit tcp 52.120.0.0 0.3.255.255 any range 50020 50039
+ 70 permit udp any range 50020 50039 52.112.0.0 0.3.255.255
+ 80 permit udp any range 50020 50039 13.107.64.0 0.0.63.255
+ 90 permit udp any range 50020 50039 52.120.0.0 0.3.255.255
+ 100 permit udp 52.112.0.0 0.3.255.255 any range 50020 50039
+ 110 permit udp 13.107.64.0 0.0.63.255 any range 50020 50039
+ 120 permit udp 52.120.0.0 0.3.255.255 any range 50020 50039
+ip access-list extended MARK-DSCP-CS3
+ 10 permit tcp any eq tacacs any
+ 20 permit tcp any any eq tacacs
+ 30 permit tcp any range 1812 1813 any
+ 40 permit tcp any any range 1812 1813
+ 50 permit udp any any eq 1719
+ 60 permit udp any eq 1719 any
+ 70 permit tcp any any range 1718 1720
+ 80 permit tcp any range 1718 1720 any
+ 90 permit udp any any eq 2427
+ 100 permit udp any eq 2427 any
+ 110 permit tcp any any eq 2428
+ 120 permit tcp any eq 2428 any
+ 130 permit tcp any any range 5060 5061
+ 140 permit udp any any range 5060 5061
+ 150 permit tcp any any eq bgp
+ 160 permit tcp any eq bgp any
+ip access-list extended MARK-DSCP-EF
+ 20 permit udp any range 16384 32767 any dscp ef
+ 30 permit udp any any range 16384 32767 dscp ef
+ 40 permit udp any range 16384 32767 any precedence critical
+ 50 permit udp any any range 16384 32767 precedence critical
+ 60 permit udp any range 50000 50019 52.120.0.0 0.3.255.255
+ 70 permit tcp 52.120.0.0 0.3.255.255 any range 50000 50019
+ 80 permit udp any range 50000 50019 13.107.64.0 0.0.63.255
+ 90 permit tcp any range 50000 50019 13.107.64.0 0.0.63.255
+ 100 permit udp any range 50000 50019 52.112.0.0 0.3.255.255
+ 110 permit udp 52.120.0.0 0.3.255.255 any range 50000 50019
+ 120 permit tcp 13.107.64.0 0.0.63.255 any range 50000 50019
+ 130 permit tcp 52.112.0.0 0.3.255.255 any range 50000 50019
+ 140 permit udp 13.107.64.0 0.0.63.255 any range 50000 50019
+ 150 permit tcp any range 50000 50019 52.112.0.0 0.3.255.255
+ 160 permit tcp any range 50000 50019 52.120.0.0 0.3.255.255
+ 170 permit udp 52.112.0.0 0.3.255.255 any range 50000 50019
+!
+!
+ip prefix-list Firewall-Statics seq 5 permit 146.26.43.192/27
+logging history size 10
+logging source-interface Loopback0
+logging host 146.36.114.214
+logging host 139.65.140.24
+ip access-list standard 20
+ 10 permit 139.65.136.0 0.0.3.255
+ 20 permit 139.65.140.0 0.0.3.255
+ 30 permit 139.65.192.0 0.0.15.255
+ 40 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 permit 146.40.10.21
+ 40 deny   any log
+ip access-list standard 1490
+ 10 permit 146.40.185.0 0.0.0.255
+ 20 deny   any log
+!
+route-map static2eigrp permit 10 
+ match ip address prefix-list Firewall-Statics
+!
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server source-interface informs Loopback0
+snmp-server location MONCA / 601 S VAIL AVE, Montebello, CA / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Low
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps license
+snmp-server enable traps memory bufferpeak
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021  config
+snmp-server host 139.65.136.12 version 3 priv cvx2022  config
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+radius-server dead-criteria time 5 tries 3
+radius-server timeout 60
+radius-server deadtime 480
+!
+radius server HOU_RadiusVIP
+ address ipv4 136.171.184.185 auth-port 1812 acct-port 1813
+ key 7 123416353C2B1E31280B7D71
+!
+radius server LON_RadiusVIP
+ address ipv4 146.38.86.26 auth-port 1812 acct-port 1813
+ key 7 09615D2B37250527092C5D73
+!
+radius server SIN_RadiusVIP
+ address ipv4 146.40.1.25 auth-port 1812 acct-port 1813
+ key 7 11240A2739321939060A727D
+!
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner login ^CCC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ length 0
+ transport preferred none
+ transport input ssh
+line vty 5 31
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+call-home
+ contact-email-addr nmbtcon@chevron.com
+ profile "CSSM"
+  reporting smart-licensing-data
+  destination transport-method http
+  no destination transport-method email
+  destination address http http://cssm.chevron.net/Transportgateway/services/DeviceRequestHandler 
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+!
+end

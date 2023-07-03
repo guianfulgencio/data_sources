@@ -1,0 +1,1002 @@
+Building configuration...
+
+Current configuration : 28337 bytes
+!
+! Last configuration change at 12:43:41 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 12:44:14 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+!
+hostname POROR1SL1
+!
+boot-start-marker
+boot system bootflash:cat4500e-universalk9.SPA.03.08.09.E.152-4.E9.bin
+boot-end-marker
+!
+!
+vrf definition mgmtVrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server radius AAA
+ server name HOU_RadiusVIP
+ server name LON_RadiusVIP
+ server name SIN_RadiusVIP
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authentication dot1x default group AAA
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group ACS if-authenticated 
+aaa authorization network flexvpn local 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting dot1x default start-stop group AAA
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+aaa server radius dynamic-author
+!
+aaa session-id common
+device-sensor accounting
+device-sensor notify all-changes
+!
+!
+!
+!
+!
+udld enable
+
+!
+!
+!
+!
+no ip source-route
+!
+ip multicast-routing 
+ip multicast heartbeat 239.194.128.31 5 10 180
+ip multicast route-limit 1000 900
+ip domain-lookup source-interface Loopback0
+ip domain-name poror1.chevrontexaco.net
+ip name-server 146.36.80.34
+ip device tracking probe delay 10
+!
+!
+login quiet-mode access-class 10
+login on-failure log
+login on-success log
+vtp domain Portland
+vtp mode transparent
+authentication mac-move permit
+!
+!
+dot1x system-auth-control
+dot1x critical eapol
+errdisable recovery cause udld
+errdisable recovery cause security-violation
+errdisable recovery cause channel-misconfig
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+errdisable recovery cause sfp-config-mismatch
+errdisable recovery cause gbic-invalid
+errdisable recovery cause l2ptguard
+errdisable recovery cause psecure-violation
+errdisable recovery cause dhcp-rate-limit
+errdisable recovery cause unicast-flood
+errdisable recovery cause vmps
+errdisable recovery cause storm-control
+errdisable recovery cause arp-inspection
+errdisable recovery interval 60
+power redundancy-mode combined
+archive
+ path bootflash:cvx_134053
+ maximum 5
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast edge bpduguard default
+spanning-tree extend system-id
+spanning-tree vlan 1 priority 24576
+spanning-tree vlan 2-999 priority 40960
+!
+vlan internal allocation policy ascending
+!
+vlan 72
+ name 146.26.72.0/24_User_LAN_Segment
+!
+vlan 88
+ name POROR1FP2-OCS
+!
+vlan 90
+ name PCN_Firewall_Net
+!
+vlan 99
+ name RACS_Subnet
+!
+vlan 200
+ name 146.41.183.128/25-IPT
+!
+vlan 236
+ name POROR1FPC01-FIREWALL-MGMT
+!
+vlan 400
+ name 146.26.73.112/29_WLAN_Mgmt
+!
+vlan 500
+ name NRWiFi 
+!
+vlan 600
+ name POROR1SAPWLAN 
+!
+vlan 999
+ name Native_Vlan
+!
+vlan 2001
+ name POROR1RA1-POROR1SL1
+!
+vlan 2010
+ name POROR1RA2-POROR1SL1
+lldp run
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+!
+class-map match-any DSCP-EF
+ match dscp ef 
+class-map match-any DSCP-CSx
+ match dscp cs3 
+ match dscp cs6 
+class-map match-any LAN-MARK-EF
+ match access-group name MARK-DSCP-EF
+class-map match-any LAN-MARK-AF1
+ match access-group name MARK-DSCP-AF11
+class-map match-any LAN-MARK-AF3
+ match access-group name MARK-DSCP-AF31
+class-map match-any DSCP-AF4x
+ match dscp af41 
+ match dscp af42 
+ match dscp af43 
+class-map match-any LAN-MARK-AF2
+ match access-group name MARK-DSCP-AF21
+class-map match-any DSCP-AF2x
+ match dscp af21 
+ match dscp af22 
+ match dscp af23 
+class-map match-any LAN-MARK-AF4
+ match access-group name MARK-DSCP-AF41
+class-map match-any DSCP-AF3x
+ match dscp af31 
+ match dscp af32 
+ match dscp af33 
+class-map match-any DSCP-AF1x
+ match dscp af11 
+ match dscp af12 
+ match dscp af13 
+class-map match-any LAN-MARK-CS3
+ match access-group name MARK-DSCP-CS3
+!
+policy-map LANQOS-OUT
+ class DSCP-AF4x
+  bandwidth remaining percent 25 
+ class DSCP-AF3x
+  bandwidth remaining percent 5 
+ class DSCP-AF2x
+  bandwidth remaining percent 25 
+ class DSCP-AF1x
+  bandwidth remaining percent 15 
+ class DSCP-CSx
+  bandwidth remaining percent 5 
+ class DSCP-EF
+  priority
+ class class-default
+  bandwidth remaining percent 25 
+policy-map SETDSCP
+ class LAN-MARK-EF
+  set dscp ef
+ class LAN-MARK-AF4
+  set dscp af41
+ class LAN-MARK-AF3
+  set dscp af31
+ class LAN-MARK-AF2
+  set dscp af21
+ class LAN-MARK-AF1
+  set dscp af11
+ class LAN-MARK-CS3
+  set dscp cs3
+ class class-default
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 146.26.73.249 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+!
+interface Port-channel1
+ no ip address
+!
+interface Port-channel2
+ description PORORSL2 Po1
+ switchport
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport nonegotiate
+ flowcontrol receive on
+!
+interface Port-channel3
+ description PORORSL3 Po1
+ switchport
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ flowcontrol receive on
+!
+interface Port-channel4
+ description PORORSL4 Po1
+ switchport
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ flowcontrol receive on
+!
+interface Port-channel5
+ description PORORSL5 Po1
+ switchport
+ switchport trunk allowed vlan 1,2,72,90,99,200,236
+ switchport trunk native vlan 999
+ switchport mode trunk
+ flowcontrol receive on
+!
+interface Port-channel9
+ description PORORSL9 Po1
+ switchport
+ switchport trunk allowed vlan 1,72,88,99,200,236,400,500
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ flowcontrol receive on
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+ spanning-tree guard loop
+ ip dhcp snooping trust
+!
+interface Port-channel14
+ description *** POROR1SL10 ***
+ switchport
+ switchport trunk allowed vlan 72
+ switchport trunk native vlan 999
+ switchport mode trunk
+ load-interval 30
+ flowcontrol receive on
+!
+interface Port-channel15
+ description *** POROR1SL11***
+ switchport
+ switchport trunk allowed vlan 1,72,400,500,600
+ switchport trunk native vlan 999
+ switchport mode trunk
+ load-interval 30
+ flowcontrol receive on
+!
+interface FastEthernet1
+ vrf forwarding mgmtVrf
+ no ip address
+ speed auto
+ duplex auto
+!
+interface TenGigabitEthernet1/1
+ description PORORSL2
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport nonegotiate
+ udld port
+ channel-group 2 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/2
+ description PORORSL2
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport nonegotiate
+ udld port
+ channel-group 2 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/3
+ description PORORSL3
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ channel-group 3 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/4
+ description PORORSL3
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ channel-group 3 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/5
+ description PORORSL4
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ channel-group 4 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/6
+ description PORORSL4
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ channel-group 4 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/7
+ description PORORSL5
+ switchport trunk allowed vlan 1,2,72,90,99,200,236
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ channel-group 5 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/8
+ description PORORSL5
+ switchport trunk allowed vlan 1,2,72,90,99,200,236
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ channel-group 5 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/9
+ description PORORSL7
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ spanning-tree guard loop
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/10
+ description **WAS RESERVED FOR SL7, DUE TO FIBER LIMITS, SL7 CONNECTS TO SL6**
+ switchport trunk allowed vlan 1,72
+ switchport trunk native vlan 999
+ switchport mode trunk
+ shutdown
+ udld port
+ spanning-tree guard loop
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/11
+ description PORORSL8
+ switchport trunk allowed vlan 1,72,200
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ spanning-tree guard loop
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/12
+ description PORORSL9 
+ switchport trunk allowed vlan 1,72,88,99,200,236,400,500
+ switchport trunk native vlan 999
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ udld port
+ channel-protocol lacp
+ channel-group 9 mode active
+ spanning-tree portfast disable
+ spanning-tree bpduguard disable
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+ ip dhcp snooping trust
+!
+interface TenGigabitEthernet1/13
+ description *** POROR1SL10  Gi1/1/1 ***
+ switchport trunk allowed vlan 72
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ channel-group 14 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/14
+ description *** POROR1SL10  Gi1/1/2 ***
+ switchport trunk allowed vlan 72
+ switchport trunk native vlan 999
+ switchport mode trunk
+ udld port
+ channel-group 14 mode active
+ spanning-tree guard loop
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/15
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/16
+ description Uplink to POROR1RA1 G0/0
+ switchport trunk allowed vlan 2001
+ switchport mode trunk
+ load-interval 30
+ udld port
+ no snmp trap link-status
+ spanning-tree bpduguard enable
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/1
+ description *** pororfhs50a - Firewall - CVX *** 
+ switchport access vlan 72
+ switchport mode access
+ authentication control-direction in
+ authentication event server dead action authorize vlan 72
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast edge
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/2
+ description *** pororfhs50b - Firewall - CVX *** 
+ switchport access vlan 72
+ switchport mode access
+ authentication control-direction in
+ authentication event server dead action authorize vlan 72
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast edge
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/3
+ description *** POROR1SL11 Gi1/1/1 ***
+ switchport trunk allowed vlan 1,72,400,500,600
+ switchport trunk native vlan 999
+ switchport mode trunk
+ channel-group 15 mode active
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/4
+ description *** POROR1SL11 Te2/1/2***
+ switchport trunk allowed vlan 1,72,400,500,600
+ switchport trunk native vlan 999
+ switchport mode trunk
+ channel-group 15 mode active
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/5
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/6
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/7
+ description Trunk Link to POROR1RA2 Gi0/0
+ switchport trunk allowed vlan 2010
+ switchport trunk native vlan 900
+ switchport mode trunk
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/8
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface Vlan1
+ description VLAN Management Subnet
+ ip address 146.26.73.129 255.255.255.192
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan72
+ description User LAN Segment
+ ip address 146.26.72.1 255.255.255.0
+ ip helper-address 146.27.66.36 
+ ip helper-address 146.27.72.93 
+ ip helper-address 136.171.184.187 
+ ip helper-address 146.36.3.180 
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan90
+ description PCN_Firewall_Net
+ ip address 146.26.73.121 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan99
+ description Connection to RACS system
+ ip address 146.26.73.233 255.255.255.252
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip cgmp
+!
+interface Vlan200
+ description IPT Segment
+ ip address 146.41.183.129 255.255.255.128
+ ip helper-address 146.27.66.36 
+ ip helper-address 136.171.184.187 
+ no ip redirects
+ no ip proxy-arp
+!
+interface Vlan236
+ description POROR1FPC01 FIREWALL MGMT
+ ip address 146.26.73.237 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan400
+ description POROR1 WLAN Mgmt 
+ ip address 146.26.73.118 255.255.255.248
+ no ip proxy-arp
+!
+interface Vlan500
+ description POROR1- NRWiFi  
+ ip address 146.26.74.129 255.255.255.128
+ ip helper-address 146.27.66.36 
+ ip helper-address 146.27.72.93 
+ ip helper-address 136.171.184.187 
+ ip helper-address 146.36.3.180 
+ no ip proxy-arp
+!
+interface Vlan2001
+ ip address 146.26.73.227 255.255.255.248
+ no ip redirects
+ no ip proxy-arp
+ ip summary-address eigrp 65055 146.26.72.0 255.255.254.0
+ ip summary-address eigrp 65055 146.26.73.120 255.255.255.248
+ ip summary-address eigrp 65055 146.26.75.128 255.255.255.192
+ ip summary-address eigrp 65055 146.41.183.128 255.255.255.128
+ load-interval 30
+!
+interface Vlan2010
+ ip address 146.26.33.210 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip summary-address eigrp 65055 146.26.72.0 255.255.254.0
+ ip summary-address eigrp 65055 146.26.73.120 255.255.255.248
+ ip summary-address eigrp 65055 146.26.75.128 255.255.255.192
+ ip summary-address eigrp 65055 146.41.183.128 255.255.255.128
+!
+!
+router eigrp 65055
+ default-metric 2000 100 255 1 1500
+ network 146.0.0.0 0.63.255.255
+ network 146.26.33.208 0.0.0.3
+ network 146.26.72.0 0.0.1.255
+ network 146.26.73.251 0.0.0.0
+ network 146.41.183.128 0.0.0.127
+ redistribute static route-map FW-STATIC-to-EIGRP
+ passive-interface default
+ no passive-interface Vlan2001
+ no passive-interface Vlan2010
+ eigrp router-id 146.26.73.249
+ eigrp stub connected static summary
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip forward-protocol udp 5246
+ip forward-protocol udp 5247
+no ip http server
+no ip http secure-server
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+!
+ip tftp source-interface Loopback0
+ip route 146.26.73.32 255.255.255.224 146.26.72.5 name SAP_WLAN
+ip route 146.26.73.64 255.255.255.240 146.26.72.5
+ip route 146.26.73.80 255.255.255.240 146.26.72.5 name DMZ
+ip route 146.26.73.96 255.255.255.240 146.26.72.16
+ip route 146.26.73.192 255.255.255.224 146.26.73.234
+ip route 146.26.73.253 255.255.255.255 146.26.72.5 name DMZ.Loopback
+ip route 146.26.75.128 255.255.255.192 146.26.73.123 name FPC51-NAT
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-boundary-site-campus
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-boundary-site-campus-high
+ remark Campus
+ deny   239.193.0.0 0.0.255.255
+ remark SSM Campus
+ deny   239.232.253.0 0.0.0.255
+ remark Site
+ deny   239.255.0.0 0.0.255.255
+ remark High-Speed WAN
+ deny   239.194.0.0 0.0.255.255
+ remark Permit everything else
+ permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-limit-hi-gt1Mbps
+ permit 239.194.193.0 0.0.0.255
+ip access-list standard mcast-limit-hi-gt1mbps
+ permit 239.195.128.0 0.0.0.255
+ permit 239.194.128.0 0.0.0.255
+ permit 239.195.192.0 0.0.0.255
+ permit 239.194.192.0 0.0.0.255
+ permit 239.194.193.0 0.0.0.255
+ip access-list standard mcast-limit-hi-max1mbps
+ permit 239.194.192.0 0.0.0.255
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+ permit 224.0.0.0 7.255.255.255
+!
+ip access-list extended MARK-DSCP-AF11
+ permit ip any any dscp af11
+ permit ip any any dscp af12
+ permit ip any any dscp af13
+ permit tcp any any eq smtp
+ permit tcp any eq smtp any
+ permit tcp any any eq 8080
+ permit tcp any eq 8080 any
+ permit tcp any any range 10565 10566
+ permit tcp any range 10565 10566 any
+ permit tcp any any eq 2051
+ip access-list extended MARK-DSCP-AF21
+ permit udp any eq domain any
+ permit udp any any eq domain
+ permit udp any eq bootpc any
+ permit udp any eq bootps any
+ permit udp any any eq bootpc
+ permit udp any any eq bootps
+ permit tcp any range 22 telnet any
+ permit udp any eq 88 any
+ permit udp any any eq 88
+ permit tcp any eq 88 any
+ permit tcp any any eq 88
+ permit udp any eq netbios-ns any
+ permit udp any any eq netbios-ns
+ permit tcp any eq 1494 any
+ permit tcp any any eq 1494
+ permit tcp any eq 3389 any
+ permit tcp any any eq 3389
+ permit udp any any eq tftp
+ permit udp any eq tftp any
+ permit tcp any any range 1521 1522
+ permit tcp any range 1521 1522 any
+ permit tcp any any eq 1433
+ permit tcp any eq 1433 any
+ permit udp any any eq 1434
+ permit udp any eq 1434 any
+ permit tcp any range 50040 50059 52.112.0.0 0.3.255.255
+ permit tcp any range 50040 50059 13.107.64.0 0.0.63.255
+ permit tcp any range 50040 50059 52.120.0.0 0.3.255.255
+ permit tcp 52.112.0.0 0.3.255.255 any range 50040 50059
+ permit tcp 13.107.64.0 0.0.63.255 any range 50040 50059
+ permit tcp 52.120.0.0 0.3.255.255 any range 50040 50059
+ permit udp any range 50040 50059 52.112.0.0 0.3.255.255
+ permit udp any range 50040 50059 13.107.64.0 0.0.63.255
+ permit udp any range 50040 50059 52.120.0.0 0.3.255.255
+ permit udp 52.112.0.0 0.3.255.255 any range 50040 50059
+ permit udp 13.107.64.0 0.0.63.255 any range 50040 50059
+ permit udp 52.120.0.0 0.3.255.255 any range 50040 50059
+ permit tcp any eq 40001 any
+ permit tcp any any eq 40001
+ip access-list extended MARK-DSCP-AF31
+ permit tcp any any range 2000 2002
+ permit tcp any range 2000 2002 any
+ permit tcp any any range 11000 11999
+ permit tcp any range 11000 11999 any
+ip access-list extended MARK-DSCP-AF41
+ permit tcp any range 50020 50039 52.112.0.0 0.3.255.255
+ permit tcp any range 50020 50039 13.107.64.0 0.0.63.255
+ permit tcp any range 50020 50039 52.120.0.0 0.3.255.255
+ permit tcp 52.112.0.0 0.3.255.255 any range 50020 50039
+ permit tcp 13.107.64.0 0.0.63.255 any range 50020 50039
+ permit tcp 52.120.0.0 0.3.255.255 any range 50020 50039
+ permit udp any range 50020 50039 52.112.0.0 0.3.255.255
+ permit udp any range 50020 50039 13.107.64.0 0.0.63.255
+ permit udp any range 50020 50039 52.120.0.0 0.3.255.255
+ permit udp 52.112.0.0 0.3.255.255 any range 50020 50039
+ permit udp 13.107.64.0 0.0.63.255 any range 50020 50039
+ permit udp 52.120.0.0 0.3.255.255 any range 50020 50039
+ip access-list extended MARK-DSCP-CS3
+ permit tcp any eq tacacs any
+ permit tcp any any eq tacacs
+ permit tcp any range 1812 1813 any
+ permit tcp any any range 1812 1813
+ permit udp any any eq 1719
+ permit udp any eq 1719 any
+ permit tcp any any range 1718 1720
+ permit tcp any range 1718 1720 any
+ permit udp any any eq 2427
+ permit udp any eq 2427 any
+ permit tcp any any eq 2428
+ permit tcp any eq 2428 any
+ permit tcp any any range 5060 5061
+ permit udp any any range 5060 5061
+ permit tcp any any eq bgp
+ permit tcp any eq bgp any
+ip access-list extended MARK-DSCP-EF
+ permit udp any range 16384 32767 any dscp ef
+ permit udp any any range 16384 32767 dscp ef
+ permit udp any range 16384 32767 any precedence critical
+ permit udp any any range 16384 32767 precedence critical
+ permit tcp any range 50000 50019 52.112.0.0 0.3.255.255
+ permit tcp any range 50000 50019 13.107.64.0 0.0.63.255
+ permit tcp any range 50000 50019 52.120.0.0 0.3.255.255
+ permit tcp 52.112.0.0 0.3.255.255 any range 50000 50019
+ permit tcp 13.107.64.0 0.0.63.255 any range 50000 50019
+ permit tcp 52.120.0.0 0.3.255.255 any range 50000 50019
+ permit udp any range 50000 50019 52.112.0.0 0.3.255.255
+ permit udp any range 50000 50019 13.107.64.0 0.0.63.255
+ permit udp any range 50000 50019 52.120.0.0 0.3.255.255
+ permit udp 52.112.0.0 0.3.255.255 any range 50000 50019
+ permit udp 13.107.64.0 0.0.63.255 any range 50000 50019
+ permit udp 52.120.0.0 0.3.255.255 any range 50000 50019
+!
+!
+ip prefix-list FW-STATIC-to-EIGRP seq 5 permit 146.26.73.96/28
+ip prefix-list FW-STATIC-to-EIGRP seq 10 permit 146.26.73.192/27
+ip prefix-list FW-STATIC-to-EIGRP seq 15 permit 146.26.73.80/28
+ip prefix-list FW-STATIC-to-EIGRP seq 20 permit 146.26.73.253/32
+ip prefix-list FW-STATIC-to-EIGRP seq 25 permit 146.26.73.32/27
+ip prefix-list FW-STATIC-to-EIGRP seq 30 permit 146.26.73.64/28
+ip prefix-list FW-STATIC-to-EIGRP seq 35 permit 146.26.73.120/29
+ip prefix-list FW-STATIC-to-EIGRP seq 40 permit 146.26.75.128/26
+logging history size 10
+logging source-interface Loopback0
+logging host 146.27.145.4
+logging host 146.27.145.68
+logging host 146.27.145.132
+logging host 146.27.95.122
+logging host 146.36.114.214
+logging host 134.248.81.53
+logging host 139.65.140.24
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+route-map FW-STATIC-to-EIGRP permit 10
+ match ip address prefix-list FW-STATIC-to-EIGRP
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 auth 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location POROR1 / 5531 NW Doane Ave, Portland, OR /USA /Americas /US-NA-Utility-WAN-Remotes/Criticality-Low
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps transceiver all
+snmp-server enable traps memory
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps ipmulticast
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+!
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+radius-server dead-criteria time 5 tries 3
+radius-server timeout 60
+radius-server deadtime 480
+!
+radius server HOU_RadiusVIP
+ address ipv4 136.171.184.185 auth-port 1812 acct-port 1813
+ key 7 062B1C03626E1B2C07374B52
+!
+radius server LON_RadiusVIP
+ address ipv4 146.38.86.26 auth-port 1812 acct-port 1813
+ key 7 143A01292224381E26086A6C
+!
+radius server SIN_RadiusVIP
+ address ipv4 146.40.1.25 auth-port 1812 acct-port 1813
+ key 7 153F182E2A0A39112A136C7B
+!
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ length 0
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

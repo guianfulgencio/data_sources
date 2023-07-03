@@ -1,0 +1,537 @@
+Building configuration...
+
+
+  
+Current configuration : 14128 bytes
+!
+! Last configuration change at 12:46:56 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 12:47:30 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.7
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+!
+hostname SJ215GA1
+!
+boot-start-marker
+boot system flash:c2900-universalk9-mz.SPA.157-3.M4a.bin
+boot-end-marker
+!
+!
+card type t1 0 0
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface GigabitEthernet0/0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group tacacs+
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause rootguard
+errdisable recovery cause pagp-flap
+errdisable recovery cause dtp-flap
+errdisable recovery cause link-flap
+network-clock-participate wic 0 
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+!
+!
+!
+ip domain lookup source-interface GigabitEthernet0/0
+ip domain name sj215.chevrontexaco.net
+ip name-server 146.23.1.1
+ip name-server 146.23.2.2
+ip cef
+no ipv6 cef
+multilink bundle-name authenticated
+!
+!
+!
+!
+isdn switch-type primary-dms100
+!
+!
+trunk group pstn.pri
+ hunt-scheme round-robin
+!
+!
+crypto pki trustpoint TP-self-signed-1146789062
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1146789062
+ revocation-check none
+!
+!
+crypto pki certificate chain TP-self-signed-1146789062
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 04050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 31313436 37383930 3632301E 170D3132 30313230 31303139 
+  35385A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 31343637 
+  38393036 3230819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281 
+  8100DF11 1A1622D2 E8BD4D98 050DD10A 6FAC9F1D 2833E6E6 AB2ACBAC E7F865AD 
+  A93B1F9E 7A328D76 59A9FC9A E997E815 0940FE5D 69B3E663 511BBB56 84159A84 
+  72BEE1F6 4CD01194 B184F09D 4C0BEF8A 4C7B1FA6 62E6FEB7 BEFAA643 E09DF7DC 
+  CB07BC84 9D749E21 703CB840 F69C54F2 065F239E 5EC3E3A7 232F3FEA 5577640E 
+  223D0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603 
+  551D2304 18301680 14FD7D7B DE50B31B 343FB990 A0138A59 22D687A3 E7301D06 
+  03551D0E 04160414 FD7D7BDE 50B31B34 3FB990A0 138A5922 D687A3E7 300D0609 
+  2A864886 F70D0101 04050003 818100C9 A059BD97 4EDC3A4B A80855C4 7E0E8857 
+  4AD766AB 8FAC40E7 A7C70FC6 AAD2637E D24BF1A1 644894D4 6F480C83 BB858113 
+  EC253CA6 128CDC8B C75F1122 BD163988 45B252A7 0EFC235C 912A68EA 848F9A65 
+  A5602E2C 7D94CE75 4C880874 44D6BAA5 344D1C74 9317352F 5861A5A1 B599C817 
+  1D6C15DD BF563375 CBA3EA24 524199
+  	quit
+voice-card 0
+ dspfarm
+ dsp services dspfarm
+!
+!
+!
+voice service voip
+ allow-connections h323 to h323
+ allow-connections h323 to sip
+ allow-connections sip to h323
+ allow-connections sip to sip
+ no supplementary-service h225-notify cid-update
+ fax protocol t38 nse force version 0 ls-redundancy 5 hs-redundancy 2 fallback none
+ modem relay nse codec g711ulaw redundancy gw-controlled
+ h323
+  h225 display-ie ccm-compatible
+ sip
+  bind control source-interface GigabitEthernet0/0
+  bind media source-interface GigabitEthernet0/0
+  registrar server expires max 120 min 60
+!
+!
+!
+!
+voice register global
+ default mode
+ no allow-hash-in-dn
+ system message FALLBACK MODE
+ max-dn 220
+ max-pool 110
+!
+voice register pool  1
+ translation-profile incoming prepend.to.8
+ id network 146.34.243.0 mask 255.255.255.128
+ incoming called-number 
+ dtmf-relay rtp-nte
+ call-forward b2bua busy 914032345200  
+ call-forward b2bua noan 914032345200 timeout 15
+ no vad
+!
+!
+!
+voice translation-rule 1
+ rule 1 /^8\(7......\)$/ /709\1/
+!
+voice translation-rule 2
+ rule 1 /^\(6...\)$/ /8757\1/
+ rule 2 /^\(76..\)$/ /8757\1/
+ rule 3 /^\(7[34]..\)$/ /8733\1/
+ rule 4 /87576110/ /914032345200/
+!
+voice translation-rule 3
+ rule 1 /^87..\(....\)$/ /\1/
+!
+voice translation-rule 4
+ rule 1 /^7097..\(6...\)$/ /8757\1/
+ rule 2 /^7097..\(76..\)$/ /8757\1/
+ rule 3 /^7097..\(7[34]..\)$/ /8733\1/
+ rule 4 /^9.*/ //
+!
+!
+voice translation-profile prepend.to.8
+ translate calling 3
+ translate called 2
+!
+voice translation-profile pstn.in
+ translate called 4
+!
+voice translation-profile pstn.out
+ translate calling 1
+!
+!
+!
+vxml logging-tag
+license udi pid CISCO2921/K9 sn FGL152611GP
+hw-module pvdm 0/0
+!
+!
+!
+archive
+ path flash0:cvx_134428
+ maximum 5
+vtp domain CHEVRON
+vtp mode transparent
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+!
+!
+controller T1 0/0/0
+ cablelength long 0db
+ pri-group timeslots 1-24 service mgcp
+!
+controller T1 0/0/1
+ shutdown
+ cablelength long 0db
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface GigabitEthernet0/0
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ description $ETH-LAN$$ETH-SW-LAUNCH$$INTF-INFO-GE 0/0$
+ ip address 146.34.243.2 255.255.255.128
+ no ip proxy-arp
+ duplex auto
+ speed auto
+ h323-gateway voip interface
+ h323-gateway voip bind srcaddr 146.34.243.2
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0:23
+ no ip address
+ encapsulation hdlc
+ no cdp enable
+ isdn switch-type primary-dms100
+ isdn incoming-voice voice
+ isdn bind-l3 ccm-manager
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+no ip http server
+no ip http secure-server
+!
+ip tftp source-interface GigabitEthernet0/0
+ip route 0.0.0.0 0.0.0.0 146.34.243.1
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.42.255.132
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.140.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+logging source-interface GigabitEthernet0/0
+logging host 199.103.13.209
+logging host 146.27.95.122
+logging host 146.29.27.38
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+!
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source GigabitEthernet0/0
+snmp-server location SJ215 / Atlantic Place: 215 Water Street, Suite, St. John's, Newfoundland & Labr. / Canada / Americas /US-NA-Utility-WAN-Remotes/Criticality-Medium
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server host 139.65.136.12 version 3 priv cvx2021  config
+snmp-server host 139.65.136.12 version 3 priv cvx2022  config
+snmp-server host 144.5.129.147 version 3 priv cvx2023 
+snmp ifmib ifalias long
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1410 permit 146.29.29.90
+access-list 1410 deny   any log
+access-list 1530 permit 199.103.13.0 0.0.0.255
+access-list 1530 permit 199.103.14.0 0.0.0.255
+access-list 1530 deny   any log
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/0/0:23
+ cptone CA
+ !
+ !
+ !
+ !
+!
+mgcp
+mgcp call-agent calcucmipt1.cal.chevrontexaco.net 2427 service-type mgcp version 0.1
+mgcp rtp unreachable timeout 1000 action notify
+mgcp modem passthrough voip mode nse
+mgcp package-capability rtp-package
+mgcp package-capability sst-package
+mgcp package-capability pre-package
+no mgcp package-capability res-package
+no mgcp timer receive-rtcp
+mgcp sdp simple
+mgcp fax t38 ls_redundancy 5
+mgcp fax t38 hs_redundancy 2
+mgcp fax t38 nsf 000000
+mgcp fax t38 gateway force
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local GigabitEthernet0/0
+sccp ccm 146.34.19.180 identifier 3 priority 3 version 7.0 
+sccp ccm 146.34.19.102 identifier 2 priority 2 version 7.0 
+sccp ccm 146.34.19.84 identifier 1 priority 1 version 7.0 
+sccp
+!
+sccp ccm group 1
+ associate ccm 1 priority 1
+ associate ccm 2 priority 2
+ associate ccm 3 priority 3
+ associate profile 1 register TXC_SJ215GA1
+ associate profile 2 register CFB_SJ215GA1
+ associate profile 3 register MTP_SJ215GA1
+!
+ccm-manager music-on-hold
+!
+ccm-manager fallback-mgcp 
+ccm-manager redundant-host calnxcm2.cal.chevrontexaco.net calnxcm1.cal.chevrontexaco.net
+ccm-manager mgcp
+no ccm-manager fax protocol cisco
+ccm-manager config server 146.34.19.84  
+ccm-manager config
+!
+dspfarm profile 1 transcode  
+ codec g711ulaw
+ codec g711alaw
+ codec g729ar8
+ codec g729abr8
+ codec g729r8
+ codec pass-through
+ maximum sessions 3
+ associate application SCCP
+!
+dspfarm profile 2 conference  
+ codec g711ulaw
+ codec g711alaw
+ codec g729ar8
+ codec g729abr8
+ codec g729r8
+ codec g729br8
+ associate application SCCP
+ shutdown
+!
+dspfarm profile 3 mtp  
+ codec g711ulaw
+ maximum sessions software 500
+ associate application SCCP
+!
+dial-peer voice 90007 pots
+ trunkgroup pstn.pri
+ description LOCAL 7 DIGIT DIALING
+ destination-pattern 9[2-9]......
+ forward-digits 7
+!
+dial-peer voice 90011 pots
+ trunkgroup pstn.pri
+ description NANP / LONG DISTAND
+ destination-pattern 9[01][2-9]..[2-9]......
+ forward-digits 11
+!
+dial-peer voice 90012 pots
+ trunkgroup pstn.pri
+ description INTERNATIONAL
+ destination-pattern 9011T
+ prefix 011
+!
+dial-peer voice 1 pots
+ trunkgroup pstn.pri
+ incoming called-number .
+ direct-inward-dial
+!
+!
+sip-ua 
+ timers keepalive down 3
+ timers keepalive active 10
+!
+!
+!
+gatekeeper
+ shutdown
+!
+!
+call-manager-fallback
+ secondary-dialtone 9
+ max-conferences 8 gain -6
+ transfer-system full-consult
+ ip source-address 146.34.243.2 port 2000
+ max-ephones 20
+ max-dn 40 octo-line
+ translation-profile incoming prepend.to.8
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ transport output pad telnet rlogin lapb-ta mop udptn v120 ssh
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp source GigabitEthernet0/0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end

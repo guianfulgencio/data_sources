@@ -1,0 +1,1729 @@
+Building configuration...
+
+Current configuration : 45930 bytes
+!
+! Last configuration change at 06:28:21 CDT Fri Jun 16 2023 by admin
+! NVRAM config last updated at 06:28:57 CDT Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.2
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+!
+hostname WR29RL1-VSS
+!
+boot-start-marker
+boot system bootflash:cat4500e-universalk9.SPA.03.08.05.E.152-4.E5.bin
+boot system bootflash:cat4500e-universalk9.SPA.03.06.01.E.152-2.E1.bin
+boot-end-marker
+!
+!
+vrf definition mgmtVrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 128000
+logging event link-status global
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone CST -6 0
+clock summer-time CDT recurring
+!
+switch virtual domain 29
+ switch mode virtual
+ mac-address use-virtual
+!
+ dual-active detection pagp trust channel-group 255
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip source-route
+!
+ip multicast-routing 
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+no ip domain-lookup
+ip domain-name wr29.chevrontexaco.net
+ip name-server 146.23.1.1
+ip name-server 146.23.2.2
+ip dhcp excluded-address 146.32.3.33 146.32.3.36
+ip dhcp excluded-address 146.32.3.161
+ip dhcp excluded-address 146.32.3.164 146.32.3.171
+!
+ip dhcp pool temp_POB
+ network 146.32.3.32 255.255.255.240
+ default-router 146.32.3.33 
+ netbios-name-server 146.24.112.34 
+ option 150 ip 146.34.11.164 
+ dns-server 146.24.112.34 
+!
+ip dhcp pool temp_Rigkit
+ network 146.32.3.160 255.255.255.240
+ default-router 146.32.3.161 
+ netbios-name-server 146.24.112.34 
+ option 150 ip 146.34.11.164 
+ dns-server 146.24.112.34 
+!
+!
+vtp mode off
+!
+!
+flow record wr29r1
+ match ipv4 source address
+ match ipv4 destination address
+ collect counter bytes long
+ collect counter packets long
+ collect timestamp sys-uptime first
+ collect timestamp sys-uptime last
+!
+!
+flow exporter EMC_Collector
+ description EMC Netflow Collector
+ destination 146.36.126.150
+ source Loopback0
+ transport udp 9995
+!
+!
+flow monitor wr29m1
+ exporter EMC_Collector
+ cache timeout inactive 30
+ cache timeout active 60
+ cache entries 30000
+ record wr29r1
+!
+!
+crypto pki trustpoint DNAC-CA
+ enrollment mode ra
+ enrollment terminal
+ usage ssl-client
+ revocation-check crl none
+!
+!
+crypto pki certificate chain DNAC-CA
+ certificate ca 0092610CB2638158CF
+  30820397 3082027F A0030201 02020900 92610CB2 638158CF 300D0609 2A864886 
+  F70D0101 0B050030 62312D30 2B060355 04030C24 32346434 39356664 2D386539 
+  392D3434 36612D37 3231622D 63383966 38643734 63373161 31163014 06035504 
+  0A0C0D43 6973636F 20537973 74656D73 31193017 06035504 0B0C1043 6973636F 
+  20444E41 2043656E 74657230 1E170D31 39313231 37313333 3931385A 170D3232 
+  30393132 31333339 31385A30 62312D30 2B060355 04030C24 32346434 39356664 
+  2D386539 392D3434 36612D37 3231622D 63383966 38643734 63373161 31163014 
+  06035504 0A0C0D43 6973636F 20537973 74656D73 31193017 06035504 0B0C1043 
+  6973636F 20444E41 2043656E 74657230 82012230 0D06092A 864886F7 0D010101 
+  05000382 010F0030 82010A02 82010100 B91BAE52 6ABF65E3 E7324160 3B489B72 
+  33C670BC 40B11A56 044E7390 DEF9EBB5 74C9EFD7 B3A2642F 1F861B1E D01E7617 
+  3530991D 4A46E4DD D31C11FB 9802B274 AB41B09B 454FDFB2 76C5303A 57EE02E7 
+  E7902FC5 FD86F32C 455DED22 60899EF0 49E99733 9805E111 36356CB3 F7D15E24 
+  A3CF654A 7F2670A8 8A031EA9 52704708 EE5D9AB2 0E74F074 1153C28E 3A5C35F9 
+  6CAEAB36 88BC44BC 2B20B9BC CA87EF08 7CA93337 C02E51A5 B248F825 FA3D5B31 
+  F336B9E0 AADDD20B 45092A3C AF973D00 4C9D2846 D2C58A9A A55B4FCC 558590FB 
+  F92BB5C9 6AA553A2 FD6D70FA EFA6E33F A72B01D2 37508587 4ED61FC5 3557A584 
+  AC8978E1 DC2BA371 468ADDCE BEB1629F 02030100 01A35030 4E301D06 03551D0E 
+  04160414 E9CED628 F4149FD9 F360E63F 809B6594 B6BD467C 301F0603 551D2304 
+  18301680 14E9CED6 28F4149F D9F360E6 3F809B65 94B6BD46 7C300C06 03551D13 
+  04053003 0101FF30 0D06092A 864886F7 0D01010B 05000382 01010087 66C08539 
+  F519565B 1B34CC4B 1DF5F557 499E3D9D CA347AEA 4F2D2BAA 8A3D968A 015E46FD 
+  25B06B6A 11360A6C E3F9428B C893BFC5 C120F5BC F59952D2 F3E4E9A3 A9719AA7 
+  0559D770 70DBCD37 B1E4434D AE2EE9AE 67D9B8A6 CAF5E31D 4E7970A2 E5BF841B 
+  F5138287 5D500D5D FCCADEB5 AC4D30B9 F7A138BC EE9E9BE0 FD28C998 ADB97A0F 
+  D31E131F B4AB3237 E16FD258 FAF7B63F A2C6F06D 1A1E6841 8BC33BE9 527BCE13 
+  4B8657F9 81B42C91 BED01378 4F9E6270 FE1A1B1B AE61CC10 3B9F5DBB 61671538 
+  151A047C DBC9A6AB 37B71285 3349AF7E 0E70F405 43E65F8C 90B0B76A 89E4B824 
+  4368842A B1B3C0AD 0462ADAD F846A4EE 1518CFAC 33882F90 CC6A10
+  	quit
+power redundancy-mode combined
+!
+mac access-list extended VSL-BPDU
+ permit any 0180.c200.0000 0000.0000.0003
+mac access-list extended VSL-CDP
+ permit any host 0100.0ccc.cccc
+mac access-list extended VSL-DOT1x
+ permit any any 0x888E
+mac access-list extended VSL-GARP
+ permit any host 0180.c200.0020
+mac access-list extended VSL-LLDP
+ permit any host 0180.c200.000e
+mac access-list extended VSL-MGMT
+ permit any 0022.bdcd.d200 0000.0000.00ff
+ permit 0022.bdcd.d200 0000.0000.00ff any
+mac access-list extended VSL-SSTP
+ permit any host 0100.0ccc.cccd
+archive
+ path bootflash:cvx_122533
+ maximum 5
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+no spanning-tree vlan 100
+spanning-tree vlan 1-949,952-4094 priority 24576
+!
+redundancy
+ mode sso
+!
+vlan internal allocation policy ascending
+!
+vlan 10
+ name 146.032.000.000/24_BLAN
+!
+vlan 11
+ name 146.032.001.064/27_BGF_BLAN_SERV
+!
+vlan 12
+ name 146.032.004.000/24_BLAN_QUAYSIDE
+!
+vlan 13
+ name SLB.REALTIMEMONITOR
+!
+vlan 19
+ name 146.032.001.096/27_BLAN_VM_MGMT
+!
+vlan 20
+ name 146.041.175.000/24_Voice_VLAN
+!
+vlan 21
+ name SLB.DMDI 
+!
+vlan 40
+ name 146.032.001.000/26_WLAN
+!
+vlan 50
+ name 146.032.245.232/30_WARS_BLAN
+!
+vlan 51
+ name 146.32.3.0/28_BGF_CARS_BLAN
+!
+vlan 52
+ name 146.32.3.16/28_BGF_AVIATION_BLAN
+!
+vlan 53
+ name 146.32.3.48/28_BGF_AWOS_BLAN
+!
+vlan 54
+ name 146.032.003.080/28_Video_Conf
+!
+vlan 55
+ name 146.32.3.32/28_Temp_POB_Trailer
+!
+vlan 60 
+!
+vlan 61
+ name 146.032.003.164/28_CCTV_MGMT
+!
+vlan 100
+ name 146.032.001.128/28_WIMAX_MGMT
+!
+vlan 101
+ name 146.032.001.160/28_WIMAX_BLAN
+!
+vlan 151
+ name 146.032.002.000/26_BGF_DMZ
+!
+vlan 161
+ name 146.032.001.192/29_BGF_STEELHEAD
+!
+vlan 180
+ name LTE_eNodeB
+!
+vlan 217
+ name 144.5.217.0/25_KOS_VLAN_FOR_Tunn
+!
+vlan 250
+ name 146.032.003.096/27_RIGKIT_VIRTUA
+!
+vlan 400
+ name 146.032.003.128/27_RIGKIT_SERVER
+!
+vlan 401
+ name 10.25.118.160/27_Wellops144-Data
+!
+vlan 500
+ name 146.032.003.160/28_RIGKIT_SERVER
+!
+vlan 501
+ name 10.25.118.192/27_Wellops144-Mgmt
+!
+vlan 700
+ name management
+!
+vlan 800
+ name 10.25.118.224/27_Wellops144-DMZ
+!
+vlan 811
+ name 146.032.003.176/28_RIGKIT_DMZ-RT
+!
+vlan 888
+ name guest_access
+!
+vlan 900
+ name VM_STORAGE
+!
+vlan 921
+ name 172.20.1.0/24.ML.GeoServices
+!
+vlan 922
+ name 172.20.2.0/24.MWD.BakerHughes
+!
+vlan 923
+ name 172.20.3.0/24.SLS.CanRig
+!
+vlan 924
+ name 172.20.4.0/24.MPD.Halliburton
+!
+vlan 925
+ name 172.20.5.0/24.CMT.Halliburton
+!
+vlan 926
+ name 172.20.6.0/24.WL.BakerHughes
+!
+vlan 927
+ name 172.20.7.0/24.BOP.IPT
+!
+vlan 928
+ name 172.20.8.0/24.AGR.CVX
+!
+vlan 933
+ name 146.032.233.232/29_GMRIGFHS03
+!
+vlan 950
+ name 146.032.001.176/29_Aprisa_Microw
+!
+vlan 951
+ name 146.032.001.184/29_cAMBIUM_PTP_M
+!
+vlan 952-953 
+!
+vlan 960
+ name 192.168.0.0/24.Drill.3rd.Party
+!
+vlan 991
+ name WR29RL1-VSS.Fast.Hello
+!
+vlan 996
+ name WR29FA2.STATE.Failover
+!
+vlan 997
+ name WR29FA2.LAN.Failover
+!
+vlan 998
+ name WR29FA1.LAN.Failover
+!
+vlan 999
+ name WR29FA1.STATE.Failover
+!
+vlan 3156
+ name 172.030.156.000/23_Guest_Wireles
+lldp run
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+!
+class-map match-any VSL-MGMT-PACKETS
+ match access-group name VSL-MGMT
+class-map match-any VSL-DATA-PACKETS
+ match any 
+class-map match-any VSL-L2-CONTROL-PACKETS
+ match access-group name VSL-DOT1x
+ match access-group name VSL-BPDU
+ match access-group name VSL-CDP
+ match access-group name VSL-LLDP
+ match access-group name VSL-SSTP
+ match access-group name VSL-GARP
+class-map match-any VSL-L3-CONTROL-PACKETS
+ match access-group name VSL-IPV4-ROUTING
+ match access-group name VSL-BFD
+ match access-group name VSL-DHCP-CLIENT-TO-SERVER
+ match access-group name VSL-DHCP-SERVER-TO-CLIENT
+ match access-group name VSL-DHCP-SERVER-TO-SERVER
+ match access-group name VSL-IPV6-ROUTING
+class-map match-any VSL-MULTIMEDIA-TRAFFIC
+ match dscp af41 
+ match dscp af42 
+ match dscp af43 
+ match dscp af31 
+ match dscp af32 
+ match dscp af33 
+ match dscp af21 
+ match dscp af22 
+ match dscp af23 
+class-map match-any VSL-VOICE-VIDEO-TRAFFIC
+ match dscp ef 
+ match dscp cs4 
+ match dscp cs5 
+class-map match-any VSL-SIGNALING-NETWORK-MGMT
+ match dscp cs2 
+ match dscp cs3 
+ match dscp cs6 
+ match dscp cs7 
+!
+policy-map VSL-Queuing-Policy
+ class VSL-MGMT-PACKETS
+  bandwidth percent 5 
+ class VSL-L2-CONTROL-PACKETS
+  bandwidth percent 5 
+ class VSL-L3-CONTROL-PACKETS
+  bandwidth percent 5 
+ class VSL-VOICE-VIDEO-TRAFFIC
+  bandwidth percent 30 
+ class VSL-SIGNALING-NETWORK-MGMT
+  bandwidth percent 10 
+ class VSL-MULTIMEDIA-TRAFFIC
+  bandwidth percent 20 
+ class VSL-DATA-PACKETS
+  bandwidth percent 20 
+ class class-default
+  bandwidth percent 5 
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description System Access
+ ip address 146.32.1.252 255.255.255.255
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+!
+interface Port-channel1
+ description WR29SS1-N5K
+ switchport
+ switchport trunk allowed vlan 10,11,19,250,400,401,500,501,700,800,811,900
+ switchport mode trunk
+ spanning-tree portfast edge trunk
+!
+interface Port-channel10
+ description VSS LINK - DO NOT DELETE OR AMEND!!!!
+ switchport
+ switchport mode trunk
+ switchport nonegotiate
+ switch virtual link 1
+!
+interface Port-channel11
+ description VSS LINK - DO NOT DELETE OR AMEND!!!!
+ switchport
+ switchport mode trunk
+ switchport nonegotiate
+ switch virtual link 2
+!
+interface Port-channel40
+ description WR29WLC-01
+ switchport
+ switchport access vlan 10
+ switchport trunk allowed vlan 10,40,953,3156
+ switchport trunk native vlan 10
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel101
+ description WR29SL1
+ switchport
+ switchport trunk allowed vlan 10-12,20,40,51,52,54,55,100,151,180,217,700,888
+ switchport trunk allowed vlan add 933,952
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel102
+ description WR29SL2
+ switchport
+ switchport trunk allowed vlan 10,13,20,21,40,54,55,700,888,921-928,960
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel103
+ description WR29SL3
+ switchport
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel104
+ description WR29SL4
+ switchport
+ switchport trunk allowed vlan 10,12,20,40,52,100,101,700,888,921-927,953
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel105
+ description WR29SL5
+ switchport
+ switchport trunk allowed vlan 10,20,40,100,101,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel106
+ description WR29SL6
+ switchport
+ switchport trunk allowed vlan 10,20,700
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel107
+ description WR29SL7
+ switchport
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel108
+ description WR29SL8
+ switchport
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel109
+ description WR29SL9
+ switchport
+ switchport trunk allowed vlan 10,13,20,40,700,888,921-927,960
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel110
+ description WR29SL10
+ switchport
+ switchport trunk allowed vlan 10,12,20,40,51,53,55,217,700,888,950,951,953
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel111
+ description WR29SL11
+ switchport
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel112
+ description WR29SL12
+ switchport
+ switchport trunk allowed vlan 10,20,40,53,100,700,888,953
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel113
+ description WR29SL13
+ switchport
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel114
+ description WR29SL14
+ switchport
+ switchport trunk allowed vlan 10,20,40,50-52,54,100,101,700,888,925,3156
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel115
+ description WR29SL15
+ switchport
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel116
+ description WR29SL16
+ switchport
+ switchport trunk allowed vlan 10,20,40,52,55,700,888,925
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel120
+ description WR29SE1
+ switchport
+ switchport trunk allowed vlan 10,13,21,151,250,400,401,500,501,800,811,921-928
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel151
+ description TEMP connection to DMZ 5k for Tow Master EFMS station
+ switchport
+ switchport trunk allowed vlan 151
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel200
+ description WR29SL100
+ switchport
+ switchport trunk allowed vlan 61,700
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface Port-channel255
+ description WR718SL1 - PaGP link for Dual Active Detection - DO NOT DELETE OR AMEND!!!!!
+ switchport
+ switchport trunk allowed vlan 991
+ switchport mode trunk
+ load-interval 30
+!
+interface FastEthernet1
+ vrf forwarding mgmtVrf
+ no ip address
+ speed auto
+ duplex auto
+!
+interface TenGigabitEthernet1/1/1
+ description WR29RA1 - Gi0/0/0
+ no switchport
+ bandwidth 1000000
+ ip flow monitor wr29m1 input
+ ip address 146.32.1.225 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface TenGigabitEthernet1/1/2
+ description WR29RA3 - Gi0/0/1
+ no switchport
+ ip flow monitor wr29m1 input
+ ip address 146.32.1.210 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface TenGigabitEthernet1/1/3
+ description WR29FPC50A - ETH1/1
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/1/4
+ description Link to WR29FA2_Primary Gi1/0 Internet Anywhere XIL5k-141008
+ switchport access vlan 888
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/1/5
+ description WR29FPC51A - ETH1/1
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/1/6
+ description WR29CS1 - inpath0_0
+ switchport access vlan 161
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/1/7
+ description WR29WLC-01
+ switchport access vlan 10
+ switchport trunk allowed vlan 10,40,953,3156
+ switchport trunk native vlan 10
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 40 mode on
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/8
+ description WR29RA3 - Gi0/0/3
+ switchport trunk allowed vlan 161,217,950-953
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/9
+ description WR29-55-B12
+ switchport access vlan 180
+ switchport mode access
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface TenGigabitEthernet1/1/10
+ description WR29-295-B12
+ switchport access vlan 180
+ switchport mode access
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface TenGigabitEthernet1/1/11
+ description WR29SL1 - Gi2/1/1
+ switchport trunk allowed vlan 10-12,20,40,51,52,54,55,100,151,180,217,700,888
+ switchport trunk allowed vlan add 933,952
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 101 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/12
+ description WR29SL2 - Gi2/1/1
+ switchport trunk allowed vlan 10,13,20,21,40,54,55,700,888,921-928,960
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 102 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/13
+ description WR29SL3 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 103 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/14
+ description WR29SL4 - Gi1/1/2
+ switchport trunk allowed vlan 10,12,20,40,52,100,101,700,888,921-927,953
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 104 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/15
+ description Link to WR29SL5 - LAB
+ switchport trunk allowed vlan 10,20,40,100,101,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 105 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/16
+ description WR29SL6 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 106 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/17
+ description WR29SL7 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 107 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/18
+ description WR29SL8 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 108 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/19
+ description WR29SL9 - Gi1/1/2
+ switchport trunk allowed vlan 10,13,20,40,700,888,921-927,960
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 109 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/20
+ description WR29SL10 - Gi1/1/2
+ switchport trunk allowed vlan 10,12,20,40,51,53,55,217,700,888,950,951,953
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 110 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/21
+ description WR29SL11 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 111 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/22
+ description WR29SL12 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,40,53,100,700,888,953
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 112 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/23
+ description WR29SL13 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 113 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/24
+ description WR29SL14 - Gi3/1/1
+ switchport trunk allowed vlan 10,20,40,50-52,54,100,101,700,888,925,3156
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 114 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/25
+ description WR29SL15 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 115 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/26
+ description WR29SL16 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,52,55,700,888,925
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 116 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/27
+ description WR29SL100 - Te1/0/24
+ switchport trunk allowed vlan 61,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 200 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/28
+ description WR29FEX51A - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/1/29
+ description WR29SE1 - Gi1/0/1
+ switchport trunk allowed vlan 10,13,21,151,250,400,401,500,501,800,811,921-928
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 120 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet1/1/30
+ description Link to PaloAlto wr029fexo1a CVX 
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/1/31
+ description To WR718SL1 - PaGP link for Dual Active Detection
+ switchport trunk allowed vlan 991
+ switchport mode trunk
+ load-interval 30
+ channel-group 255 mode auto
+!
+interface TenGigabitEthernet1/1/32
+ description VSS LINK - DO NOT DELETE OR AMEND!!!!
+ switchport mode trunk
+ switchport nonegotiate
+ no lldp transmit
+ no lldp receive
+ no cdp enable
+ channel-group 10 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet1/2/1
+ description VSS LINK - DO NOT DELETE OR AMEND!!!!
+ switchport mode trunk
+ switchport nonegotiate
+ no lldp transmit
+ no lldp receive
+ no cdp enable
+ channel-group 10 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet1/2/2
+ description WR29RA2 - Gi0/0/0
+ no switchport
+ bandwidth 1000000
+ ip flow monitor wr29m1 input
+ ip address 146.32.1.227 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface TenGigabitEthernet1/2/3
+ description WR29SE2 - Gi1/0/24
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/2/4
+ description WR29FPC50A - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/2/5
+ description WR29FPC51A - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/2/6
+ description WR29FPC52A - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet1/2/7
+ description WR29SS1-N5K - Eth 1/31
+ switchport trunk allowed vlan 10,11,19,250,400,401,500,501,700,800,811,900
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface TenGigabitEthernet1/2/8
+ description Link to WR29SS2 Eth1/1
+ switchport trunk allowed vlan 10,11,19,250,400,401,500,501,700,800,811,900
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface TenGigabitEthernet2/1/1
+ description WR29RA1 - Gi0/0/1
+ no switchport
+ bandwidth 1000000
+ ip flow monitor wr29m1 input
+ ip address 146.32.1.229 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface TenGigabitEthernet2/1/2
+ description WR29RA3 - Gi0/0/2
+ no switchport
+ ip flow monitor wr29m1 input
+ ip address 146.32.1.214 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface TenGigabitEthernet2/1/3
+ description WR29FPC50B - ETH1/1
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/1/4
+ description Link WR29FA2_Secondary Gi1/0 Internet Anywhere XIL5K-141008
+ switchport access vlan 888
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/1/5
+ description WR29FPC51B - ETH1/1
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/1/6
+ description WR29FEX51A - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/1/7
+ description WR29WLC-01
+ switchport access vlan 10
+ switchport trunk allowed vlan 10,40,953,3156
+ switchport trunk native vlan 10
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 40 mode on
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/8
+ description WR29FEX51B - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/1/9
+ description WR29FA3_Sec Mgmt0/0
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/1/10
+ description WR29-175-B12
+ switchport access vlan 180
+ switchport mode access
+ load-interval 30
+ spanning-tree portfast edge
+!
+interface TenGigabitEthernet2/1/11
+ description WR29SL1 - Gi1/1/1
+ switchport trunk allowed vlan 10-12,20,40,51,52,54,55,100,151,180,217,700,888
+ switchport trunk allowed vlan add 933,952
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 101 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/12
+ description WR29SL2 - Gi1/1/1
+ switchport trunk allowed vlan 10,13,20,21,40,54,55,700,888,921-928,960
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 102 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/13
+ description WR29SL3 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 103 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/14
+ description WR29SL4 - Gi1/1/1
+ switchport trunk allowed vlan 10,12,20,40,52,100,101,700,888,921-927,953
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 104 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/15
+ description WR29SL5 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,100,101,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 105 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/16
+ description WR29SL6 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 106 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/17
+ description WR29SL7 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 107 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/18
+ description WR29SL8 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 108 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/19
+ description WR29SL9 - Gi1/1/1
+ switchport trunk allowed vlan 10,13,20,40,700,888,921-927,960
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 109 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/20
+ description WR29SL10 - Gi1/1/1
+ switchport trunk allowed vlan 10,12,20,40,51,53,55,217,700,888,950,951,953
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 110 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/21
+ description WR29SL11 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 111 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/22
+ description WR29SL12 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,53,100,700,888,953
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 112 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/23
+ description WR29SL13 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,700,888
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 113 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/24
+ description WR29SL14 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,50-52,54,100,101,700,888,925,3156
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 114 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/25
+ description WR29SL15 - Gi1/1/1
+ switchport trunk allowed vlan 10,20,40,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 115 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/26
+ description WR29SL16 - Gi1/1/2
+ switchport trunk allowed vlan 10,20,40,52,55,700,888,925
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 116 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/27
+ description WR29SL100 - Gi2/1/2
+ switchport trunk allowed vlan 61,700
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 200 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/28
+ description WR29FEX51B - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/1/29
+ description WR29SE1 - Gi2/0/1
+ switchport trunk allowed vlan 10,13,21,151,250,400,401,500,501,800,811,921-928
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 120 mode active
+ spanning-tree portfast edge trunk
+!
+interface TenGigabitEthernet2/1/30
+ description Link to PaloAlto wr029fexo2a CVX 
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/1/31
+ description WR29-360-B13
+ switchport trunk allowed vlan 180
+ switchport trunk native vlan 180
+ switchport mode trunk
+ load-interval 30
+!
+interface TenGigabitEthernet2/1/32
+ description VSS LINK - DO NOT DELETE OR AMEND!!!!
+ switchport mode trunk
+ switchport nonegotiate
+ no lldp transmit
+ no lldp receive
+ no cdp enable
+ channel-group 11 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet2/2/1
+ description VSS LINK - DO NOT DELETE OR AMEND!!!!
+ switchport mode trunk
+ switchport nonegotiate
+ no lldp transmit
+ no lldp receive
+ no cdp enable
+ channel-group 11 mode on
+ service-policy output VSL-Queuing-Policy
+!
+interface TenGigabitEthernet2/2/2
+ description WR29RA2 - Gi0/0/1
+ no switchport
+ bandwidth 1000000
+ ip flow monitor wr29m1 input
+ ip address 146.32.1.231 255.255.255.254
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ load-interval 30
+!
+interface TenGigabitEthernet2/2/3
+ description WR29SE2 - Gi2/0/24
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/2/4
+ description WR29FPC50B - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/2/5
+ description WR29FPC51B - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/2/6
+ description WR29FPC52B - MGMT
+ switchport access vlan 10
+ switchport mode access
+ switchport nonegotiate
+!
+interface TenGigabitEthernet2/2/7
+ description WR29SS1-N5K - Eth 1/32
+ switchport trunk allowed vlan 10,11,19,250,400,401,500,501,700,800,811,900
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface TenGigabitEthernet2/2/8
+ description Link to WR29SS2 Eth1/2
+ switchport trunk allowed vlan 10,11,19,250,400,401,500,501,700,800,811,900
+ switchport mode trunk
+ channel-group 1 mode active
+!
+interface Vlan1
+ no ip address
+!
+interface Vlan10
+ description WR29 BLAN - 146.32.0.0/24
+ ip address 146.32.0.1 255.255.255.0
+ ip helper-address 146.32.1.88 
+ ip helper-address 146.24.240.64 
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ load-interval 30
+!
+interface Vlan11
+ description WR29 BLAN Servers - 146.32.1.64/27
+ ip address 146.32.1.65 255.255.255.224
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan12
+ description WR29 BLAN(Quayside) - 146.32.4.0/24 (To be deleted)
+ ip address 146.32.4.1 255.255.255.0
+ ip helper-address 146.24.240.34 
+ ip helper-address 146.24.112.34 
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ load-interval 30
+ shutdown
+!
+interface Vlan19
+ description WR29 BLAN VM_Mgmt - 146.32.1.96/27
+ ip address 146.32.1.97 255.255.255.224
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan20
+ description WR29 voice vlan - 146.41.175.0/24
+ ip address 146.41.175.1 255.255.255.0
+ ip helper-address 146.32.1.88 
+ ip helper-address 146.24.240.64 
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ load-interval 30
+!
+interface Vlan40
+ description WR29 WLAN BLAN - 146.32.1.0/26
+ ip address 146.32.1.1 255.255.255.192
+ ip helper-address 146.32.1.88 
+ ip helper-address 146.24.240.64 
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ load-interval 30
+!
+interface Vlan50
+ description BGF_WARS_BLAN - 146.32.245.232/30
+ ip address 146.32.245.233 255.255.255.252
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan51
+ description BGF_CARS_BLAN - 146.32.3.0/28
+ ip address 146.32.3.1 255.255.255.240
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan52
+ description BGF_AVIATION_BLAN - 146.32.3.16/28
+ ip address 146.32.3.17 255.255.255.240
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan53
+ description BGF_AWOS_BLAN - 146.32.3.48/28
+ ip address 146.32.3.49 255.255.255.240
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan54
+ description Video_Conference - 146.32.3.80/28
+ ip address 146.32.3.81 255.255.255.240
+ ip helper-address 146.24.240.34 
+ ip helper-address 146.24.240.64 
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ load-interval 30
+!
+interface Vlan55
+ description Temp_POB_Trailer - 146.32.3.32/28
+ ip address 146.32.3.33 255.255.255.240
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ load-interval 30
+!
+interface Vlan61
+ description CCTV Mgmt - 146.32.3.64/28
+ ip address 146.32.3.65 255.255.255.240
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ load-interval 30
+!
+interface Vlan100
+ description WR29 WiMAX Management VLAN
+ ip address 146.32.1.129 255.255.255.240
+ ip helper-address 146.24.240.34 
+ ip helper-address 146.32.1.88 
+ ip helper-address 146.24.240.64 
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ load-interval 30
+!
+interface Vlan151
+ no ip address
+ shutdown
+!
+interface Vlan180
+ description LTE eNodeB
+ ip address 192.168.25.140 255.255.255.0 secondary
+ ip address 146.32.1.161 255.255.255.240
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan250
+ description RIGKIT_VIRTUAL DESKTOP - 146.32.3.96/27
+ ip address 146.32.3.97 255.255.255.224
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan400
+ description RIGKIT_SERVER DATA - 146.32.3.128/27
+ ip address 146.32.3.129 255.255.255.224
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan401
+ ip address 10.25.118.161 255.255.255.224
+ no ip proxy-arp
+!
+interface Vlan500
+ description RIGKIT_SERVER MGMT - 146.32.3.160/28
+ ip address 146.32.3.161 255.255.255.240
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+!
+interface Vlan501
+ ip address 10.25.118.193 255.255.255.224
+ no ip proxy-arp
+!
+interface Vlan700
+ description WR29 - MANAGEMENT NETWORK
+ ip address 146.32.5.4 255.255.255.128
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+!
+interface Vlan811
+ description RIGKIT_DMZ-RTD - 146.32.3.176/28
+ ip address 146.32.3.177 255.255.255.240
+ no ip proxy-arp
+ ip pim sparse-mode
+ no ip route-cache
+ shutdown
+!
+interface Vlan888
+ no ip address
+ shutdown
+!
+interface Vlan933
+ description GMRIGFHS03 IA Firewall (Silixa) - 146.32.233.232/29
+ ip address 146.32.233.233 255.255.255.248
+ no ip proxy-arp
+ no ip route-cache
+ load-interval 30
+!
+!
+router eigrp 65102
+ network 10.0.0.0
+ network 146.32.0.0
+ network 146.34.0.0
+ network 146.41.0.0
+ redistribute static route-map o-eigrp
+ passive-interface default
+ no passive-interface TenGigabitEthernet1/1/2
+ no passive-interface TenGigabitEthernet2/1/2
+ no passive-interface TenGigabitEthernet1/1/1
+ no passive-interface TenGigabitEthernet1/2/2
+ no passive-interface TenGigabitEthernet2/1/1
+ no passive-interface TenGigabitEthernet2/2/2
+ nsf
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+no ip http server
+no ip http secure-server
+ip http client source-interface Vlan700
+ip pim rp-address 146.32.188.242 mcast-rp-bidir-site-WARS-WEST override
+ip pim rp-address 146.32.219.248 mcast-rp-bidir-site-WARS-EAST override
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+no ip pim dm-fallback
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+no ip pim log-neighbor-changes
+!
+ip tftp source-interface Loopback0
+ip route 10.25.118.224 255.255.255.224 10.25.118.173 name Wellops144fex50
+ip route 146.32.2.0 255.255.255.192 146.32.0.17 name WR29-PCN-DMZ
+ip route 146.32.2.160 255.255.255.224 146.32.0.17 name WR29-ESX
+ip route 146.32.3.176 255.255.255.240 146.32.0.18 name DMDI-Aggregators
+ip route 146.32.18.0 255.255.255.192 146.32.16.34 name GC763-PCN-DMZ
+ip route 172.20.36.0 255.255.255.0 146.32.0.19 name CCTV
+ip ssh source-interface Vlan700
+ip ssh version 2
+!
+ip access-list standard cvx-ro
+ permit 136.171.79.121
+ permit 134.248.82.116
+ permit 139.65.136.38
+ permit 146.38.36.21
+ permit 146.40.2.48
+ deny   any log
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.42.255.132
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.140.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+ip access-list standard mcast-rp-bidir-site-WARS-EAST
+ permit 237.95.32.246
+ permit 237.95.32.244
+ permit 237.95.32.245
+ip access-list standard mcast-rp-bidir-site-WARS-WEST
+ permit 237.95.32.242
+ permit 237.95.32.243
+ permit 237.95.32.241
+ip access-list standard mcast-rp-sparse-wan
+ permit 239.194.128.0 0.0.127.255
+ permit 239.195.128.0 0.0.127.255
+ permit 239.200.0.0 0.7.255.255
+ permit 224.0.0.0 7.255.255.255
+ip access-list standard snmp-gom-ro
+ permit 146.24.240.56
+ permit 136.171.198.120
+ permit 146.24.240.139
+ permit 146.24.250.0 0.0.0.255
+ deny   any log
+ip access-list standard snmp-gom-rw
+ permit 146.22.71.201
+ permit 146.24.240.56
+ permit 146.22.9.201
+ permit 136.171.198.120
+ permit 139.65.137.144
+ permit 146.24.240.139
+ deny   any log
+ip access-list standard snmp-itc-ro
+ permit 146.22.71.201
+ permit 146.22.9.201
+ permit 146.22.8.0 0.0.0.255
+ permit 146.38.92.0 0.0.0.255
+ permit 146.24.136.0 0.0.0.255
+ permit 146.24.146.0 0.0.0.255
+ permit 146.24.250.0 0.0.0.255
+ permit 146.27.26.0 0.0.1.255
+ permit 146.36.145.0 0.0.0.255
+ permit 146.36.10.0 0.0.0.255
+ permit 146.40.185.0 0.0.0.255
+ permit 139.65.136.0 0.0.3.255
+ permit 146.36.126.128 0.0.0.63
+ permit 146.27.84.128 0.0.0.63
+ permit 146.36.130.224 0.0.0.31
+ deny   any log
+!
+ip access-list extended Guest_WiFi_Allowed
+ deny   ip any host 144.5.197.232 time-range Guest_Wifi_Allow
+ permit ip any any
+ip access-list extended VSL-BFD
+ permit udp any any eq 3784
+ip access-list extended VSL-DHCP-CLIENT-TO-SERVER
+ permit udp any eq bootpc any eq bootps
+ip access-list extended VSL-DHCP-SERVER-TO-CLIENT
+ permit udp any eq bootps any eq bootpc
+ip access-list extended VSL-DHCP-SERVER-TO-SERVER
+ permit udp any eq bootps any eq bootps
+ip access-list extended VSL-IPV4-ROUTING
+ permit ip any 224.0.0.0 0.0.0.255
+ip access-list extended WiMAX-Airspan
+ permit ip host 146.24.240.177 any
+ permit ip host 146.24.240.56 any
+ permit udp host 146.22.70.251 eq ntp any
+ permit udp host 134.248.2.29 eq ntp any
+ permit udp host 146.24.240.34 eq bootps any
+ permit udp host 146.24.112.34 eq bootps any
+ permit tcp 146.24.101.0 0.0.0.255 any
+ permit tcp 146.24.250.0 0.0.0.255 any
+ permit tcp 146.24.125.0 0.0.0.127 any
+ permit tcp 146.32.144.0 0.0.0.127 any
+ permit ip host 136.171.198.120 any
+ permit ip host 136.171.198.121 any
+ permit icmp any any
+ deny   ip any any log
+!
+!
+ip prefix-list o-eigrp seq 10 permit 172.20.36.0/24
+ip prefix-list o-eigrp seq 20 permit 146.32.2.0/26
+ip prefix-list o-eigrp seq 25 permit 146.32.2.160/27
+ip prefix-list o-eigrp seq 30 permit 146.32.3.176/28
+ip prefix-list o-eigrp seq 35 permit 10.25.118.224/27
+logging history size 10
+logging source-interface Loopback0
+logging host 146.24.240.56
+logging host 146.36.114.214
+logging host 139.65.140.24
+access-list 20 permit 10.0.0.0 0.63.255.255
+access-list 20 permit 10.128.0.0 0.7.255.255
+access-list 20 permit 10.254.0.0 0.0.255.255
+access-list 20 permit 146.22.0.0 0.1.255.255
+access-list 20 permit 146.24.0.0 0.7.255.255
+access-list 20 permit 146.32.0.0 0.7.255.255
+access-list 20 permit 146.40.0.0 0.3.255.255
+access-list 20 permit 146.44.0.0 0.1.255.255
+access-list 20 permit 146.46.0.0 0.0.255.255
+access-list 20 permit 136.171.0.0 0.0.255.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.0.0 0.0.255.255
+access-list 20 permit 134.248.0.0 0.0.255.255
+access-list 20 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+!
+route-map o-eigrp permit 5
+ match ip address prefix-list o-eigrp
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 auth 
+snmp-server group CVX2 v3 priv 
+snmp-server group cvx-ro v3 priv 
+snmp-server group gom-rw v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group default v3 priv 
+snmp-server group snmp-ro v3 priv 
+snmp-server group snmp-rw v3 priv write v1default 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location WR29 / BigFoot (BGF), Walker Ridge 29, Gulf of Mexico / USA / Americas /US-GOM-NA-Utility-WAN-Remotes/Criticality-Medium
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv CVX  ipmulticast
+snmp-server host 139.65.136.12 version 3 priv CVX2  ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 146.32.139.37 version 3 priv gom-rw  config
+snmp ifmib ifindex persist
+!
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+ipv6 access-list VSL-IPV6-ROUTING
+ permit ipv6 any FF02::/124
+!
+no vstack
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+!
+module provision switch 1
+ chassis-type 72 base-mac 2894.0FAA.CE00
+ slot 1 slot-type 402 base-mac 2894.0FAA.CE00
+ slot 2 slot-type 400 base-mac 30E4.DBF9.4E00
+ !
+module provision switch 2
+ chassis-type 72 base-mac 2894.0FAA.C4C0
+ slot 1 slot-type 402 base-mac 2894.0FAA.C4C0
+ slot 2 slot-type 400 base-mac 30E4.DBF9.4848
+ 
+!
+
+ ntp source Loopback0
+ ntp access-group peer 40
+ ntp server 146.38.37.9
+ ntp server 146.22.70.251
+ ntp server 146.40.10.21
+ time-range Guest_Wifi_Allow
+  periodic daily 0:01 to 19:59
+ !
+ !
+end

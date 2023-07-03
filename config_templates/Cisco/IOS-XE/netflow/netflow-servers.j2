@@ -1,0 +1,11 @@
+! Variables
+! {{ netflow_server.ip_address | default ("139.65.245.55") }} = IP Address of the Netflow Server
+! {{ netflow_server.port | default ("2055") }} = UDP port of the Netflow daemon running on the server
+! {{ host.mgmt_ifname | default ("Lo0") }} = Management interface of the device
+!
+flow exporter NETQOS-EXPORTER
+ destination {{ netflow_server.ip_address }} 
+ source {{ host.mgmt_ifname }}
+ transport udp {{ netflow_server.port }} 
+ template data timeout 300
+ option exporter-stats timeout 60

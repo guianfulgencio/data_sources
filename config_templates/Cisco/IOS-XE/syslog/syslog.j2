@@ -1,0 +1,13 @@
+! Syslog
+! Variables
+! {{ syslog1 }} = IP address of syslog server 1
+! {{ syslog2 }} = IP address of syslog server 2
+! {{ host.mgmt_ifname }} = Management Interface name
+
+logging trap informational
+logging history size 10
+logging host {{ syslog1 }} 
+logging host {{ syslog2 }}
+logging buffered 128000
+logging source-interface {{ host.mgmt_ifname }}
+no logging console

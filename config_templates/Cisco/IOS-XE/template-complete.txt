@@ -1,0 +1,655 @@
+!
+version {{ template.software_version }}
+service nagle
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+no platform punt-keepalive disable-kernel-core
+!
+hostname {{ host.hostname }}
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 128000
+no logging console
+enable secret {{ system.enable.secret }}
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ {{ aaa.group.tacacsplus.name }}
+{% for item in aaa.group.tacacsplus.server.get(host.snmp_location.region) %}
+ server name {{ item }}
+{% endfor %}
+!
+aaa group server radius {{ aaa_dot1x.group.radius.name }}
+{% for item in aaa_dot1x.group.radius.server.get(host.snmp_location.region) %}
+ server name {{ item }}
+{% endfor %}
+!
+aaa authentication login default group {{ aaa.group.tacacsplus.name }} local
+aaa authentication enable default group {{ aaa.group.tacacsplus.name }} enable
+aaa authentication dot1x default group {{ aaa_dot1x.group.radius.name }}
+aaa authorization config-commands
+aaa authorization exec default group {{ aaa.group.tacacsplus.name }} if-authenticated
+aaa authorization commands 0 default group {{ aaa.group.tacacsplus.name }} if-authenticated 
+aaa authorization commands 1 default group {{ aaa.group.tacacsplus.name }} if-authenticated 
+aaa authorization commands 15 default group {{ aaa.group.tacacsplus.name }} if-authenticated 
+aaa authorization network default group {{ aaa_dot1x.group.radius.name }}
+aaa authorization reverse-access default group {{ aaa.group.tacacsplus.name }} if-authenticated 
+aaa accounting update newinfo
+aaa accounting dot1x default start-stop group {{ aaa_dot1x.group.radius.name }}
+aaa accounting exec default start-stop group {{ aaa.group.tacacsplus.name }}
+aaa accounting commands 0 default start-stop group {{ aaa.group.tacacsplus.name }}
+aaa accounting commands 1 default start-stop group {{ aaa.group.tacacsplus.name }}
+aaa accounting commands 15 default start-stop group {{ aaa.group.tacacsplus.name }}
+aaa accounting network default start-stop group {{ aaa_dot1x.group.radius.name }}
+aaa accounting connection default start-stop group {{ aaa.group.tacacsplus.name }}
+aaa accounting system default start-stop group {{ aaa.group.tacacsplus.name }}
+!
+!
+!
+!
+!
+!
+aaa session-id common
+boot system bootflash://packages.j2
+power redundancy-mode combined
+power supply autoLC shutdown
+power supply autoLC priority 1 2 5 6 7
+!
+!
+!
+!
+call-home
+ contact-email-addr nmbtcon@chevron.com
+ profile "CSSM"
+  reporting smart-licensing-data
+  destination transport-method http
+  no destination transport-method email
+  destination address http http://cssm.chevron.net/Transportgateway/services/DeviceRequestHandler
+no ip source-route
+no ip routing
+!
+ip name-server 146.36.82.34 146.36.80.34
+ip domain name {{ host.snmp_location.facility }}.chevrontexaco.net
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+device-sensor accounting
+device-sensor notify all-changes
+!
+!
+vtp domain {{ host.snmp_location.facility }}
+vtp mode off
+authentication mac-move permit
+no device-tracking logging theft
+qos queue-softmax-multiplier 1200
+device-tracking tracking retry-interval 10
+!
+device-tracking policy sisf_policy
+ no protocol udp
+ tracking enable
+!
+!
+crypto pki trustpoint SLA-TrustPoint
+!
+crypto pki certificate chain SLA-TrustPoint
+!
+license boot level network-essentials addon dna-essentials
+!
+!
+diagnostic bootup level minimal
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast bpduguard default
+spanning-tree extend system-id
+spanning-tree pathcost method long
+archive
+ path bootflash:
+memory1
+file verify auto
+dot1x system-auth-control
+dot1x critical eapol
+!
+errdisable recovery cause udld
+errdisable recovery cause bpduguard
+errdisable recovery cause link-flap
+!
+{% if system.username is defined %}
+{% for item in system.username %}
+username {{ item.name }} privilege 15 secret {{ item.secret }}
+{% endfor %}
+{% endif %}
+!
+redundancy
+ mode sso
+!
+!
+!
+!
+!
+transceiver type all
+ monitoring
+!
+{% for item in host.vlan %}
+vlan {{ item.id }}
+ name {{ item.vlan_name }}
+!
+{% endfor %}
+{% for item in vlan %}
+vlan {{ item.id }}
+ name {{item.vlan_name }}
+!
+{% endfor %}
+lldp run
+!
+classStart
+class1
+class2
+class3
+class4
+class-map match-any ACCESS_OUT_SIGNALING
+ match dscp cs3 
+ match dscp cs6 
+ match dscp af31  af32  af33 
+class5
+class-map match-any DSCP-AF1
+ match dscp af11  af12  af13
+class6
+class7
+class8
+class-map match-any ACCESS_OUT_VOICE
+ match dscp ef 
+class-map match-any ACCESS_OUT_VIDEO
+ match dscp cs4  af41  af42  af43
+class9
+classMap1
+classMap2
+classMap3
+classMap4
+classMap5
+class-map match-any non-client-nrt-class
+classMap6
+classMap7
+class-map match-any LAN-MARK-EF
+ match access-group name MARK-DSCP-ef 
+class-map match-any LAN-MARK-AF4
+ match access-group name MARK-DSCP-af4x
+class-map match-any LAN-MARK-CS3
+ match access-group name MARK-DSCP-af3x
+class-map match-any LAN-MARK-AF2
+ match access-group name MARK-DSCP-af2x
+class-map match-any LAN-MARK-AF1
+ match access-group name MARK-DSCP-af1x
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any system-cpp-police-ios-routing
+  description L2 control, Topology control, Routing control, Low Latency
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+class-map match-any system-cpp-police-ios-feature
+  description ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed
+!
+!
+policy-map system-cpp-policy
+policy-map {{ qos.queue_policy.name }}
+ class ACCESS_OUT_VOICE
+  priority level {{ qos.queue_policy.bandwidth.voice.priority }}
+  queue-buffers ratio {{ qos.queue_policy.buffer_ratio.voice.percentage }}
+ class ACCESS_OUT_VIDEO
+  priority level {{ qos.queue_policy.bandwidth.video.priority }}
+  queue-buffers ratio {{ qos.queue_policy.buffer_ratio.video.percentage }} 
+ class ACCESS_OUT_SIGNALING
+  bandwidth remaining percent {{ qos.queue_policy.bandwidth.signaling.percentage }}
+  queue-buffers ratio {{ qos.queue_policy.buffer_ratio.signaling.percentage }} 
+ class class-default
+  bandwidth remaining percent {{ qos.queue_policy.bandwidth.default.percentage }}
+  queue-buffers ratio {{ qos.queue_policy.buffer_ratio.default.percentage }}
+policy-map {{ qos.marking_policy.name }} 
+!Policy map marks traffic being received by the LAN interface
+ class LAN-MARK-EF
+  set dscp ef 
+ class LAN-MARK-AF4 
+  set dscp af41 
+ class LAN-MARK-CS3
+  set dscp cs3
+ class LAN-MARK-AF2 
+  set dscp af21 
+ class LAN-MARK-AF1 
+  set dscp af11 
+ class class-default 
+  set dscp default
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+interface Null0
+ no ip unreachables
+!
+{% if host.l2_interface.uplink.port_channel is defined %}
+{% if host.l2_interface.uplink.port_channel.name is defined %}
+interface {{ host.l2_interface.uplink.port_channel.name }}
+{% endif %}
+{% if host.l2_interface.uplink.port_channel.description is defined %}
+ description {{ host.l2_interface.uplink.port_channel.description }}
+{% endif %}
+ switchport trunk native vlan {{ vlan | selectattr("vlan_name", "equalto", "DOT1Q.NATIVE") | map(attribute="id") | join('') }}
+{% set all_vlans = [] %}
+{% for item in vlan -%}
+{{ all_vlans.append(item.id) if item.vlan_name != "DOT1Q.NATIVE" }}
+{%- endfor %}
+{% for item in host.vlan -%}
+{{ all_vlans.append(item.id) }}
+{%- endfor %}
+ switchport trunk allowed vlan {{ all_vlans | sort | join(',') }}
+ switchport mode trunk
+ switchport nonegotiate
+{% if uplink.load_interval is defined %}
+ load-interval {{ uplink.load_interval }}
+{% endif %}
+{% endif %}
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ no ip address
+ no ip route-cache
+ negotiation auto
+!
+{% if (downlink is defined) and (host.l2_interface is defined) %}
+{% for interface in list_of_interfaces.stdout_lines if ('GigabitEthernet' in interface) and not ('GigabitEthernet0/0' in interface) %}
+{% if host.l2_interface.downlink | selectattr("name", "equalto", interface) %}
+interface {{ interface }}
+ description {{ host.l2_interface.downlink | selectattr("name", "equalto", interface) | map(attribute='description') | join('') }}
+{% for vlan in host.vlan if vlan.vlan_name == "DATA" %}
+ switchport access vlan {{ vlan.id }}
+{% endfor %}
+ switchport mode access
+{% for vlan in host.vlan if vlan.vlan_name == "VOICE" %}
+ switchport voice vlan {{ vlan.id }}
+{% endfor %}
+{% if dot1x is defined %}
+ device-tracking attach-policy {{ dot1x.device.tracking.policy.name }}
+{% endif %}
+ no logging event link-status
+ load-interval 30
+ udld port
+ authentication control-direction in
+ authentication event fail action next-method
+{% for vlan in host.vlan if vlan.vlan_name == "DATA" %}
+ authentication event server dead action authorize vlan {{ vlan.id }}
+ authentication event server dead action authorize voice
+{% endfor %}
+ authentication event server alive action reinitialize
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+{% if downlink.authentication.port_control is defined %}
+ authentication port-control {{ downlink.authentication.port_control }}
+{% endif %}
+ authentication periodic
+ authentication timer reauthenticate server
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ mab
+ spanning-tree portfast
+ no snmp trap link-status
+{% if qos.marking_policy is defined %}
+ service-policy input {{ qos.marking_policy.name }}
+{% endif %}
+{% if qos.queue_policy is defined %}
+ service-policy output {{ qos.queue_policy.name }}
+{% endif %}
+!
+{% elif host.l2_interface.uplink.physical_interface | selectattr("name", "equalto", interface) %}
+interface {{ interface }}
+ description {{ host.l2_interface.uplink.physical_interface | selectattr("name", "equalto", interface) | map(attribute='description') | join('') }}
+ switchport mode trunk
+ switchport trunk native vlan {{ vlan | selectattr("vlan_name", "equalto", "DOT1Q.NATIVE") | map(attribute="id") | join('') }}
+{% set all_vlans = [] %}
+{% for item in vlan -%}
+{{ all_vlans.append(item.id) if item.vlan_name != "DOT1Q.NATIVE" }}
+{%- endfor %}
+{% for item in host.vlan -%}
+{{ all_vlans.append(item.id) }}
+{%- endfor %}
+ switchport trunk allowed vlan {{ all_vlans | sort | join(',') }}
+ switchport nonegotiate
+ udld port
+ spanning-tree portfast disable
+ spanning-tree link-type point-to-point
+ load-interval 30
+ channel-group {{ host.l2_interface.uplink.port_channel.name | regex_replace("[A-Z,a-z,-]*") }} mode active
+{% if qos.queue_policy is defined %}
+ service-policy output {{ qos.queue_policy.name }}
+{% endif %}
+!
+{% else %}
+interface {{ interface }}
+!
+{% endif %}
+{% endfor %}
+{% endif %}
+interface Vlan1
+ no ip address
+ no ip proxy-arp
+ no ip route-cache
+!
+{% if host.management_interface is defined %}
+interface {{ host.management_interface.name }}
+ ip address {{ host.management_interface.ip_address | ansible.netcommon.ipaddr('address') }} {{ host.management_interface.ip_address | ansible.netcommon.ipaddr('netmask') }}
+ load-interval 30
+ no ip proxy-arp
+ no ip route-cache
+{% endif %}
+!
+ip default-gateway {{ host.default_gateway.ip_address }}
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip tcp path-mtu-discovery
+no ip http server
+no ip http secure-server
+ip tacacs source-interface {{ host.management_interface.name }}
+ip ssh source-interface {{ host.management_interface.name }}
+ip ssh version 2
+ip scp server enable
+!
+ip radius source-interface {{ host.management_interface.name }}
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 50 permit 146.40.2.8
+ 60 permit 146.40.2.11
+ 70 permit 146.40.2.12
+ 80 permit 146.40.2.13
+ 90 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.0.0 0.0.255.255
+ 150 deny   any log
+!
+{# access lists config #}
+{% if qos.marking_policy is defined %}
+{% for item in qos.marking_policy.marks %}
+ip access-list extended MARK-DSCP-{{ item }}
+{% set sequense_number = [0] %}
+{% if item == 'ef' %}
+ 10 permit ip any any dscp ef
+{{ sequense_number.append(sequense_number.pop() +2) -}}
+{% else %}
+{% for count in range(1,4) %}
+ {{ count*10 }} permit ip any any dscp {{ item | replace('x', count ) }}
+{{ sequense_number.append(sequense_number.pop() +1) -}}
+{% endfor %}
+{% endif %}
+{% if item == 'af3x' %}
+ 40 permit ip any any dscp cs3
+ 50 permit ip any any dscp cs6
+{{ sequense_number.append(sequense_number.pop() +2) -}}
+{% endif %}
+{% for app in application if app.mark == item %}
+{{ sequense_number.append(sequense_number.pop() +1) -}}
+{% set ns = namespace() %}
+{% set ns.precedence = ''%}
+{% set ns.src_port = '' %}
+{% set ns.dest_port = '' %}
+{% set ns.src_subnet = 'any' %}
+{% set ns.dest_subnet = 'any' %}
+{# source port configuration #}
+{% if app.port.src.range is defined %}
+{% if app.port.src.range.start | string == "23" %}{# cisco ACLs automatically convert some port numbers in protocol names. These lines always shows in diff. To handle this behaviour this if statement converts port numbers into names #}
+{% set port_start = "telnet" %}
+{% else %}
+{% set port_start = app.port.src.range.start | string %}
+{% endif %}
+{% if app.port.src.range.end | string == "23" %}
+{% set port_end = "telnet" %}
+{% else %}
+{% set port_end = app.port.src.range.end | string %}
+{% endif %}
+{% set ns.src_port = "range " + port_start +" " + port_end %}
+{% elif (app.port.src is defined) and (app.port.src != "any") %}
+{% if app.port.src | string == "23" %}
+{% set port = "telnet" %}
+{% else %}
+{% set port = app.port.src | string %}
+{% endif %}
+{% set ns.src_port = "eq " + port %}
+{% endif%}
+{# dest port configuration #}
+{% if app.port.dest.range is defined %}
+{% if app.port.dest.range.start | string == "23" %}{# cisco ACLs automatically convert some port numbers in protocol names. These lines always shows in diff. To handle this behaviour this if statement converts port numbers into names #}
+{% set port_start = "telnet" %}
+{% else %}
+{% set port_start = app.port.dest.range.start | string %}
+{% endif %}
+{% if app.port.dest.range.end | string == "23" %}
+{% set port_end = "telnet" %}
+{% else %}
+{% set port_end = app.port.dest.range.end | string %}
+{% endif %}
+{% set ns.dest_port = "range " + port_start +" " + port_end %}
+{% elif (app.port.dest is defined) and (app.port.dest != "any") %}
+{% if app.port.dest | string == "23" %}
+{% set port = "telnet" %}
+{% else %}
+{% set port = app.port.dest | string %}
+{% endif %}
+{% set ns.dest_port = "eq " + app.port.dest | string %}
+{% endif%}
+{# source subnet part #}
+{% if (app.src.subnet is defined) and (app.src.subnet != "any")  %}
+{% set ns.src_subnet = app.src.subnet | ansible.netcommon.ipaddr('network') | string + ' ' + app.src.subnet | ansible.netcommon.ipaddr('wildcard') | string %}
+{% elif app.src.host is defined %}
+{% set ns.src_subnet = "host " + app.src.host | string %}
+{% endif %}
+{# destination subnet part #}
+{% if (app.dest.subnet is defined) and (app.dest.subnet != "any")  %}
+{% set ns.dest_subnet = app.dest.subnet | ansible.netcommon.ipaddr('network') | string + ' ' + app.dest.subnet | ansible.netcommon.ipaddr('wildcard') | string %}
+{% elif app.dest.host is defined %}
+{% set ns.dest_subnet = "host " + app.dest.host | string %}
+{% endif %}
+{# presedence and dscp part #}
+{% if app.precedence is defined %}
+{% set ns.precedence = "precedence " + app.precedence | string %}
+{% endif %}
+{% if app.dscp is defined %}
+{% set ns.precedence = "dscp " + app.dscp %}
+{% endif %}
+ {{ sequense_number[0]*10 }} remark {{ app.name }}
+ {{ sequense_number[0]*10 }} permit {{ app.protocol }} {{ ns.src_subnet }} {{ ns.src_port }} {{ ns.dest_subnet }} {{ ns.dest_port }} {{ ns.precedence }}
+{% if app.bidirectional == True %}
+ {{ sequense_number.append(sequense_number.pop() +1) -}}
+ {{ sequense_number[0]*10 }} permit {{ app.protocol }} {{ ns.dest_subnet }} {{ ns.dest_port }} {{ ns.src_subnet }} {{ ns.src_port }} {{ ns.precedence }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+{% endif %}
+logging source-interface {{ host.management_interface.name }}
+{% for server in syslog.server.get(host.snmp_location.region) %}
+logging host {{ server.ip_address }}
+{% endfor %}
+logging history size 11
+logging buffered 128000
+no logging console
+ip access-list standard 20
+ 10 permit 10.0.0.0 0.63.255.255
+ 20 permit 10.128.0.0 0.7.255.255
+ 30 permit 10.254.0.0 0.0.255.255
+ 40 permit 146.22.0.0 0.1.255.255
+ 50 permit 146.24.0.0 0.7.255.255
+ 60 permit 146.32.0.0 0.7.255.255
+ 70 permit 146.40.0.0 0.3.255.255
+ 80 permit 146.44.0.0 0.1.255.255
+ 90 permit 146.46.0.0 0.0.255.255
+ 100 permit 136.171.0.0 0.0.255.255
+ 110 permit 139.65.140.0 0.0.3.255
+ 120 permit 139.65.136.0 0.0.3.255
+ 130 permit 139.65.0.0 0.0.255.255
+ 140 permit 134.248.0.0 0.0.255.255
+ 150 deny   any log
+{% for item in ntp.server.get(host.snmp_location.region) %}
+access-list 40 permit {{ item.ip_address }}
+{% endfor %}
+access-list 40 deny any log
+!
+{% if snmp.users %}
+{% for item in snmp.users %}
+snmp-server user {{item.user}} {{ item.group }} v3 auth {{ item.authentication_protocol }} {{ item.authentication_password }} priv {{ item.privacy_protocol }} {{ item.privacy_password }}
+{% endfor %}
+{% endif %}
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source {{ host.management_interface.name }}
+snmp-server location {{ host.snmp_location.facility }} / {{ host.snmp_location.address }} / {{ host.snmp_location.country }} / {{ host.snmp_location.region }} /{{ host.snmp_location.iso_country }}-{{ host.snmp_location.support_org }}-Utility-{{ host.snmp_location.utility }}/Criticality-{{ host.snmp_location.criticality }}
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps entity
+snmp-server enable traps license
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+{% if snmp.server.get(host.snmp_location.region) and snmp.users %}
+{% for item_server in snmp.server.get(host.snmp_location.region) %}
+{% for item_user in snmp.users %}
+{% if (item_server.allow is defined) and ( item_server.allow != 'all') %}
+snmp-server host {{ item_server.ip_address }} version {{ item_server.version }} {{ item_server.security_level }} {{ item_user.user }} {{ item_server.allow | join("") }}
+{% else %}
+snmp-server host {{ item_server.ip_address }} version {{ item_server.version }} {{ item_server.security_level }} {{ item_user.user }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+{% endif %}
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+{% for item_name in aaa.group.tacacsplus.server.get(host.snmp_location.region) %}
+{% for item_server in aaa.tacacsplus.server %}
+{% if item_server.name == item_name %}
+tacacs server {{ item_server.name }}
+ address ipv4 {{ item_server.ip_address }}
+ key {{ item_server.key }}
+ timeout {{ item_server.timeout }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+!
+radius-server dead-criteria time 5 tries 3
+radius-server timeout 60
+radius-server deadtime 480
+!
+{% for item_name in aaa_dot1x.group.radius.server.get(host.snmp_location.region) %}
+{% for item_server in aaa_dot1x.radius.server %}
+{% if item_name == item_server.name %}
+radius server {{ item_server.name }}
+ address ipv4 {{ item_server.ip_address }} auth-port {{ item_server.auth_port }} acct-port {{ item_server.acct_port }}
+ key {{ item_server.key }}
+!
+{% endif %}
+{% endfor %}
+{% endfor %}
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner login 
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password {{ system.line.console.password }}
+ logging synchronous
+ transport preferred none
+ transport output none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password {{ system.line.aux.password }}
+ no exec
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password {{ system.line.vty.password }}
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output none
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password {{ system.line.vty.password }}
+ logging synchronous
+ transport preferred none
+ transport input ssh
+!
+ntp source {{ host.management_interface.name }}
+ntp access-group peer 40
+{% for server in ntp.server.get(host.snmp_location.region) %}
+{% if server.prefer == True %}
+ntp server {{ server.ip_address }} prefer
+{% else %}
+ntp server {{ server.ip_address }}
+{% endif %}
+{% endfor %}
+!
+!
+!
+!
+!
+!
+end

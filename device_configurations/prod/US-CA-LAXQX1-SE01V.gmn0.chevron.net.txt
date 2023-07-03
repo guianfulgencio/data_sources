@@ -1,0 +1,1029 @@
+Building configuration...
+
+Current configuration : 28838 bytes
+!
+! Last configuration change at 11:24:18 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 11:24:52 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 17.6
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone year
+service timestamps log datetime msec localtime show-timezone year
+service password-encryption
+service call-home
+no platform punt-keepalive disable-kernel-core
+!
+hostname US-CA-LAXQX1-SE01V
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging buffered 128000
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip vrf forwarding Mgmt-vrf
+ ip tacacs source-interface GigabitEthernet0/0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+clock timezone UTC -1 0
+clock summer-time UTC recurring
+switch 1 provision c9500-24y4c
+switch 2 provision c9500-24y4c
+boot system bootflash:packages.conf
+stackwise-virtual
+ domain 1
+!
+ip name-server 146.23.1.1 146.23.2.2
+ip domain lookup vrf Mgmt-vrf source-interface GigabitEthernet0/0
+ip domain name gmn0.chevron.net
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+!
+!
+vtp mode transparent
+!
+!
+crypto pki trustpoint TP-self-signed-3661210606
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3661210606
+ revocation-check none
+ rsakeypair TP-self-signed-3661210606
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+!
+crypto pki certificate chain TP-self-signed-3661210606
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 33363631 32313036 3036301E 170D3230 30333138 30393435 
+  31365A17 0D333030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D33 36363132 
+  31303630 36308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100B96A 1ABA892E A36A76C4 0DD16BE1 802CA11E 7D8B16BF CAFB4695 
+  5F33FDFB F5B9F9C2 9E0B6196 62BF0F9D 4A7B5E2B A9516ADA 427F20F9 8083B641 
+  5B619F21 E8E762E6 E9FF2DBE 1ED1DDD3 76601BD8 9CD02412 A17ABB4D 5EE45762 
+  17CF17B0 7BA3A40A AF7B67AB F30A59BE 300CA8B7 1211606A 2402383C 84A65570 
+  0416B915 2F7F6F23 A9A5CE99 02DB7029 919F10AD FB959BE2 C9F5C99C 22BB8361 
+  990FA310 11DD2317 76AD755F 33F14946 6E5E5B8D DC6753EF A7350E37 570E831F 
+  884046FB 7C321491 985A7C3A 33D84F14 1F5C906F 8F6E8265 E354DC4F E70EB101 
+  0C31E594 789A7D39 8CD845C3 DDE2C7FD FACE09A8 288D9C96 90520D6F 4BD2EE65 
+  0BA41A92 063F0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 144B0750 53904BA2 E8244E2F 9000C139 C9E0DCC5 
+  38301D06 03551D0E 04160414 4B075053 904BA2E8 244E2F90 00C139C9 E0DCC538 
+  300D0609 2A864886 F70D0101 05050003 82010100 31C36933 A6F9829F 72D208EA 
+  EDB2D9F0 EA9593B6 8872CD10 EBACA7BD 5062E5B7 F65CE721 3A1F89CF C0D50537 
+  32C7A5B2 B94EE245 C2E8B77E 73DE4064 5353FDB6 A43D2717 F393E52B 712A3B48 
+  B6E7003F C14B0C16 EA01EB15 5EFCDD20 D1784C1A C37F955E C7638952 A96E01D0 
+  D1B72B74 37D3D068 92F7F118 14799CC9 37A430CF EB867554 07483169 DC149D1A 
+  0D8E78FD EF77864A 2358ABC5 5DC70DD0 FF5EBC86 3372C592 12C10FD9 3F58E1E9 
+  A7272046 7EF4C9A4 6136CF72 A9285918 995EC8C0 3EE579A1 EEE68C72 592A707B 
+  5633400E 8C831FBC ABE2557D 3E5734F2 64C1047B D9F57491 A2CFD525 649ACDB6 
+  1FBD657A D94EB10C 46FC83F9 A31D6F00 C0FEBF45
+  	quit
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+!
+crypto pki certificate pool
+ cabundle nvram:ios_core.p7b
+!
+!
+system mtu 9216
+license boot level network-advantage addon dna-advantage
+!
+!
+diagnostic bootup level complete
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 200-210,300-301,2100,3100-3111 priority 0
+archive
+ path bootflash:cvx_122125
+ maximum 5
+ time-period 1440
+memory free low-watermark processor 186772
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode sso
+!
+!
+!
+!
+!
+!
+transceiver type all
+ monitoring
+!
+vlan 100
+ name HX.STORAGE.PRIVATE
+!
+vlan 101
+ name vMOTION
+!
+vlan 200
+ name eDMZ
+!
+vlan 300
+ name HX.MGMT
+!
+vlan 301
+ name iDMZ
+!
+vlan 2100
+ name INTERNET
+!
+vlan 2950
+ name L3CVX-NETMGMT
+!
+vlan 3100
+ name L3CVX-CORP
+!
+vlan 3101
+ name L3CVX-GUEST
+!
+vlan 3102
+ name L3CVX-IND
+!
+vlan 3103
+ name L3CVX-USER
+!
+vlan 3104
+ name L3CVX-DEVICES
+!
+vlan 3105
+ name L3CVX-RED
+!
+vlan 3106
+ name L3CVX-EXTRANET-IC
+!
+vlan 3111
+ name PKT-CAPTURE
+!
+vlan 3200
+ name L3CVX-CORP_RB01
+!
+vlan 3201
+ name L3CVX-GUEST_RB01
+!
+vlan 3202
+ name L3CVX-IND_RB01
+!
+vlan 3203
+ name L3CVX-USER_RB01
+!
+vlan 3204
+ name L3CVX-DEVICES_RB01
+!
+vlan 3205
+ name L3CVX-RED_RB01
+!
+vlan 3206
+ name L3CVX-MGMT-MCBU-RB01
+!
+vlan 3300
+ name L3CVX-CORP_RB02
+!
+vlan 3301
+ name L3CVX-GUEST_RB02
+!
+vlan 3302
+ name L3CVX-IND_RB02
+!
+vlan 3303
+ name L3CVX-USER_RB02
+!
+vlan 3304
+ name L3CVX-DEVICES_RB02
+!
+vlan 3305
+ name L3CVX-RED_RB02
+!
+vlan 3306
+ name L3CVX-MGMT-MCBU-RB02
+!
+vlan 3400
+ name RB01-VPN0
+!
+vlan 3500
+ name RB02-VPN0
+!
+vlan 3600
+ name LAXQX1-RD30.PE1
+!
+vlan 3700
+ name LAXQX1-RD30.PE2
+lldp run
+!
+!
+class-map match-any system-cpp-police-ewlc-control
+  description EWLC Control 
+class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data packets, LOGGING, Transit Traffic
+class-map match-any system-cpp-default
+  description EWLC Data, Inter FED Traffic 
+class-map match-any system-cpp-police-sys-data
+  description Openflow, Exception, EGR Exception, NFL Sampled Data, RPF Failed
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any DSCP-EF
+ match dscp ef 
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-high-rate-app
+  description High Rate Applications 
+class-map match-any system-cpp-police-multicast
+  description MCAST Data
+class-map match-any DSCP-CSx
+ match dscp cs3 
+ match dscp cs6 
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+  description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual OOB
+class-map match-any non-client-nrt-class
+class-map match-any system-cpp-police-routing-control
+  description Routing control and Low Latency
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+class-map match-any DSCP-AF4x
+ match dscp af41 
+ match dscp af42 
+ match dscp af43 
+class-map match-any DSCP-AF2x
+ match dscp af21 
+ match dscp af22 
+ match dscp af23 
+class-map match-any DSCP-AF3x
+ match dscp af31 
+ match dscp af32 
+ match dscp af33 
+class-map match-any DSCP-AF1x
+ match dscp af11 
+ match dscp af12 
+ match dscp af13 
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any system-cpp-police-ios-routing
+  description L2 control, Topology control, Routing control, Low Latency
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+class-map match-any system-cpp-police-ios-feature
+  description ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed
+!
+policy-map system-cpp-policy
+policy-map ION-C9500-OUT
+ class DSCP-EF
+  priority level 1 percent 10
+ class DSCP-AF4x
+  bandwidth remaining percent 25 
+  random-detect dscp-based
+ class DSCP-AF3x
+  bandwidth remaining percent 5 
+  random-detect dscp-based
+ class DSCP-AF2x
+  bandwidth remaining percent 10 
+  random-detect dscp-based
+ class DSCP-AF1x
+  bandwidth remaining percent 10 
+  random-detect dscp-based
+ class DSCP-CSx
+  bandwidth remaining percent 5 
+  random-detect dscp-based
+ class class-default
+  bandwidth remaining percent 45 
+  random-detect dscp-based
+  queue-buffers ratio 30
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel11
+ description LAXQX1-PE1 : AE17
+ switchport trunk allowed vlan 2100-2110
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel12
+ description LAXQX1-PE1 : AE18
+ switchport trunk allowed vlan 3100-3110,3200-3206,3400,3600
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel13
+ description LAXQX1FEX40A : AE1 : Outside & DMZ
+ switchport trunk allowed vlan 200-210,2100-2110
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel14
+ description LAXQX1FEX40A : AE4 : Inside
+ switchport trunk allowed vlan 300-310,3100-3110
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel15
+ description FEX09-DEV : AE1 : Outside
+ switchport trunk allowed vlan 2100
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel21
+ description LAXQX1-PE2 : AE17
+ switchport trunk allowed vlan 2100-2110
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel22
+ description LAXQX1-PE2 : AE18
+ switchport trunk allowed vlan 3100-3110,3300-3306,3500,3700
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel23
+ description LAXQX1FEX40B : AE1 : Outside & DMZ
+ switchport trunk allowed vlan 200-210,2100-2110
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel24
+ description LAXQX1FEX40B : AE4 : Inside
+ switchport trunk allowed vlan 300-310,3100-3110
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel25
+ description FEX09-DEV : AE4 : Inside
+ switchport trunk allowed vlan 3100-3105
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel30
+ description LAXQX1-MS : Po30
+ switchport trunk allowed vlan 300,2950
+ switchport mode trunk
+ logging event trunk-status
+!
+interface Port-channel98
+ description Connected to NA-US-SCAL-C-LAXQX1-PE1 for Core Circuits via Megaport Cloud Fabric
+ switchport mode trunk
+ mtu 9170
+!
+interface Port-channel99
+ description Connected to NA-US-SCAL-C-LAXQX1-PE2 for Core Circuits via Megaport Cloud Fabric
+ switchport mode trunk
+ mtu 9170
+!
+interface GigabitEthernet0/0
+ vrf forwarding Mgmt-vrf
+ ip address 139.65.212.207 255.255.255.192
+ no ip redirects
+ no ip proxy-arp
+ negotiation auto
+!
+interface TwentyFiveGigE1/0/1
+ description LAXQX1-PE1 : xe-0/0/3
+ switchport trunk allowed vlan 2100-2110
+ switchport mode trunk
+ load-interval 30
+ channel-group 11 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/2
+ description LAXQX1-PE1 : xe-1/0/3
+ switchport trunk allowed vlan 3100-3110,3200-3206,3400,3600
+ switchport mode trunk
+ load-interval 30
+ channel-group 12 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/3
+ description US-CA-LAXQX1-RV01 : Outside
+ switchport access vlan 200
+ load-interval 30
+ spanning-tree portfast edge
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/4
+ description US-CA-LAXQX1-RV01 : Inside
+ switchport access vlan 301
+ load-interval 30
+ spanning-tree portfast edge
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/5
+ description : NA-US-SCAL-C-LAXQX1-PE1 xe1/0/0 : Megaport WAN
+ switchport mode trunk
+ mtu 9170
+ load-interval 30
+ channel-group 98 mode active
+!
+interface TwentyFiveGigE1/0/6
+ description : NA-US-SCAL-C-LAXQX1-PE2 xe0/0/7 : Megaport WAN
+ switchport mode trunk
+ mtu 9170
+ load-interval 30
+ channel-group 99 mode active
+!
+interface TwentyFiveGigE1/0/7
+ description LAXQX1-HXE-01
+ switchport trunk allowed vlan 100,101,200-210,300-310,2950,3200-3206,3300-3306
+ switchport trunk allowed vlan add 3400,3500
+ switchport mode trunk
+ switchport nonegotiate
+ logging event trunk-status
+ load-interval 30
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/8
+ description LAXQX1-HXE-02
+ switchport trunk allowed vlan 100,101,200-210,300-310,2950,3200-3206,3300-3306
+ switchport trunk allowed vlan add 3400,3500
+ switchport mode trunk
+ switchport nonegotiate
+ logging event trunk-status
+ load-interval 30
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/9
+ description GGQE-IPv6-TESTLAPTOP1
+ switchport access vlan 301
+ switchport mode access
+ spanning-tree portfast edge
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/10
+ no switchport
+ no ip address
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/11
+ description LAXQX1FEX40A : Port 13 : Outside
+ switchport trunk allowed vlan 200-210,2100-2110
+ switchport mode trunk
+ load-interval 30
+ channel-group 13 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/12
+ description LAXQX1FEX40B : Port 13 : Outside
+ switchport trunk allowed vlan 200-210,2100-2110
+ switchport mode trunk
+ load-interval 30
+ channel-group 23 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/13
+ description LAXQX1FEX40A : Port 15 : Inside
+ switchport trunk allowed vlan 300-310,3100-3110
+ switchport mode trunk
+ load-interval 30
+ channel-group 14 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/14
+ description LAXQX1FEX40B : Port 15 : Inside
+ switchport trunk allowed vlan 300-310,3100-3110
+ switchport mode trunk
+ load-interval 30
+ channel-group 24 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/15
+ description FEX09-DEV : Eth1/9 : Outside
+ switchport trunk allowed vlan 2100
+ switchport mode trunk
+ load-interval 30
+ channel-group 15 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/16
+ description FEX09-DEV : Eth1/11 : Inside
+ switchport trunk allowed vlan 3100-3105
+ switchport mode trunk
+ load-interval 30
+ channel-group 25 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/17
+ no switchport
+ no ip address
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/18
+ description LAXQX1-MS1 : Gi1/1
+ switchport trunk allowed vlan 300,2950
+ switchport mode trunk
+ logging event trunk-status
+ channel-group 30 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/19
+ description Equinix ECX : 135078-LA1-CX-SEC-01 : CableID 21382840 : PP:0000:181531 Port 20
+ switchport mode trunk
+ load-interval 30
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/20
+ no switchport
+ no ip address
+ shutdown
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/21
+ no switchport
+ no ip address
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/22
+ description LAXQX1AG1 : Port 11 : Incoming decrypted/span traffic
+ switchport access vlan 3111
+ switchport mode access
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast edge
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/23
+ description LAXQX1-PE1 : xe-1/0/4 : Outgoing decrypted/span traffic
+ switchport trunk allowed vlan 3111
+ switchport mode trunk
+ load-interval 30
+ spanning-tree portfast edge trunk
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE1/0/24
+ stackwise-virtual dual-active-detection
+ description ** Stackwise-virtual Dual.Active.Detect - DO NOT REMOVE **
+!
+interface HundredGigE1/0/25
+ stackwise-virtual link 1
+ description ** Stackwise-virtual link - DO NOT REMOVE **
+!
+interface HundredGigE1/0/26
+ stackwise-virtual link 1
+ description ** Stackwise-virtual link - DO NOT REMOVE **
+!
+interface HundredGigE1/0/27
+ no switchport
+ no ip address
+!
+interface HundredGigE1/0/28
+ no switchport
+ no ip address
+!
+interface TwentyFiveGigE2/0/1
+ description LAXQX1-PE2 : xe-0/0/3
+ switchport trunk allowed vlan 2100-2110
+ switchport mode trunk
+ load-interval 30
+ channel-group 21 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/2
+ description LAXQX1-PE2 : xe-1/0/3
+ switchport trunk allowed vlan 3100-3110,3300-3306,3500,3700
+ switchport mode trunk
+ load-interval 30
+ channel-group 22 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/3
+ description US-CA-LAXQX1-RV02 : Outside
+ switchport access vlan 200
+ load-interval 30
+ spanning-tree portfast edge
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/4
+ description US-CA-LAXQX1-RV02 : Inside
+ switchport access vlan 301
+ load-interval 30
+ spanning-tree portfast edge
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/5
+ description : NA-US-SCAL-C-LAXQX1-PE1 xe1/0/1 : Megaport WAN
+ switchport mode trunk
+ mtu 9170
+ load-interval 30
+ channel-group 98 mode active
+!
+interface TwentyFiveGigE2/0/6
+ description : NA-US-SCAL-C-LAXQX1-PE2 xe1/0/1 : Megaport WAN
+ switchport mode trunk
+ mtu 9170
+ load-interval 30
+ channel-group 99 mode active
+!
+interface TwentyFiveGigE2/0/7
+ description LAXQX1-HXE-01
+ switchport trunk allowed vlan 100,101,200-210,300-310,2950,3200-3206,3300-3306
+ switchport trunk allowed vlan add 3400,3500
+ switchport mode trunk
+ switchport nonegotiate
+ logging event trunk-status
+ load-interval 30
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/8
+ description LAXQX1-HXE-02
+ switchport trunk allowed vlan 100,101,200-210,300-310,2950,3200-3206,3300-3306
+ switchport trunk allowed vlan add 3400,3500
+ switchport mode trunk
+ switchport nonegotiate
+ logging event trunk-status
+ load-interval 30
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/9
+ description GGQE-IPv6-TESTLAPTOP2
+ switchport access vlan 301
+ switchport mode access
+ spanning-tree portfast edge
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/10
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/11
+ description LAXQX1FEX40A : Port 14 : Outside
+ switchport trunk allowed vlan 200-210,2100-2110
+ switchport mode trunk
+ load-interval 30
+ channel-group 13 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/12
+ description LAXQX1FEX40B : Port 14 : Outside
+ switchport trunk allowed vlan 200-210,2100-2110
+ switchport mode trunk
+ load-interval 30
+ channel-group 23 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/13
+ description LAXQX1FEX40A : Port 16 : Inside
+ switchport trunk allowed vlan 300-310,3100-3110
+ switchport mode trunk
+ load-interval 30
+ channel-group 14 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/14
+ description LAXQX1FEX40B : Port 16 : Inside
+ switchport trunk allowed vlan 300-310,3100-3110
+ switchport mode trunk
+ load-interval 30
+ channel-group 24 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/15
+ description FEX09-DEV : Eth1/10 : Outside
+ switchport trunk allowed vlan 2100
+ switchport mode trunk
+ load-interval 30
+ channel-group 15 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/16
+ description FEX09-DEV : Eth1/12 : Inside
+ switchport trunk allowed vlan 3100-3105
+ switchport mode trunk
+ load-interval 30
+ channel-group 25 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/17
+ no switchport
+ no ip address
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/18
+ description LAXQX1-MS1 : Gi1/2
+ switchport trunk allowed vlan 300,2950
+ switchport mode trunk
+ logging event trunk-status
+ channel-group 30 mode active
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/19
+ description Equinix ECX : 135078-LA1-CX-PRI-01 : CableID 21393047 : PP:0000:181531 Port 43
+ switchport mode trunk
+ load-interval 30
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/20
+ no switchport
+ no ip address
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/21
+ no switchport
+ no ip address
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/22
+ description LAXQX1AG1 : Port 12 : Incoming decrypted/span traffic
+ switchport access vlan 3111
+ switchport mode access
+ switchport nonegotiate
+ load-interval 30
+ spanning-tree portfast edge
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/23
+ description LAXQX1-PE2 : xe-1/0/4 : Outgoing decrypted/span traffic
+ switchport trunk allowed vlan 3111
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ no cdp enable
+ spanning-tree portfast edge trunk
+ service-policy output ION-C9500-OUT
+!
+interface TwentyFiveGigE2/0/24
+ stackwise-virtual dual-active-detection
+ description ** Stackwise-virtual Dual.Active.Detect - DO NOT REMOVE **
+!
+interface HundredGigE2/0/25
+ stackwise-virtual link 1
+ description ** Stackwise-virtual link - DO NOT REMOVE **
+!
+interface HundredGigE2/0/26
+ stackwise-virtual link 1
+ description ** Stackwise-virtual link - DO NOT REMOVE **
+!
+interface HundredGigE2/0/27
+ no switchport
+ no ip address
+!
+interface HundredGigE2/0/28
+ no switchport
+ no ip address
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan3001
+ no ip address
+!
+interface Vlan3100
+ no ip address
+!
+interface Vlan3111
+ ip address 139.65.26.189 255.255.255.248
+ no ip proxy-arp
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip tcp path-mtu-discovery
+no ip http server
+no ip http secure-server
+ip http client source-interface Vlan3100
+ip tftp source-interface GigabitEthernet0/0
+ip route 0.0.0.0 0.0.0.0 139.65.26.185
+ip route vrf Mgmt-vrf 0.0.0.0 0.0.0.0 139.65.212.193
+ip tacacs source-interface GigabitEthernet0/0 vrf Mgmt-vrf
+ip ssh source-interface GigabitEthernet0/0
+ip ssh version 2
+ip scp server enable
+!
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 50 permit 146.40.2.8
+ 60 permit 146.40.2.11
+ 70 permit 146.40.2.12
+ 80 permit 146.40.2.13
+ 90 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.0.0 0.0.255.255
+ 150 deny   any log
+!
+!
+logging history size 10
+logging source-interface GigabitEthernet0/0 vrf Mgmt-vrf
+logging host 146.36.114.214 vrf Mgmt-vrf
+logging host 146.38.53.162 vrf Mgmt-vrf
+logging host 139.65.140.25
+logging host 139.65.140.24 vrf Mgmt-vrf
+ip access-list standard 20
+ 10 permit 139.65.136.0 0.0.3.255
+ 20 permit 139.65.140.0 0.0.3.255
+ 30 permit 139.65.192.0 0.0.15.255
+ 40 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 permit 146.40.10.21
+ 40 deny   any log
+!
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 priv 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source GigabitEthernet0/0
+snmp-server location LAXQX1 / CC1-U40, 600 West 7th St., 6th Flr, Los Angeles, CA / USA / Americas /US-NA-Utility-Campus-Metro/Criticality-Medium
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps license
+snmp-server enable traps memory bufferpeak
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner login ^CCC
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output ssh
+!
+call-home
+ contact-email-addr nmbtcon@chevron.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+ profile "CSSM"
+  destination transport-method http
+  no destination transport-method email
+  destination address http http://cssm.chevron.net/Transportgateway/services/DeviceRequestHandler 
+ntp source GigabitEthernet0/0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+!
+end

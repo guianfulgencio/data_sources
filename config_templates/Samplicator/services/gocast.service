@@ -1,0 +1,13 @@
+[Unit]
+Description=GoCast
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/gocast -logtostderr -v=2 -config /usr/local/etc/gocast.yaml
+Restart=always
+RestartSec=300
+StartLimitInterval=1000
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target

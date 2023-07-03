@@ -1,0 +1,5850 @@
+Building configuration...
+
+Current configuration : 189250 bytes
+!
+! Last configuration change at 10:41:17 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 10:41:52 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 17.3
+service nagle
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+no platform punt-keepalive disable-kernel-core
+!
+hostname HOU140SL05
+!
+!
+vrf definition Mgmt-vrf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+logging snmp-authfail
+logging buffered 128000
+logging reload warnings
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server radius AAA
+ server name HOU_RadiusVIP
+ server name LON_RadiusVIP
+ server name SIN_RadiusVIP
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Vlan5
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authentication dot1x default group radius
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting dot1x default start-stop group radius
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting network default start-stop group AAA
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+aaa server radius dynamic-author
+!
+aaa session-id common
+boot system bootflash:/packages.conf
+power redundancy-mode combined
+power supply autoLC shutdown
+power supply autoLC priority 1 2 5 6 7
+!
+!
+!
+!
+no ip routing
+!
+ip name-server 146.23.1.1 146.23.2.2
+ip domain name hou140.chevrontexaco.net
+!
+!
+!
+login on-success log
+!
+!
+!
+!
+!
+device-sensor accounting
+device-sensor notify all-changes
+qos queue-softmax-multiplier 1200
+vtp domain HOU140
+vtp mode off
+authentication mac-move permit
+no device-tracking logging theft
+device-tracking tracking auto-source
+!
+device-tracking policy sisf_policy
+ limit address-count 10
+ no protocol udp
+ tracking enable
+!
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment terminal
+ revocation-check crl
+!
+crypto pki trustpoint TP-self-signed-3415321947
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-3415321947
+ revocation-check none
+ rsakeypair TP-self-signed-3415321947
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+crypto pki certificate chain TP-self-signed-3415321947
+ certificate self-signed 01
+  30820330 30820218 A0030201 02020101 300D0609 2A864886 F70D0101 05050030 
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 33343135 33323139 3437301E 170D3230 30383235 31353238 
+  34305A17 0D333030 31303130 30303030 305A3031 312F302D 06035504 03132649 
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D33 34313533 
+  32313934 37308201 22300D06 092A8648 86F70D01 01010500 0382010F 00308201 
+  0A028201 0100CD6C 55F80591 6C65F7F6 B3C024F3 F0778FE9 4569BDD1 5AEF586A 
+  69470283 B6DECDE7 583DC6AD 3B02C499 960BD684 52B452C2 BEAE3ED4 F318D48A 
+  1C74539D 6590C6B4 E98B86A6 12331146 6E7D4443 F8B989AE CBB46B26 D9D1768C 
+  C62A819F 871BD33A 89E55C69 BE52617C A8CD8A42 CD4FFD77 19DE731E 8F1F390B 
+  8DBB3968 D9DBCA22 6929598C 3334F7CB 5AA3B54E D696E06F 1F395B37 0175CA3A 
+  5D07F78E 4FFC5B6C 360612EC 5C7EC544 E832DF41 F5A78773 ADE8A7D5 91EAAC1C 
+  93DFA585 77DF4C86 80AE0A51 2127EF99 218985EA 9C5806B9 4AE83C3A 40309CAE 
+  786DF037 7E960F6B 210EB4D9 C0FC92D6 F2EE24F7 C4731263 CA6C719E 607A1FEB 
+  4B6454DD F6330203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 
+  301F0603 551D2304 18301680 14D0A766 AEEA391C 3675131C B3C28B9C B751834A 
+  B7301D06 03551D0E 04160414 D0A766AE EA391C36 75131CB3 C28B9CB7 51834AB7 
+  300D0609 2A864886 F70D0101 05050003 82010100 46301F8C B3ECA759 6FF0F3E1 
+  14F52EBC 1B59B874 15E9907F A505E7BC 3D3ED553 66BEED09 A47391E8 BF283C93 
+  ED080402 588B8D40 22E8D068 CF554289 5A3A4A7D 3002FBA7 3956362B 6417C228 
+  46AAE67D 7633E840 4A8981E7 99134E3B 718DB149 28E95183 FEBDF763 0204709B 
+  8FA48877 2BA2F6C1 4CB02581 31E78C16 76AD5F68 B64A8598 C4587637 C9AC5780 
+  D9ABC765 200AD555 A059E052 1E02EE0A D850204A C073BF37 ABE5EAA3 34421C8E 
+  7F5B7779 8086D618 0F87A90D 20A57359 B12726AE 767884A4 FAFDD726 8EC8D8C3 
+  4BAC15D7 FF9688DD 67CC81B0 8BC66F39 817B7980 A9CB88A4 5B07425C DFDE7595 
+  F0B87BE5 6A5F22E6 888CD00E D9011B02 47A5C6A2
+  	quit
+!
+dot1x system-auth-control
+dot1x critical eapol
+license boot level network-essentials addon dna-essentials
+license smart transport off
+!
+!
+diagnostic bootup level minimal
+!
+spanning-tree mode rapid-pvst
+spanning-tree portfast bpduguard default
+spanning-tree extend system-id
+spanning-tree pathcost method long
+archive
+ path bootflash:cvx_113823
+ maximum 5
+memory free low-watermark processor 185551
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode sso
+!
+!
+!
+!
+!
+!
+transceiver type all
+ monitoring
+!
+vlan 5
+ name 146.36.252.0/24.5th.data
+!
+vlan 105
+ name 146.41.5.0/24.5th.voice
+!
+vlan 800
+ name CBRES-METASYS
+!
+vlan 888
+ name internet_anywhere
+!
+vlan 999
+ name dot1q.native
+!
+!
+class-map match-any system-cpp-police-ewlc-control
+  description EWLC Control 
+class-map match-any system-cpp-police-topology-control
+  description Topology control
+class-map match-any system-cpp-police-sw-forward
+  description Sw forwarding, L2 LVX data packets, LOGGING, Transit Traffic
+class-map match-any system-cpp-default
+  description EWLC Data, Inter FED Traffic 
+class-map match-any system-cpp-police-sys-data
+  description Openflow, Exception, EGR Exception, NFL Sampled Data, RPF Failed
+class-map match-any ACCESS_IN_BULK
+ match access-group name ACCESS_IN_BULK_2020Q2
+class-map match-any ACCESS_OUT_SIGNALING
+ match dscp cs3 
+ match dscp cs6 
+ match dscp af31  af32  af33 
+class-map match-any ACCESS_OUT_VIDEO
+ match dscp cs4  af41  af42  af43 
+class-map match-any ACCESS_OUT_VOICE
+ match dscp ef 
+class-map match-any system-cpp-police-punt-webauth
+  description Punt Webauth
+class-map match-any system-cpp-police-l2lvx-control
+  description L2 LVX control packets
+class-map match-any system-cpp-police-forus
+  description Forus Address resolution and Forus traffic
+class-map match-any DSCP-EF
+ match dscp ef 
+class-map match-any system-cpp-police-multicast-end-station
+  description MCAST END STATION
+class-map match-any system-cpp-police-high-rate-app
+  description High Rate Applications 
+class-map match-any system-cpp-police-multicast
+  description MCAST Data
+class-map match-any DSCP-CSx
+ match dscp cs3 
+ match dscp cs6 
+class-map match-any system-cpp-police-l2-control
+  description L2 control
+class-map match-any system-cpp-police-dot1x-auth
+  description DOT1X Auth
+class-map match-any system-cpp-police-data
+  description ICMP redirect, ICMP_GEN and BROADCAST
+class-map match-any ACCESS_IN_TRANSACTIONAL
+ match access-group name ACCESS_IN_TRANSACTIONAL_2020Q2
+class-map match-any DEFAULT
+class-map match-any system-cpp-police-stackwise-virt-control
+  description Stackwise Virtual OOB
+class-map match-any ACCESS_IN_VIDEO
+ match access-group name ACCESS_IN_VIDEO_2020Q2
+class-map match-any ACCESS_IN_VOICE
+ match access-group name ACCESS_IN_VOICE_2020Q2
+class-map match-any LAN-MARK-EF
+ match access-group name MARK-DSCP-EF
+class-map match-any non-client-nrt-class
+class-map match-any ACCESS_IN_SIGNALING
+ match access-group name ACCESS_IN_SIGNALING_2020Q2
+class-map match-any LAN-MARK-AF1
+ match access-group name MARK-DSCP-AF11
+class-map match-any system-cpp-police-routing-control
+  description Routing control and Low Latency
+class-map match-any system-cpp-police-protocol-snooping
+  description Protocol snooping
+class-map match-any LAN-MARK-AF3
+ match access-group name MARK-DSCP-AF31
+class-map match-any DSCP-AF4x
+ match dscp af41 
+ match dscp af42 
+ match dscp af43 
+class-map match-any LAN-MARK-AF2
+ match access-group name MARK-DSCP-AF21
+class-map match-any DSCP-AF2x
+ match dscp af21 
+ match dscp af22 
+ match dscp af23 
+class-map match-any LAN-MARK-AF4
+ match access-group name MARK-DSCP-AF41
+class-map match-any DSCP-AF3x
+ match dscp af31 
+ match dscp af32 
+ match dscp af33 
+class-map match-any DSCP-AF1x
+ match dscp af11 
+ match dscp af12 
+ match dscp af13 
+class-map match-any system-cpp-police-dhcp-snooping
+  description DHCP snooping
+class-map match-any system-cpp-police-ios-routing
+  description L2 control, Topology control, Routing control, Low Latency
+class-map match-any system-cpp-police-system-critical
+  description System Critical and Gold Pkt
+class-map match-any LAN-MARK-CS3
+ match access-group name MARK-DSCP-CS3
+class-map match-any system-cpp-police-ios-feature
+  description ICMPGEN,BROADCAST,ICMP,L2LVXCntrl,ProtoSnoop,PuntWebauth,MCASTData,Transit,DOT1XAuth,Swfwd,LOGGING,L2LVXData,ForusTraffic,ForusARP,McastEndStn,Openflow,Exception,EGRExcption,NflSampled,RpfFailed
+!
+policy-map LANQOS-OUT
+ class DSCP-EF
+  priority level 1 percent 10
+ class DSCP-AF4x
+  bandwidth remaining percent 25 
+ class DSCP-AF3x
+  bandwidth remaining percent 5 
+ class DSCP-AF2x
+  bandwidth remaining percent 25 
+ class DSCP-AF1x
+  bandwidth remaining percent 15 
+ class DSCP-CSx
+  bandwidth remaining percent 5 
+ class class-default
+  bandwidth remaining percent 25 
+policy-map system-cpp-policy
+policy-map SETDSCP
+ class LAN-MARK-EF
+  set dscp ef
+ class LAN-MARK-AF4
+  set dscp af41
+ class LAN-MARK-AF3
+  set dscp af31
+ class LAN-MARK-AF2
+  set dscp af21
+ class LAN-MARK-AF1
+  set dscp af11
+ class LAN-MARK-CS3
+  set dscp cs3
+ class class-default
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel1
+ description HOU140RL1-VSS Uplink
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 5,105,800,888
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+!
+interface GigabitEthernet0/0
+ description mgmt
+ vrf forwarding Mgmt-vrf
+ ip address 146.36.4.112 255.255.255.0
+ no ip proxy-arp
+ load-interval 30
+ negotiation auto
+!
+interface GigabitEthernet1/0/1
+ description TO 001 RM 05027
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/2
+ description TO 002 RM 05028
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/3
+ description TO 003D2 RM 05028
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/4
+ description TO 005 RM 05028
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/5
+ description TO 009D2 RM 05040
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/6
+ description TO 010
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/7
+ description TO 010D2 RM 05044
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/8
+ description TO 011 RM 05048
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/9
+ description TO 012 RM 05048
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/10
+ description TO 025 RM 05069
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/11
+ description TO 025D2 RM 05069
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/12
+ description TO 026
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/13
+ description TO 027 RM 05072
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/14
+ description TO 028 RM 05076
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/15
+ description TO 029 RM 05073
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/16
+ description TO 029D2 RM 05073
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/17
+ description TO 030 RM 05075
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/18
+ description TO 030D2 RM 05075
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/19
+ description TO 031 RM 05079
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/20
+ description TO 031D2 RM 05079
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/21
+ description TO 032 RM 05077
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/22
+ description TO 032D2 RM 05077
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/23
+ description TO 033
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet1/0/24
+ description TO 034 RM 05087
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/25
+ description TO 040 RM 05088
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/26
+ description TO 039 RM 05086
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/27
+ description TO 038 RM 05084
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/28
+ description TO 037 RM 05080
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/29
+ description TO 024D2 RM 05065
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/30
+ description TO 024 RM 05065
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/31
+ description TO 023 D2 RM 05047
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/32
+ description TO 023 RM 05047
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/33
+ description TO 022D2 RM 05053
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/34
+ description TO 022 RM 05053
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/35
+ description TO 021 RM 05053
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/36
+ description TO 020 RM 05051
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/37
+ description TO 019D2 RM 05051
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/38
+ description TO 019 RM 05051
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/39
+ description TO 018 RM 05049
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/40
+ description TO 285 HOU140wa-05028
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/41
+ description TO 017D2 RM 05068
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/42
+ description TO 017 RM 05068
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/43
+ description TO 016 RM 05066
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/44
+ description TO 015 RM 05062
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/45
+ description TO 133 HOU140wa-05090
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/46
+ description TO 286 HOU140wa-05156
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/47
+ description TO 014 RM 05058
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet1/0/48
+ description TO 013 RM 05054
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/1
+ description TO 034D2 RM 05087
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/2
+ description TO 035 RM 05947
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/3
+ description TO 049 RM 05105
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/4
+ description TO 050 RM 05095
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/5
+ description TO 051 RM 05093
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/6
+ description TO 053 RM 05091
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/7
+ description TO 054D2 RM 05091
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/8
+ description TO 055 RM 05091
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/9
+ description TO 055D2 RM 05091
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/10
+ description TO 056 RM 05110
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/11
+ description TO 057 RM 05112
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/12
+ description TO 058 RM 05114
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/13
+ description TO 059 RM 05118
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/14
+ description TO 060 RM 05117
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/15
+ description TO 073 RM 05134
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/16
+ description TO 074 RM 05148
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/17
+ description TO 075
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/18
+ description TO 076 RM 05138
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/19
+ description TO 077 RM 05142
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/20
+ description TO 078 RM 05148
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/21
+ description TO 079 RM 05152
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/22
+ description TO 081 RM 05156
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/23
+ description TO 082 RM 05158
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet2/0/24
+ description TO 083 RM 05153
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/25
+ description TO 070D2 RM 05135
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/26
+ description TO 070 RM 05135
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/27
+ description TO 069
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/28
+ description TO 068 RM 05130
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/29
+ description TO 067 RM 05126
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/30
+ description TO 066 RM 05122
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/31
+ description TO 065 RM 05127
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/32
+ description TO-64 D2 RM 05129
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/33
+ description TO 064 RM 05129
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/34
+ description TO 063 RM 05125
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/35
+ description TO 062 RM 05123
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/36
+ description TO 048 RM 05108
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/37
+ description TO 047 RM 05106
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/38
+ description TO 046 RM 05104
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/39
+ description TO 045 RM 05102
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/40
+ description TO 287 HOU140wa-05008
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/41
+ description TO 044D2 RM 05096
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/42
+ description TO 043 RM 05094
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/43
+ description TO 042D2 RM 05092
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/44
+ description TO 042 RM 05092
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/45
+ description TO 289 HOU140wa-05068
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/46
+ description TO 143 HOU140wa-05147
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/47
+ description TO 041 RM 05090
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet2/0/48
+ description TO 040D2 RM 05088
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet3/0/1
+ description HOU140RL1-VSS Te1/1/5
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 5,105,800,888
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 1 mode active
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet3/0/2
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet3/0/3
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet3/0/4
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet3/0/5
+ description HOU140RL1-VSS Te2/1/5
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 5,105,800,888
+ switchport mode trunk
+ switchport nonegotiate
+ load-interval 30
+ channel-group 1 mode active
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet3/0/6
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet3/0/7
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet3/0/8
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface FortyGigabitEthernet3/0/9
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface FortyGigabitEthernet3/0/10
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/1
+ description TO 084 RM 05155
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/2
+ description TO 097 RM 05177
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/3
+ description TO 099
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/4
+ description TO 100 RM 05187
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/5
+ description TO 100D2 RM 05187
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/6
+ description TO 101
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/7
+ description TO 102D2 RM 05039
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/8
+ description TO 104 RM 05178
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/9
+ description TO 105 RM 05180
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/10
+ description TO 106 RM 05184
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/11
+ description TO 107 RM 05186
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/12
+ description TO 108 RM 05188
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/13
+ description TO 121 RM 05006
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/14
+ description TO 122 RM 05008
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/15
+ description TO 123 RM 05010
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/16
+ description TO 124 RM 05012
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/17
+ description TO 125 RM 05016
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/18
+ description TO 126 RM 05016
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/19
+ description TO 127 RM 05017
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/20
+ description TO-127 RM 05017
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/21
+ description TO 156 RM 05173
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/22
+ description TO 156D2 RM 05173
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/23
+ description TO 157 RM 05175
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet5/0/24
+ description TO 158
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/25
+ description TO 116 RM 05007
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/26
+ description TO 116 RM 05007
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/27
+ description TO 114 RM 05195
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/28
+ description TO 113 RM 05004
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/29
+ description TO 112 RM 05002
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/30
+ description TO 111 RM 05198
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/31
+ description TO 110 RM 05194
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/32
+ description TO 095 RM 05176
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/33
+ description TO 094D2 RM 05168
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/34
+ description TO 094 RM 05168
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/35
+ description TO 093
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/36
+ description TO 092 RM 05170
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/37
+ description TO 091 RM 05152
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/38
+ description TO 090
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/39
+ description TO 089D2 RM 05165
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/40
+ description TO 102 HOU140wa-05186
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/41
+ description TO 088 RM 05161
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/42
+ description TO 087 RM 05167
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/43
+ description TO 086D2 RM 05163
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/44
+ description TO 086 RM 05163
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/45
+ description TO 141 HOU140wa-05053
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/46
+ description TO 290 HOU140wa-05122
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/47
+ description TO 085
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet5/0/48
+ description TO 072 RM 05139
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/1
+ description TO 160 RM 05497
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/2
+ description TO 161 RM 05947B
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/3
+ description TO 262 RM 05133
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/4
+ description TO 263 RM 05063
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/5
+ description TO 264 RM 05067 D1
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/6
+ description TO 266
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/7
+ description TO 267 RM 05041
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/8
+ description TO 268D2 RM 05045A
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/9
+ description TO 269D2 RM 05045C
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/10
+ description TO 05-063 D2 RM 05063
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/11
+ description TO-264D2 RM 05067
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/12
+ description TO-268D1 
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/13
+ description TO-159 RM 05125
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/14
+ description TO-56 RM 05110
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/15
+ description spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/16
+ description spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/17
+ description spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/18
+ description spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/19
+ description Spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/20
+ description Spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/21
+ description Spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/22
+ description Spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/23
+ description Spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface GigabitEthernet6/0/24
+ description Spare
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ shutdown
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/25
+ description TO 293 Lobby Display
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/26
+ description TO 294 Lobby Display
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/27
+ description TO 295 RM 05053
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/28
+ description TO 296 RM 05053
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/29
+ description TO-299D1 
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/30
+ description TO-297D1 
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/31
+ description TO-47 D2 RM 05106
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/32
+ description TO-72 D2 RM 05139
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/33
+ description TO-63 D2 RM 05125
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/34
+ description TO-292 RM 05051
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/35
+ description TO-138 RM 05051
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/36
+ description TO 291 Metasys NAE Connection
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 800
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/37
+ description TO 154
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/38
+ description TO 150 RM 05137
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/39
+ description TO 148D2 RM 05039
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/40
+ description TO 135 HOU140wa-05175
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/41
+ description TO 120D2 RM 05009
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/42
+ description TO 120 RM 05009
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/43
+ description TO 119 RM 05009
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/44
+ description TO 118D2 RM 05009
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/45
+ description TO 288 HOU140wa-05048
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/46
+ description TO 134 HOU140wa-05106
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/47
+ description TO 118 RM 05009
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface TenGigabitEthernet6/0/48
+ description TO 117 RM 05005
+ switchport access vlan 5
+ switchport mode access
+ switchport voice vlan 105
+ device-tracking attach-policy sisf_policy
+ load-interval 30
+ authentication control-direction in
+ authentication event fail action next-method
+ authentication event server dead action authorize vlan 5
+ authentication event server dead action authorize voice
+ authentication event server alive action reinitialize 
+ authentication host-mode multi-auth
+ authentication order dot1x mab
+ authentication priority dot1x mab
+ authentication port-control auto
+ authentication periodic
+ authentication timer reauthenticate server
+ mab
+ no snmp trap link-status
+ dot1x pae authenticator
+ dot1x timeout tx-period 1
+ spanning-tree portfast
+ service-policy input SETDSCP
+ service-policy output LANQOS-OUT
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan5
+ description mgmt
+ ip address 146.36.252.4 255.255.255.0
+ no ip proxy-arp
+ load-interval 30
+!
+ip default-gateway 146.36.252.1
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip tcp path-mtu-discovery
+no ip http server
+no ip http secure-server
+ip http timeout-policy linger 1
+ip http client source-interface Vlan5
+ip tftp source-interface Vlan5
+ip route vrf Mgmt-vrf 0.0.0.0 0.0.0.0 146.36.4.1
+ip ssh source-interface GigabitEthernet0/0
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 50 permit 146.40.2.8
+ 60 permit 146.40.2.11
+ 70 permit 146.40.2.12
+ 80 permit 146.40.2.13
+ 90 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.0.0 0.0.255.255
+ 150 deny   any log
+!
+ip access-list extended ACCESS_IN_BULK_2020Q2
+ 10 remark * * * PERMIT LAN RECEIVED BULK To DSCP AF1X- REVISION Q2 2020 * * *
+ 10 remark * * * Permit received bulk traffic to DSCP AF11***
+ 10 permit ip any any dscp af11
+ 20 permit ip any any dscp af12
+ 30 permit ip any any dscp af13
+ip access-list extended ACCESS_IN_SIGNALING_2020Q2
+ 10 remark * * * PERMIT/MARK LAN RECEIVED SIGNALING TO DSCP AF3X - REVISION Q2 2020 * * *
+ 10 remark * * * permit already marked Incoming Signaling Traffic to dscp CS3-AF31-AF32-AF33* * *
+ 10 permit ip any any dscp cs3
+ 20 permit ip any any dscp af31
+ 30 permit ip any any dscp af32
+ 40 permit ip any any dscp af33
+ 50 remark * * * SCCP - 2020 Q2 * * *
+ 50 permit tcp any any range 2000 2002
+ 60 permit tcp any range 2000 2002 any
+ 70 permit tcp any any range 11000 11999
+ 80 permit tcp any range 11000 11999 any
+ 90 remark * * * H323-H225 - 2020 Q2 * * *
+ 90 permit udp any any eq 1719
+ 100 permit udp any eq 1719 any
+ 110 permit tcp any any range 1718 1720
+ 120 permit tcp any range 1718 1720 any
+ 130 remark * * * MGCP - 2020 Q2 * * *
+ 130 permit udp any any eq 2427
+ 140 permit udp any eq 2427 any
+ 150 permit tcp any any eq 2428
+ 160 permit tcp any eq 2428 any
+ 170 remark * * * SIP - 2020 Q2 * * *
+ 170 permit tcp any any range 5060 5061
+ 180 permit udp any any range 5060 5061
+ 190 permit tcp any range 5060 5061 any
+ 200 permit udp any range 5060 5061 any
+ 210 remark * * * H.245 for Cisco-Tandberg video - 2020 Q2 * * *
+ 210 permit tcp any range 5556 5574 any range 5555 5565
+ 220 permit tcp any range 5555 5565 any range 5556 5574
+ 230 remark * * * BGP - 2020 Q2 * * *
+ 230 permit tcp any any eq bgp
+ 240 permit tcp any eq bgp any
+ip access-list extended ACCESS_IN_TRANSACTIONAL_2020Q2
+ 10 remark * * * PERMIT/MARK LAN RECEIVED TRANSACTIONAL TO DSCP AF3X - REVISION Q2 2020 * * *
+ 10 remark * * * Permit already marked transactional traffic to DSCP AF21-AF22-AF22 * * *
+ 10 permit ip any any dscp af21
+ 20 permit ip any any dscp af22
+ 30 permit ip any any dscp af23
+ 40 remark * * * DNS * * *
+ 40 permit udp any eq domain any
+ 50 permit udp any any eq domain
+ 60 remark * * * BOOTP (DHCP * * *
+ 60 permit udp any eq bootpc any
+ 70 permit udp any eq bootps any
+ 80 permit udp any any eq bootpc
+ 90 permit udp any any eq bootps
+ 100 remark * * * SSH & Telnet * * *
+ 100 permit tcp any range 22 telnet any
+ 110 remark * * * Kerberos * * *
+ 110 permit udp any eq 88 any
+ 120 permit udp any any eq 88
+ 130 permit tcp any eq 88 any
+ 140 permit tcp any any eq 88
+ 150 remark * * * Netbios name lookups * * *
+ 150 permit udp any eq netbios-ns any
+ 160 permit udp any any eq netbios-ns
+ 170 remark * * * Citrix & RDP * * *
+ 170 permit tcp any eq 1494 any
+ 180 permit tcp any any eq 1494
+ 190 permit tcp any eq 3389 any
+ 200 permit tcp any any eq 3389
+ 210 remark * * * TFTP * * *
+ 210 permit udp any any eq tftp
+ 220 permit udp any eq tftp any
+ 230 remark * * * TACACS & RADIUS * * *
+ 230 permit tcp any eq tacacs any
+ 240 permit tcp any any eq tacacs
+ 250 permit tcp any range 1812 1813 any
+ 260 permit tcp any any range 1812 1813
+ 270 remark * * * SQL * * *
+ 270 permit tcp any any range 1521 1522
+ 280 permit tcp any range 1521 1522 any
+ 290 permit tcp any any eq 1433
+ 300 permit tcp any eq 1433 any
+ 310 permit udp any any eq 1434
+ 320 permit udp any eq 1434 any
+ip access-list extended ACCESS_IN_VIDEO_2020Q2
+ 10 remark * * * PERMIT/MARK LAN RECEIVED VIDEO TRAFFIC To DSCP AF4X - REVISION Q2 2020 * * *
+ 10 remark * * * permit already marked Incoming Real-Time Video Traffic * * *
+ 10 permit udp any any dscp cs4
+ 20 permit udp any any dscp af41
+ 30 permit udp any any dscp af42
+ 40 permit udp any any dscp af43
+ 50 remark * * * QOS_WEBEX_AUDIO_TEAMS * * *
+ 50 permit udp any range 52000 52099 any eq 5004
+ 60 permit udp any eq 5004 any range 52000 52099
+ 70 remark * * * QOS_WEBEX_MEETINGS * * *
+ 70 permit udp any range 48000 65535 any eq 9000
+ 80 permit udp any eq 9000 any range 48000 65535
+ 90 remark * * *  QOS_WEBEX_VIDEO_TEAMS  * * *
+ 90 permit udp any range 52100 52299 any eq 5004
+ 100 permit udp any eq 5004 any range 52100 52299
+ 110 remark * * * TANDBERG_CODIAN_MCU * * *
+ 110 permit udp any range 49152 65535 any dscp af41
+ 120 permit udp any any range 49152 65535 dscp af41
+ip access-list extended ACCESS_IN_VOICE_2020Q2
+ 10 remark * * * MARK INCOMING REAL-TIME TRAFFIC TO DSCP EF - REVISION Q2 2020 * * *
+ 10 permit udp any range 16384 32767 any dscp ef
+ 20 permit udp any any range 16384 32767 dscp ef
+ 30 permit udp any range 16384 32767 any precedence critical
+ 40 permit udp any any range 16384 32767 precedence critical
+ip access-list extended MARK-DSCP-AF11
+ 10 permit ip any any dscp af11
+ 20 permit ip any any dscp af12
+ 30 permit ip any any dscp af13
+ 40 permit tcp any any eq smtp
+ 50 permit tcp any eq smtp any
+ 60 permit tcp any any eq 8080
+ 70 permit tcp any eq 8080 any
+ 80 permit tcp any any range 10565 10566
+ 90 permit tcp any range 10565 10566 any
+ 100 permit tcp any any eq 2051
+ip access-list extended MARK-DSCP-AF21
+ 10 permit udp any eq domain any
+ 20 permit udp any any eq domain
+ 30 permit udp any eq bootpc any
+ 40 permit udp any eq bootps any
+ 50 permit udp any any eq bootpc
+ 60 permit udp any any eq bootps
+ 70 permit tcp any range 22 telnet any
+ 80 permit udp any eq 88 any
+ 90 permit udp any any eq 88
+ 100 permit tcp any eq 88 any
+ 110 permit tcp any any eq 88
+ 120 permit udp any eq netbios-ns any
+ 130 permit udp any any eq netbios-ns
+ 140 permit tcp any eq 1494 any
+ 150 permit tcp any any eq 1494
+ 160 permit tcp any eq 3389 any
+ 170 permit tcp any any eq 3389
+ 180 permit udp any any eq tftp
+ 190 permit udp any eq tftp any
+ 200 permit tcp any any range 1521 1522
+ 210 permit tcp any range 1521 1522 any
+ 220 permit tcp any any eq 1433
+ 230 permit tcp any eq 1433 any
+ 240 permit udp any any eq 1434
+ 250 permit udp any eq 1434 any
+ 260 permit tcp any range 50040 50059 52.112.0.0 0.3.255.255
+ 270 permit tcp any range 50040 50059 13.107.64.0 0.0.63.255
+ 280 permit tcp any range 50040 50059 52.120.0.0 0.3.255.255
+ 290 permit tcp 52.112.0.0 0.3.255.255 any range 50040 50059
+ 300 permit tcp 13.107.64.0 0.0.63.255 any range 50040 50059
+ 310 permit tcp 52.120.0.0 0.3.255.255 any range 50040 50059
+ 320 permit udp any range 50040 50059 52.112.0.0 0.3.255.255
+ 330 permit udp any range 50040 50059 13.107.64.0 0.0.63.255
+ 340 permit udp any range 50040 50059 52.120.0.0 0.3.255.255
+ 350 permit udp 52.112.0.0 0.3.255.255 any range 50040 50059
+ 360 permit udp 13.107.64.0 0.0.63.255 any range 50040 50059
+ 370 permit udp 52.120.0.0 0.3.255.255 any range 50040 50059
+ 380 permit tcp any eq 40001 any
+ 390 permit tcp any any eq 40001
+ip access-list extended MARK-DSCP-AF31
+ 10 permit tcp any any range 2000 2002
+ 20 permit tcp any range 2000 2002 any
+ 30 permit tcp any any range 11000 11999
+ 40 permit tcp any range 11000 11999 any
+ip access-list extended MARK-DSCP-AF41
+ 10 permit tcp any range 50020 50039 52.112.0.0 0.3.255.255
+ 20 permit tcp any range 50020 50039 13.107.64.0 0.0.63.255
+ 30 permit tcp any range 50020 50039 52.120.0.0 0.3.255.255
+ 40 permit tcp 52.112.0.0 0.3.255.255 any range 50020 50039
+ 50 permit tcp 13.107.64.0 0.0.63.255 any range 50020 50039
+ 60 permit tcp 52.120.0.0 0.3.255.255 any range 50020 50039
+ 70 permit udp any range 50020 50039 52.112.0.0 0.3.255.255
+ 80 permit udp any range 50020 50039 13.107.64.0 0.0.63.255
+ 90 permit udp any range 50020 50039 52.120.0.0 0.3.255.255
+ 100 permit udp 52.112.0.0 0.3.255.255 any range 50020 50039
+ 110 permit udp 13.107.64.0 0.0.63.255 any range 50020 50039
+ 120 permit udp 52.120.0.0 0.3.255.255 any range 50020 50039
+ip access-list extended MARK-DSCP-CS3
+ 10 permit tcp any eq tacacs any
+ 20 permit tcp any any eq tacacs
+ 30 permit tcp any range 1812 1813 any
+ 40 permit tcp any any range 1812 1813
+ 50 permit udp any any eq 1719
+ 60 permit udp any eq 1719 any
+ 70 permit tcp any any range 1718 1720
+ 80 permit tcp any range 1718 1720 any
+ 90 permit udp any any eq 2427
+ 100 permit udp any eq 2427 any
+ 110 permit tcp any any eq 2428
+ 120 permit tcp any eq 2428 any
+ 130 permit tcp any any range 5060 5061
+ 140 permit udp any any range 5060 5061
+ 150 permit tcp any any eq bgp
+ 160 permit tcp any eq bgp any
+ip access-list extended MARK-DSCP-EF
+ 10 permit udp any range 16384 32767 any dscp ef
+ 20 permit udp any any range 16384 32767 dscp ef
+ 30 permit udp any range 16384 32767 any precedence critical
+ 40 permit udp any any range 16384 32767 precedence critical
+ 50 permit tcp any range 50000 50019 52.112.0.0 0.3.255.255
+ 60 permit tcp any range 50000 50019 13.107.64.0 0.0.63.255
+ 70 permit tcp any range 50000 50019 52.120.0.0 0.3.255.255
+ 80 permit tcp 52.112.0.0 0.3.255.255 any range 50000 50019
+ 90 permit tcp 13.107.64.0 0.0.63.255 any range 50000 50019
+ 100 permit tcp 52.120.0.0 0.3.255.255 any range 50000 50019
+ 110 permit udp any range 50000 50019 52.112.0.0 0.3.255.255
+ 120 permit udp any range 50000 50019 13.107.64.0 0.0.63.255
+ 130 permit udp any range 50000 50019 52.120.0.0 0.3.255.255
+ 140 permit udp 52.112.0.0 0.3.255.255 any range 50000 50019
+ 150 permit udp 13.107.64.0 0.0.63.255 any range 50000 50019
+ 160 permit udp 52.120.0.0 0.3.255.255 any range 50000 50019
+!
+logging source-interface Vlan5
+logging host 146.36.114.214
+logging host 146.38.53.162
+logging host 139.65.140.24
+logging host 139.65.140.25
+ip access-list standard 20
+ 10 permit 139.65.136.0 0.0.3.255
+ 20 permit 139.65.140.0 0.0.3.255
+ 30 permit 139.65.192.0 0.0.15.255
+ 40 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 permit 146.40.10.21
+ 40 deny   any log
+ip access-list standard 1330
+ 10 permit 146.22.71.201
+ 20 permit 146.22.9.201
+ 30 permit 146.22.8.0 0.0.0.255
+ 40 permit 146.38.92.0 0.0.0.255
+ 50 permit 146.24.136.0 0.0.0.255
+ 60 permit 146.24.146.0 0.0.0.255
+ 70 permit 146.24.250.0 0.0.0.255
+ 80 permit 146.27.26.0 0.0.1.255
+ 90 permit 146.36.145.0 0.0.0.255
+ 100 permit 146.36.10.0 0.0.0.255
+ 110 permit 146.40.185.0 0.0.0.255
+ 120 permit 139.65.136.0 0.0.3.255
+ 130 permit 146.36.126.128 0.0.0.63
+ 140 permit 146.27.84.128 0.0.0.63
+ 150 permit 146.36.130.224 0.0.0.31
+ 160 deny   any log
+ip access-list standard 1490
+ 10 permit 146.40.185.0 0.0.0.255
+ 20 deny   any log
+!
+snmp-server group CVX v3 auth 
+snmp-server group CVX v3 priv 
+snmp-server group CVX2 v3 auth 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Vlan5
+snmp-server location HOU140 / 1400 Smith St, Houston, Texas / USA / Americas /US-NA-Utility-Campus-Metro/Criticality-Medium
+snmp-server contact NOC: +1 713-754-4662 or CTN 842-3311 // GlobalNetOps1@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps license
+snmp-server enable traps memory bufferpeak
+snmp-server enable traps entity
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps config
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifindex persist
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+radius-server dead-criteria time 5 tries 3
+radius-server timeout 60
+radius-server deadtime 480
+!
+radius server HOU_RadiusVIP
+ address ipv4 136.171.184.185 auth-port 1812 acct-port 1813
+ key 7 123416353C2B1E31280B7D71
+!
+radius server LON_RadiusVIP
+ address ipv4 146.38.86.26 auth-port 1812 acct-port 1813
+ key 7 09615D2B37250527092C5D73
+!
+radius server SIN_RadiusVIP
+ address ipv4 146.40.1.25 auth-port 1812 acct-port 1813
+ key 7 123416353C2B1E31280B7D71
+!
+!
+control-plane
+ service-policy input system-cpp-policy
+!
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred ssh
+ transport output none
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ no exec
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in vrf-also
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred none
+ transport input ssh
+!
+call-home
+ contact-email-addr nmbtcon@chevron.com
+ profile "CSSM"
+  reporting smart-licensing-data
+  destination transport-method http
+  no destination transport-method email
+  destination address http http://cssm.chevron.net/Transportgateway/services/DeviceRequestHandler 
+ntp source Vlan5
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+!
+end

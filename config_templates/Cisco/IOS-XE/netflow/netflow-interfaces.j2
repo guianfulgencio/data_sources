@@ -1,0 +1,11 @@
+! Apply to every layer 3 interface
+! Variables
+! {{ interfaces }} = Set of L3 Interface on the device
+! {{ interface.name }} = L3 Interface on the device
+!
+{% for interface in interfaces -%}
+interface {{ interface.name }}
+  ip flow monitor NETQOS-MONITOR-IN input
+  ip flow monitor NETQOS-MONITOR-OUT output
+  exit
+{% endfor -%}

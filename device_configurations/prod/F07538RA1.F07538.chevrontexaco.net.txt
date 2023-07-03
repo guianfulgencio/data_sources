@@ -1,0 +1,981 @@
+Building configuration...
+
+
+Current configuration : 28325 bytes
+!
+! Last configuration change at 10:29:22 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 10:29:58 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 16.12
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service call-home
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+!
+hostname F07538RA1
+!
+boot-start-marker
+boot system bootflash:/isr4300-universalk9.16.12.04.SPA.bin
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+! card type command needed for slot/bay 0/1
+logging buffered 128000
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface Loopback0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization network flexvpn local 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+!
+aaa session-id common
+call-home
+ ! If contact email address in call-home is configured as sch-smart-licensing@cisco.com
+ ! the email address configured in Cisco Smart License Portal will be used as contact email address to send SCH notifications.
+ contact-email-addr sch-smart-licensing@cisco.com
+ profile "CiscoTAC-1"
+  active
+  destination transport-method http
+  no destination transport-method email
+no ip source-route
+!
+ip multicast-routing distributed
+ip multicast heartbeat 239.195.128.31 5 10 180
+ip multicast multipath
+ip multicast route-limit 1000 900
+!
+!
+!
+!
+!
+!
+ip domain name F07538.chevrontexaco.net
+!
+!
+!
+login on-success log
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+!
+multilink bundle-name authenticated
+!
+flow record FLOW4
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ collect ipv4 dscp
+ collect interface output
+ collect counter bytes
+ collect counter packets
+!
+!
+flow record FLOW6
+ match ipv6 protocol
+ match ipv6 source address
+ match ipv6 destination address
+ match transport source-port
+ match transport destination-port
+ match interface input
+ collect ipv6 dscp
+ collect interface output
+ collect counter bytes
+ collect counter packets
+!
+!
+flow exporter Exporter-1
+ destination 139.65.140.12
+ source Loopback0
+ template data timeout 16
+!
+!
+flow monitor FLOW4-LAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-WAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW4-WAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW6-LAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW6-WAN-OUT
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW6-WAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor FLOW4-LAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW4
+!
+!
+flow monitor FLOW6-LAN-IN
+ cache timeout inactive 60
+ cache timeout active 60
+ cache timeout update 1
+ record FLOW6
+!
+!
+flow monitor net-flow
+ exporter Exporter-1
+ record FLOW4
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+crypto pki trustpoint SLA-TrustPoint
+ enrollment pkcs12
+ revocation-check crl
+!
+!
+crypto pki certificate chain SLA-TrustPoint
+ certificate ca 01
+  30820321 30820209 A0030201 02020101 300D0609 2A864886 F70D0101 0B050030 
+  32310E30 0C060355 040A1305 43697363 6F312030 1E060355 04031317 43697363 
+  6F204C69 63656E73 696E6720 526F6F74 20434130 1E170D31 33303533 30313934 
+  3834375A 170D3338 30353330 31393438 34375A30 32310E30 0C060355 040A1305 
+  43697363 6F312030 1E060355 04031317 43697363 6F204C69 63656E73 696E6720 
+  526F6F74 20434130 82012230 0D06092A 864886F7 0D010101 05000382 010F0030 
+  82010A02 82010100 A6BCBD96 131E05F7 145EA72C 2CD686E6 17222EA1 F1EFF64D 
+  CBB4C798 212AA147 C655D8D7 9471380D 8711441E 1AAF071A 9CAE6388 8A38E520 
+  1C394D78 462EF239 C659F715 B98C0A59 5BBB5CBD 0CFEBEA3 700A8BF7 D8F256EE 
+  4AA4E80D DB6FD1C9 60B1FD18 FFC69C96 6FA68957 A2617DE7 104FDC5F EA2956AC 
+  7390A3EB 2B5436AD C847A2C5 DAB553EB 69A9A535 58E9F3E3 C0BD23CF 58BD7188 
+  68E69491 20F320E7 948E71D7 AE3BCC84 F10684C7 4BC8E00F 539BA42B 42C68BB7 
+  C7479096 B4CB2D62 EA2F505D C7B062A4 6811D95B E8250FC4 5D5D5FB8 8F27D191 
+  C55F0D76 61F9A4CD 3D992327 A8BB03BD 4E6D7069 7CBADF8B DF5F4368 95135E44 
+  DFC7C6CF 04DD7FD1 02030100 01A34230 40300E06 03551D0F 0101FF04 04030201 
+  06300F06 03551D13 0101FF04 05300301 01FF301D 0603551D 0E041604 1449DC85 
+  4B3D31E5 1B3E6A17 606AF333 3D3B4C73 E8300D06 092A8648 86F70D01 010B0500 
+  03820101 00507F24 D3932A66 86025D9F E838AE5C 6D4DF6B0 49631C78 240DA905 
+  604EDCDE FF4FED2B 77FC460E CD636FDB DD44681E 3A5673AB 9093D3B1 6C9E3D8B 
+  D98987BF E40CBD9E 1AECA0C2 2189BB5C 8FA85686 CD98B646 5575B146 8DFC66A8 
+  467A3DF4 4D565700 6ADF0F0D CF835015 3C04FF7C 21E878AC 11BA9CD2 55A9232C 
+  7CA7B7E6 C1AF74F6 152E99B7 B1FCF9BB E973DE7F 5BDDEB86 C71E3B49 1765308B 
+  5FB0DA06 B92AFE7F 494E8A9E 07B85737 F3A58BE1 1A48A229 C37C1E69 39F08678 
+  80DDCD16 D6BACECA EEBC7CF9 8428787B 35202CDC 60E4616A B623CDBD 230E3AFB 
+  418616A9 4093E049 4D10AB75 27E86F73 932E35B5 8862FDAE 0275156F 719BB2F0 
+  D697DF7F 28
+  	quit
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+voice-card 0/1
+ dsp services dspfarm
+ no watchdog
+!
+voice-card 0/2
+ no watchdog
+!
+voice-card 0/4
+ no watchdog
+!
+no license feature hseck9
+license udi pid ISR4331/K9 sn FDO21142PCL
+archive
+ path bootflash:cvx_112628
+ maximum 5
+memory free low-watermark processor 67089
+!
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+class-map match-all WAN-Traffic-L3CVX-CORP
+ match vlan  2005
+class-map match-any DSCP-CS3-AF3
+ match dscp cs3 
+ match dscp cs6 
+ match dscp af31  af32  af33 
+class-map match-any DSCP-AF4
+ match dscp af41  af42  af43 
+class-map match-any DSCP-AF2
+ match dscp af21  af22  af23 
+class-map match-any DSCP-AF1
+ match dscp af11  af12  af13 
+class-map match-all LAN-Traffic-L3CVX-CORP
+ match vlan  2001
+class-map match-any DSCP-EF
+ match dscp ef 
+class-map match-all NETWORK-CONTROL
+ match access-group name NETWORK-CONTROL
+class-map match-any L3CVX-CORP-LAN-MARK-CS3
+ match access-group name L3CVX-CORP-MARK-DSCP-CS3-CS6-AF3x
+class-map match-any L3CVX-CORP-LAN-MARK-AF4
+ match access-group name L3CVX-CORP-MARK-DSCP-AF4x
+class-map match-any L3CVX-CORP-LAN-MARK-AF1
+ match access-group name L3CVX-CORP-MARK-DSCP-AF1x-AND-LOCAL
+class-map match-any L3CVX-CORP-LAN-MARK-AF2
+ match access-group name L3CVX-CORP-MARK-DSCP-AF2x-AND-LOCAL
+class-map match-any L3CVX-CORP-LAN-MARK-EF
+ match access-group name L3CVX-CORP-MARK-DSCP-EF
+!
+policy-map WANQOS-OUT-L3CVX-CORP
+ class DSCP-EF
+  priority percent 10
+ class NETWORK-CONTROL
+  bandwidth remaining percent 5 
+ class DSCP-AF4
+  bandwidth remaining percent 25 
+ class DSCP-CS3-AF3
+  bandwidth remaining percent 5 
+ class DSCP-AF2
+  bandwidth remaining percent 25 
+  random-detect dscp-based
+ class DSCP-AF1
+  bandwidth remaining percent 15 
+  random-detect dscp-based
+ class class-default
+  bandwidth remaining percent 25 
+  random-detect dscp-based
+policy-map WANQOS-SITE-MULTI-VRF-OUT
+ class WAN-Traffic-L3CVX-CORP
+  bandwidth remaining percent 100 
+   service-policy WANQOS-OUT-L3CVX-CORP
+policy-map Gi0/0/0-out
+ class class-default
+  shape average percent 100   
+   service-policy WANQOS-SITE-MULTI-VRF-OUT
+policy-map L3CVX-CORP-SETDSCP
+ class L3CVX-CORP-LAN-MARK-EF
+  set dscp ef
+ class L3CVX-CORP-LAN-MARK-AF4
+  set dscp af41
+ class L3CVX-CORP-LAN-MARK-CS3
+  set dscp cs3
+ class L3CVX-CORP-LAN-MARK-AF2
+  set dscp af21
+ class L3CVX-CORP-LAN-MARK-AF1
+  set dscp af11
+ class class-default
+  set dscp default
+policy-map SETDSCP-MULTI-VRF-IN
+ class LAN-Traffic-L3CVX-CORP
+   service-policy L3CVX-CORP-SETDSCP
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+!
+interface Loopback0
+ ip flow monitor net-flow input
+ ip address 146.26.3.253 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 239.195.128.31
+ ip igmp static-group 239.195.128.31
+!
+interface GigabitEthernet0/0/0
+ no ip address
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet0/0/0.100
+ description *** Level3  :  100Mbps Ckt Id: BBPX71320 ***
+ encapsulation dot1Q 100
+ ip address 139.65.31.206 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ shutdown
+ no cdp enable
+ bfd interval 500 min_rx 500 multiplier 3
+!
+interface GigabitEthernet0/0/1
+ description *** F07538SL1    Gi1/0/48 ***
+ no ip address
+ ip nbar protocol-discovery
+ load-interval 30
+ media-type rj45
+ negotiation auto
+ service-policy input SETDSCP-MULTI-VRF-IN
+!
+interface GigabitEthernet0/0/1.2001
+ encapsulation dot1Q 2001
+ ip address 146.26.3.161 255.255.255.248
+ no ip proxy-arp
+ ip pim sparse-mode
+ no cdp enable
+!
+interface GigabitEthernet0/0/2
+ description ***Lumen EVPL : NA-US-NCAL-C-SJCQX1-PE2 xe-0/0/4.2015 : CID  443491777/443491776 ***
+ bandwidth 100000
+ no ip address
+ ip nbar protocol-discovery
+ no negotiation auto
+!
+interface GigabitEthernet0/0/2.2015
+ description ***Lumen EVPL : NA-US-NCAL-C-SJCQX1-PE2 xe-0/0/4.2015 : CID  443491777/443491776 ***
+ encapsulation dot1Q 2015
+ ip address 139.65.156.146 255.255.255.252
+ no ip redirects
+ no ip proxy-arp
+ ip pim sparse-mode
+ ip multicast boundary mcast-boundary-site-campus filter-autorp
+ no cdp enable
+ bfd interval 500 min_rx 500 multiplier 3
+!
+interface Service-Engine0/1/0
+!
+interface Service-Engine0/2/0
+!
+interface Service-Engine0/4/0
+!
+interface GigabitEthernet0
+ vrf forwarding Mgmt-intf
+ no ip address
+ shutdown
+ negotiation auto
+!
+!
+router eigrp 65055
+ bfd all-interfaces
+ default-metric 2000 100 255 1 1500
+ network 146.26.3.160 0.0.0.7
+ network 146.26.3.192 0.0.0.3
+ network 146.26.3.253 0.0.0.0
+ network 146.26.27.0 0.0.0.31
+ network 146.26.27.32 0.0.0.31
+ redistribute bgp 65055 route-map BGP-to-EIGRP
+ passive-interface default
+ no passive-interface GigabitEthernet0/0/1.2001
+ eigrp router-id 146.26.3.253
+!
+router bgp 65055
+ bgp router-id 146.26.3.253
+ bgp log-neighbor-changes
+ bgp deterministic-med
+ bgp graceful-restart
+ timers bgp 5 15
+ neighbor 139.65.156.145 remote-as 65456
+ neighbor 139.65.156.145 description SJCQX1-PE2
+ neighbor 139.65.156.145 fall-over bfd
+ !
+ address-family ipv4
+  network 146.26.3.160 mask 255.255.255.248
+  network 146.26.3.253 mask 255.255.255.255
+  network 146.26.3.254 mask 255.255.255.255
+  network 146.26.27.0 mask 255.255.255.192
+  network 146.34.251.224 mask 255.255.255.240
+  neighbor 139.65.156.145 activate
+  neighbor 139.65.156.145 send-community both
+  neighbor 139.65.156.145 soft-reconfiguration inbound
+  neighbor 139.65.156.145 route-map i--65456-L in
+  neighbor 139.65.156.145 route-map o--65456-L out
+  maximum-paths 2
+ exit-address-family
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+ip pim rp-address 139.65.245.226 mcast-rp-sparse-wan override
+ip pim spt-threshold 0
+ip pim register-rate-limit 48000
+ip pim register-source Loopback0
+ip tcp path-mtu-discovery
+ip telnet source-interface Loopback0
+no ip http server
+no ip http secure-server
+ip tftp source-interface Loopback0
+ip tftp blocksize 8192
+ip route 146.26.27.0 255.255.255.192 Null0 254
+ip ssh logging events
+ip ssh version 2
+ip scp server enable
+!
+ip bgp-community new-format
+ip as-path access-list 1 permit ^$
+!
+ip access-list standard cvx-snmpv3-acl
+ 10 permit 146.22.71.201
+ 20 permit 146.42.69.246
+ 30 permit 146.35.147.59
+ 40 permit 146.40.3.35
+ 50 permit 146.40.2.8
+ 60 permit 146.40.2.11
+ 70 permit 146.40.2.12
+ 80 permit 146.40.2.13
+ 90 permit 146.40.2.7
+ 100 permit 146.40.3.120
+ 110 permit 146.42.255.132
+ 120 permit 146.40.3.119
+ 130 permit 139.65.136.0 0.0.3.255
+ 140 permit 139.65.0.0 0.0.255.255
+ 150 deny   any log
+ip access-list standard mcast-boundary-site-campus
+ 10 remark Campus
+ 10 deny   239.193.0.0 0.0.255.255
+ 20 remark SSM Campus
+ 20 deny   239.232.253.0 0.0.0.255
+ 30 remark Site
+ 30 deny   239.255.0.0 0.0.255.255
+ 40 remark Permit everything else
+ 40 permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-boundary-site-campus-high
+ 10 remark Campus
+ 10 deny   239.193.0.0 0.0.255.255
+ 20 remark SSM Campus
+ 20 deny   239.232.253.0 0.0.0.255
+ 30 remark Site
+ 30 deny   239.255.0.0 0.0.255.255
+ 40 remark High-Speed WAN
+ 40 deny   239.194.0.0 0.0.255.255
+ 50 remark Permit everything else
+ 50 permit 224.0.0.0 15.255.255.255
+ip access-list standard mcast-limit-global-max512kbps
+ 10 permit 239.195.192.0 0.0.0.255
+ip access-list standard mcast-rp-sparse-wan
+ 10 permit 239.194.128.0 0.0.127.255
+ 20 permit 239.195.128.0 0.0.127.255
+ 30 permit 239.200.0.0 0.7.255.255
+ 40 permit 224.0.0.0 7.255.255.255
+!
+ip access-list extended L3CVX-CORP-MARK-DSCP-AF1x-AND-LOCAL
+ 10 remark * * * Mark LAN received traffic to DSCP AF11 (bulk traffic) * * *
+ 10 permit ip any any dscp af11
+ 20 permit ip any any dscp af12
+ 30 permit ip any any dscp af13
+ 40 permit tcp any any eq smtp
+ 50 permit tcp any eq smtp any
+ 60 permit tcp any any eq 8080
+ 70 permit tcp any eq 8080 any
+ 80 permit tcp any any range 10565 10566
+ 90 permit tcp any range 10565 10566 any
+ 100 remark CISCO-JABBER-RTP
+ 100 permit udp any any range 16384 32767
+ 110 remark MICROSOFT-LYNC
+ 110 permit tcp any any range 50000 59999
+ remark * * * Local admins can mark custom traffic to DSCP AF11 (bulk traffic) * * *
+ remark * * * by adding to this access-list. Do not delete these lines !!! * * *
+ip access-list extended L3CVX-CORP-MARK-DSCP-AF2x-AND-LOCAL
+ 10 remark * * * Mark LAN received traffic to DSCP AF21 (transactional traffic) * * *
+ 10 remark * * * Well-known Ports * * *
+ 10 permit ip any any dscp af21
+ 20 permit ip any any dscp af22
+ 30 permit ip any any dscp af23
+ 40 remark DNS
+ 40 permit udp any eq domain any
+ 50 permit udp any any eq domain
+ 60 remark BOOTP (DHCP)
+ 60 permit udp any eq bootpc any
+ 70 permit udp any eq bootps any
+ 80 permit udp any any eq bootpc
+ 90 permit udp any any eq bootps
+ 100 remark SSH & Telnet
+ 100 permit tcp any range 22 telnet any
+ 110 remark Kerberos
+ 110 permit udp any eq 88 any
+ 120 permit udp any any eq 88
+ 130 permit tcp any eq 88 any
+ 140 permit tcp any any eq 88
+ 150 remark Netbios name lookups
+ 150 permit udp any eq netbios-ns any
+ 160 permit udp any any eq netbios-ns
+ 170 remark Citrix & RDP
+ 170 permit tcp any eq 1494 any
+ 180 permit tcp any any eq 1494
+ 190 permit tcp any eq 3389 any
+ 200 permit tcp any any eq 3389
+ 210 remark TFTP
+ 210 permit udp any any eq tftp
+ 220 permit udp any eq tftp any
+ 230 remark TACACS & RADIUS
+ 230 permit tcp any eq tacacs any
+ 240 permit tcp any any eq tacacs
+ 250 permit tcp any range 1812 1813 any
+ 260 permit tcp any any range 1812 1813
+ 270 remark SQL
+ 270 permit tcp any any range 1521 1522
+ 280 permit tcp any range 1521 1522 any
+ 290 permit tcp any any eq 1433
+ 300 permit tcp any eq 1433 any
+ 310 permit udp any any eq 1434
+ 320 permit udp any eq 1434 any
+ 330 remark * * * Chevron High Priority Apps * * *
+ 330 remark JDE Subnet in San Ramon
+ 330 permit ip any 146.27.68.0 0.0.0.255
+ 340 permit ip 146.27.68.0 0.0.0.255 any
+ 350 remark SAP Subnets in San Ramon
+ 350 permit tcp any 146.27.78.0 0.0.1.255 range 3200 3800
+ 360 permit tcp 146.27.78.0 0.0.1.255 range 3200 3800 any
+ 370 remark eprocurement.chevron.com
+ 370 permit ip any host 146.23.4.51
+ 380 permit ip host 146.23.4.51 any
+ 390 remark sourcing.chevron.com
+ 390 permit ip any host 146.23.4.74
+ 400 permit ip host 146.23.4.74 any
+ 410 remark eProcurement Buyer (San Ramon)
+ 410 permit ip any host 146.27.126.40
+ 420 permit ip host 146.27.126.40 any
+ 430 remark eProcurement Buyer (Houston)
+ 430 permit ip any host 144.5.224.25
+ 440 permit ip host 144.5.224.25 any
+ 450 remark ERP-SAP Subnets (NADC-SAN520) 134.248.112.0/21
+ 450 permit ip any 134.248.112.0 0.0.7.255
+ 460 permit ip 134.248.112.0 0.0.7.255 any
+ 470 remark * * * Local admins can mark custom traffic to DSCP AF21 (high traffic) * * *
+ 470 remark * * * by adding to this access-list. BUT BE CAREFUL!!! Do not delete these lines !!! * * *
+ 470 remark GARS Subnet in San Ramon
+ 470 permit ip any 146.27.166.0 0.0.0.255
+ 480 permit ip 146.27.166.0 0.0.0.255 any
+ 490 permit ip host 146.27.61.225 any
+ 500 permit ip any host 146.27.61.225
+ 510 remark * * * Chevron Visitor Management * * * 
+ 510 permit ip any host 146.40.4.91
+ 520 permit udp any any range 16384 32767 precedence critical
+ 530 permit ip any 146.40.224.192 0.0.0.31
+ 540 permit ip 146.40.224.192 0.0.0.31 any
+ 550 permit ip host 146.40.4.91 any
+ 560 remark Added JDE Subnet in San Ramon
+ 560 permit ip any 146.27.61.0 0.0.0.255
+ 570 permit ip 146.27.61.0 0.0.0.255 any
+ip access-list extended L3CVX-CORP-MARK-DSCP-AF4x
+ 10 remark * * * Mark LAN received traffic to DSCP AF41 (video traffic) * * * 
+ 10 remark * * * Match Tandberg MXP/C-Series Endpoint UDP ports for H.323
+ 10 permit ip any any dscp af41
+ 20 permit ip any any dscp af42
+ 30 permit ip any any dscp af43
+ 40 permit udp any range 2326 2487 any range 2326 2487 dscp af41
+ 50 remark * * * Match Tandberg Codian MCU UDP ports
+ 50 remark Video Subnets in San Ramon for Codian MCU UDP Ports
+ 50 permit udp any 146.27.172.0 0.0.0.31 range 49152 65535
+ 60 permit udp 146.27.172.0 0.0.0.31 range 49152 65535 any
+ 70 remark Video Subnets in Houston for Codian MCU UDP Ports
+ 70 permit udp any 146.36.83.0 0.0.0.31 range 49152 65535
+ 80 permit udp 146.36.83.0 0.0.0.31 range 49152 65535 any
+ 90 remark Video Subnets in LONPWG for Codian MCU UDP Ports
+ 90 permit udp any 146.38.58.0 0.0.0.31 range 49152 65535
+ 100 permit udp 146.38.58.0 0.0.0.31 range 49152 65535 any
+ 110 remark Video Subnets in SGDC1 for Codian MCU UDP Ports
+ 110 permit udp any 146.40.10.128 0.0.0.31 range 49152 65535
+ 120 permit udp 146.40.10.128 0.0.0.31 range 49152 65535 any
+ 130 remark Video Subnets in San Ramon for MPS MCU UDP Ports
+ 130 permit udp any 146.27.70.0 0.0.0.63 range 2326 6951
+ 140 permit udp 146.27.70.0 0.0.0.63 range 2326 6951 any
+ip access-list extended L3CVX-CORP-MARK-DSCP-CS3-CS6-AF3x
+ 10 remark * * * Mark LAN received traffic to DSCP AF31 (call signalling) * * *
+ 10 permit ip any any dscp cs3
+ 20 permit ip any any dscp cs6
+ 30 permit ip any any dscp af31
+ 40 permit ip any any dscp af32
+ 50 permit ip any any dscp af33
+ 60 permit tcp any any range 2000 2002
+ 70 permit tcp any range 2000 2002 any
+ 80 permit tcp any any range 11000 11999
+ 90 permit tcp any range 11000 11999 any
+ 100 remark H323-H225
+ 100 permit udp any any eq 1719
+ 110 permit udp any eq 1719 any
+ 120 permit tcp any any range 1718 1720
+ 130 permit tcp any range 1718 1720 any
+ 140 remark MGCP
+ 140 permit udp any any eq 2427
+ 150 permit udp any eq 2427 any
+ 160 permit tcp any any eq 2428
+ 170 permit tcp any eq 2428 any
+ 180 remark SIP
+ 180 permit tcp any any range 5060 5061
+ 190 permit udp any any range 5060 5061
+ 200 permit tcp any range 5060 5061 any
+ 210 permit udp any range 5060 5061 any
+ 220 remark H.245 for Cisco-Tandberg video
+ 220 permit tcp any range 5556 5574 any range 5555 5565
+ 230 permit tcp any range 5555 5565 any range 5556 5574
+ 240 remark BGP
+ 240 permit tcp any any eq bgp
+ 250 permit tcp any eq bgp any
+ip access-list extended L3CVX-CORP-MARK-DSCP-EF
+ 10 remark * * * Mark LAN received traffic to DSCP EF (real-time) * * *
+ 10 permit ip any any dscp ef
+ 20 permit udp any range 16384 32767 any dscp ef
+ 30 permit udp any any range 16384 32767 dscp ef
+ 40 permit udp any range 16384 32767 any precedence critical
+ 50 permit udp any any range 16384 32767 precedence critical
+ip access-list extended NETWORK-CONTROL
+ 10 remark **** MATCHING BGP & BFD TRAFFIC ***
+ 10 permit tcp any any eq bgp
+ 20 permit udp any eq 49152 any eq 3784
+ 30 permit udp any eq 3785 any eq 3785
+!
+!
+ip prefix-list BGP-to-EIGRP seq 5 permit 0.0.0.0/0
+ip prefix-list BGP-to-EIGRP seq 10 permit 0.0.0.0/0 ge 12 le 19
+!
+ip prefix-list i--65040 seq 5 permit 0.0.0.0/0
+ip prefix-list i--65040 seq 10 permit 0.0.0.0/0 ge 12 le 19
+!
+ip prefix-list i--65456 seq 5 permit 0.0.0.0/0
+ip prefix-list i--65456 seq 10 permit 0.0.0.0/0 ge 12 le 19
+!
+ip prefix-list i--65456-L seq 5 permit 0.0.0.0/0
+ip prefix-list i--65456-L seq 10 permit 0.0.0.0/0 ge 12 le 19
+!
+ip prefix-list o--65456 seq 10 permit 146.26.3.160/29
+ip prefix-list o--65456 seq 20 permit 146.26.3.253/32
+ip prefix-list o--65456 seq 30 permit 146.26.3.254/32
+ip prefix-list o--65456 seq 40 permit 146.26.27.0/26
+ip prefix-list o--65456 seq 50 permit 146.34.251.224/28
+!
+ip prefix-list o--65456-L seq 10 permit 146.26.3.160/29
+ip prefix-list o--65456-L seq 20 permit 146.26.3.253/32
+ip prefix-list o--65456-L seq 30 permit 146.26.3.254/32
+ip prefix-list o--65456-L seq 40 permit 146.26.27.0/26
+ip prefix-list o--65456-L seq 50 permit 146.34.251.224/28
+logging source-interface Loopback0
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+ip access-list standard 20
+ 10 permit 139.65.136.0 0.0.3.255
+ 20 permit 139.65.140.0 0.0.3.255
+ 30 permit 139.65.192.0 0.0.15.255
+ 40 deny   any log
+ip access-list standard 40
+ 10 permit 146.22.70.251
+ 20 permit 146.38.37.9
+ 30 permit 146.40.10.21
+ 40 deny   any log
+!
+!
+route-map BGP-to-EIGRP permit 10 
+ match ip address prefix-list BGP-to-EIGRP
+!
+route-map o--65456-L permit 10 
+ match ip address prefix-list o--65456-L
+ set as-path prepend 65055
+!
+route-map i--65456-L permit 10 
+ match ip address prefix-list i--65456-L
+ set local-preference 110
+!
+route-map o--65040 permit 10 
+ match as-path 1
+ set community 65055:403 additive
+!
+route-map o--65456 permit 10 
+ match ip address prefix-list o--65456
+ set as-path prepend 65055 65055
+!
+route-map i--65456 permit 10 
+ match ip address prefix-list i--65456
+!
+route-map i--65040 permit 10 
+ match ip address prefix-list i--65040
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 auth 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 auth 
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server trap link ietf
+snmp-server trap-source Loopback0
+snmp-server location F07538 / 6379 Clark Ave, Suite 100, Dublin, CA / USA / Americas /US-NA-Utility-WAN-Remotes/Criticality-Medium
+snmp-server contact global.netops@chevron.com
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps ipmulticast
+snmp-server host 139.65.136.12 version 3 priv cvx2021 
+snmp-server host 139.65.136.12 version 3 priv cvx2022 
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp-server host 139.65.140.25 public  ipmulticast
+snmp ifmib ifalias long
+snmp ifmib ifindex persist
+!
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+!
+!
+!
+!
+control-plane
+!
+!
+voice-port 0/2/0
+ signal groundStart 
+ timing hookflash-out 50
+ timing guard-out 1000
+!
+voice-port 0/2/1
+ signal groundStart 
+ timing hookflash-out 50
+ timing guard-out 1000
+!
+voice-port 0/2/2
+ signal groundStart 
+ timing hookflash-out 50
+ timing guard-out 1000
+!
+voice-port 0/2/3
+ signal groundStart 
+ timing hookflash-out 50
+ timing guard-out 1000
+!
+mgcp
+mgcp call-agent CHVPKNXCM3.chvpk.chevrontexaco.net 2427 service-type mgcp version 0.1
+mgcp dtmf-relay voip codec all mode out-of-band
+mgcp rtp unreachable timeout 1000 action notify
+mgcp modem passthrough voip mode nse
+mgcp package-capability rtp-package
+mgcp package-capability sst-package
+mgcp package-capability pre-package
+no mgcp package-capability res-package
+no mgcp package-capability fxr-package
+no mgcp timer receive-rtcp
+mgcp sdp simple
+mgcp fax t38 inhibit
+mgcp fax t38 ls_redundancy 5
+mgcp fax t38 hs_redundancy 2
+mgcp fax t38 nsf 000000
+mgcp fax t38 gateway force
+mgcp rtp payload-type g726r16 static
+mgcp bind media source-interface Loopback0
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local Loopback0
+sccp ccm 146.34.6.163 identifier 1 version 7.0 
+sccp ccm 146.34.7.163 identifier 2 version 7.0 
+sccp ip precedence 3
+sccp
+!
+sccp ccm group 1
+ associate ccm 1 priority 1
+ associate ccm 2 priority 2
+ associate profile 1 register CFB_F07538RA1
+ associate profile 2 register XCOD_F07538RA1
+!
+ccm-manager music-on-hold
+!
+ccm-manager fallback-mgcp 
+ccm-manager redundant-host CONNXCM3.con.chevrontexaco.net
+ccm-manager mgcp
+no ccm-manager fax protocol cisco
+ccm-manager config server 146.34.6.164 146.34.7.164  
+ccm-manager config
+!
+dspfarm profile 1 conference  
+ description Conferencing Resources
+ codec g711ulaw
+ codec g711alaw
+ codec g729ar8
+ codec g729abr8
+ codec g729r8
+ codec g729br8
+ associate application SCCP
+ shutdown
+!
+dial-peer voice 999020 pots
+ service mgcpapp
+ port 0/2/0
+!
+dial-peer voice 999021 pots
+ service mgcpapp
+ port 0/2/1
+!
+dial-peer voice 999022 pots
+ service mgcpapp
+ port 0/2/2
+!
+dial-peer voice 999023 pots
+ service mgcpapp
+ port 0/2/3
+!
+!
+banner exec ^C
+*******************************************************************************************
+WARNING - this router forms part of the Regional WAN network.
+Changes to the configuration may result in loss of connectivity.
+STOP if you are unsure what you are doing and email global.netops@chevron.com for guidance!
+*******************************************************************************************
+^C
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+ transport output ssh
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport input ssh
+ transport output ssh
+!
+ntp source Loopback0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+!
+!
+!
+!
+end

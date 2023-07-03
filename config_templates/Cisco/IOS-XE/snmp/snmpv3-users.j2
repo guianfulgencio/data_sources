@@ -1,0 +1,7 @@
+! SNMP v3 Usernames
+! Variables
+! {{ snmpv3users }} = dictionary of snmpv3 usernames each with a name, auth_password and priv_password
+!
+{% for snmpv3user in snmpv3users %}
+snmp-server user {{ snmpv3user.name }} CVX-NMS v3 auth sha {{ snmpv3user.auth_password }} priv aes 128 {{ snmpv3user.priv_password }}
+{% endfor %}

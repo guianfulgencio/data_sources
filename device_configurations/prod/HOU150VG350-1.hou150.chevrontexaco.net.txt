@@ -1,0 +1,2108 @@
+Building configuration...
+
+
+  
+Current configuration : 39063 bytes
+!
+! Last configuration change at 10:49:17 UTC Fri Jun 16 2023 by admin
+! NVRAM config last updated at 10:49:50 UTC Fri Jun 16 2023 by svc-voy-ansible
+!
+version 15.7
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+!
+hostname HOU150VG350-1
+!
+boot-start-marker
+boot system flash:vg350-universalk9-mz.SPA.157-3.M2.bin
+boot-end-marker
+!
+!
+logging buffered 128000
+logging reload warnings
+no logging console
+enable secret 9 $9$TJRyhDRnBeD9ok$76l7dy2RYD0r.pZ5zYg0sYQdtFdG/aaoTlWV/VbhxV.
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ ACS
+ server name HOU_ACS
+ server name LON_ACS
+ ip tacacs source-interface GigabitEthernet0/0
+!
+aaa authentication login default group ACS local
+aaa authentication enable default group ACS enable
+aaa authorization console
+aaa authorization config-commands
+aaa authorization exec default group ACS if-authenticated 
+aaa authorization commands 0 default group ACS if-authenticated 
+aaa authorization commands 1 default group ACS if-authenticated 
+aaa authorization commands 15 default group ACS if-authenticated 
+aaa authorization reverse-access default group ACS if-authenticated 
+aaa accounting update newinfo
+aaa accounting exec default start-stop group ACS
+aaa accounting commands 0 default start-stop group ACS
+aaa accounting commands 1 default start-stop group ACS
+aaa accounting commands 15 default start-stop group ACS
+aaa accounting connection default start-stop group ACS
+aaa accounting system default start-stop group ACS
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+no ip source-route
+!
+!
+!
+!
+!
+!
+ip domain lookup source-interface GigabitEthernet0/0
+ip domain name hou150.chevrontexaco.net
+ip name-server 146.36.80.34
+ip cef
+login on-failure log
+login on-success log
+no ipv6 cef
+multilink bundle-name authenticated
+!
+stcapp ccm-group 1
+stcapp
+!
+stcapp feature access-code
+!
+!
+!
+stcapp supplementary-services
+ port 2/0/0
+  fallback-dn 88547997
+ port 2/0/1
+  fallback-dn 88545216
+ port 2/0/2
+  fallback-dn 88543039
+ port 2/0/3
+  fallback-dn 88541999
+ port 2/0/4
+  fallback-dn 88542228
+ port 2/0/5
+  fallback-dn 88541996
+ port 2/0/6
+  fallback-dn 88545656
+ port 2/0/7
+  fallback-dn 88547882
+ port 2/0/8
+  fallback-dn 88546023
+ port 2/0/9
+  fallback-dn 88543776
+ port 2/0/10
+  fallback-dn 88541989
+ port 2/0/11
+  fallback-dn 88547045
+ port 2/0/12
+  fallback-dn 88543738
+ port 2/0/14
+  fallback-dn 88541089
+ port 2/0/15
+  fallback-dn 88547828
+ port 2/0/16
+  fallback-dn 88544047
+ port 2/0/17
+  fallback-dn 88546012
+ port 2/0/18
+  fallback-dn 88546010
+ port 2/0/19
+  fallback-dn 88544034
+ port 2/0/20
+  fallback-dn 88544137
+ port 2/0/21
+  fallback-dn 88544136
+ port 2/0/22
+  fallback-dn 88543999
+ port 2/0/23
+  fallback-dn 88543966
+ port 2/0/24
+  fallback-dn 88543965
+ port 2/0/25
+  fallback-dn 88544127
+ port 2/0/26
+  fallback-dn 88544094
+ port 2/0/27
+  fallback-dn 88541995
+ port 2/0/28
+  fallback-dn 88541994
+ port 2/0/29
+  fallback-dn 88541993
+ port 2/0/30
+  fallback-dn 88541992
+ port 2/0/31
+  fallback-dn 88545184
+ port 2/0/32
+  fallback-dn 88545185
+ port 2/0/33
+  fallback-dn 88545961
+ port 2/0/34
+  fallback-dn 88544736
+ port 2/0/35
+  fallback-dn 88544788
+ port 2/0/36
+  fallback-dn 88544636
+ port 2/0/37
+  fallback-dn 88544644
+ port 2/0/38
+  fallback-dn 88544744
+ port 2/0/39
+  fallback-dn 88544738
+ port 2/0/40
+  fallback-dn 88544735
+ port 2/0/41
+  fallback-dn 88544734
+ port 2/0/42
+  fallback-dn 88544604
+ port 2/0/43
+  fallback-dn 88547096
+ port 2/0/44
+  fallback-dn 88547091
+ port 2/0/45
+  fallback-dn 88547092
+ port 2/0/46
+  fallback-dn 88544637
+ port 2/0/47
+  fallback-dn 88547090
+ port 2/0/48
+  fallback-dn 88547053
+ port 2/0/49
+  fallback-dn 88547056
+ port 2/0/50
+  fallback-dn 7121
+ port 2/0/51
+  fallback-dn 88545622
+ port 2/0/52
+  fallback-dn 88546905
+ port 2/0/53
+  fallback-dn 88545219
+ port 2/0/54
+  fallback-dn 88545763
+ port 2/0/55
+  fallback-dn 88547066
+ port 2/0/56
+  fallback-dn 88546918
+ port 2/0/57
+  fallback-dn 88546901
+ port 2/0/58
+  fallback-dn 88542225
+ port 2/0/59
+  fallback-dn 88546805
+ port 2/0/60
+  fallback-dn 88546806
+ port 2/0/61
+  fallback-dn 88542704
+ port 2/0/62
+  fallback-dn 88542713
+ port 2/0/63
+  fallback-dn 88544514
+ port 2/0/65
+  fallback-dn 88546055
+ port 2/0/66
+  fallback-dn 88455833
+ port 2/0/67
+  fallback-dn 88545895
+ port 2/0/68
+  fallback-dn 88545186
+ port 2/0/69
+  fallback-dn 88542236
+ port 2/0/70
+  fallback-dn 88545948
+ port 2/0/71
+  fallback-dn 88545948
+ port 4/0/0
+  fallback-dn 88545097
+ port 4/0/1
+  fallback-dn 88542708
+ port 4/0/2
+  fallback-dn 88545878
+ port 4/0/3
+  fallback-dn 88546078
+ port 4/0/4
+  fallback-dn 88545814
+ port 4/0/5
+  fallback-dn 88547792
+ port 4/0/6
+  fallback-dn 88547803
+ port 4/0/7
+  fallback-dn 88544664
+ port 4/0/8
+  fallback-dn 88545639
+ port 4/0/9
+  fallback-dn 88545746
+ port 4/0/10
+  fallback-dn 88542728
+ port 4/0/11
+  fallback-dn 88543294
+ port 4/0/12
+  fallback-dn 88545615
+ port 4/0/13
+  fallback-dn 88545028
+ port 4/0/14
+  fallback-dn 88545773
+ port 4/0/15
+  fallback-dn 88544141
+ port 4/0/16
+  fallback-dn 88541988
+ port 4/0/17
+  fallback-dn 88545576
+ port 4/0/18
+  fallback-dn 88541818
+ port 4/0/19
+  fallback-dn 88545616
+ port 4/0/20
+  fallback-dn 88541979
+ port 4/0/21
+  fallback-dn 88545921
+ port 4/0/22
+  fallback-dn 88545923
+ port 4/0/23
+  fallback-dn 88547407
+ port 4/0/24
+  fallback-dn 88546008
+ port 4/0/25
+  fallback-dn 88546039
+ port 4/0/26
+  fallback-dn 88546044
+ port 4/0/27
+  fallback-dn 88546078
+ port 4/0/28
+  fallback-dn 88541942
+ port 4/0/29
+  fallback-dn 88545138
+ port 4/0/30
+  fallback-dn 88544997
+ port 4/0/31
+  fallback-dn 88544943
+ port 4/0/32
+  fallback-dn 7115
+ port 4/0/33
+  fallback-dn 88544904
+ port 4/0/34
+  fallback-dn 88541987
+ port 4/0/35
+  fallback-dn 88547062
+ port 4/0/36
+  fallback-dn 88546434
+ port 4/0/37
+  fallback-dn 88546436
+ port 4/0/38
+  fallback-dn 88546440
+ port 4/0/39
+  fallback-dn 88546443
+ port 4/0/40
+  fallback-dn 88541986
+ port 4/0/41
+  fallback-dn 88546836
+ port 4/0/42
+  fallback-dn 88546840
+ port 4/0/43
+  fallback-dn 88542668
+ port 4/0/44
+  fallback-dn 88541979
+ port 4/0/45
+  fallback-dn 88546803
+ port 4/0/46
+  fallback-dn 88547068
+ port 4/0/47
+  fallback-dn 88547407
+ port 4/0/48
+  fallback-dn 88546889
+ port 4/0/49
+  fallback-dn 88547442
+ port 4/0/50
+  fallback-dn 88547112
+ port 4/0/51
+  fallback-dn 88541976
+ port 4/0/52
+  fallback-dn 88547286
+ port 4/0/53
+  fallback-dn 7127
+ port 4/0/54
+  fallback-dn 88541997
+ port 4/0/55
+  fallback-dn 88547428
+ port 4/0/56
+  fallback-dn 88547436
+ port 4/0/57
+  fallback-dn 88547410
+ port 4/0/58
+  fallback-dn 88547049
+ port 4/0/59
+  fallback-dn 88547498
+ port 4/0/60
+  fallback-dn 88541973
+ port 4/0/61
+  fallback-dn 88546283
+ port 4/0/62
+  fallback-dn 88546232
+ port 4/0/63
+  fallback-dn 88546285
+ port 4/0/64
+  fallback-dn 88546226
+ port 4/0/65
+  fallback-dn 88546961
+ port 4/0/66
+  fallback-dn 88546962
+ port 4/0/67
+  fallback-dn 88545833
+ port 4/0/68
+  fallback-dn 88546955
+ port 4/0/69
+  fallback-dn 88543184
+ port 4/0/70
+  fallback-dn 88547147
+ port 4/0/71
+  fallback-dn 88547161
+!
+!
+!
+!
+!
+voice-card 0
+!
+!
+!
+voice service voip
+ fax protocol t38 nse force version 0 ls-redundancy 5 hs-redundancy 2 fallback none
+!
+!
+!
+!
+!
+!
+license udi pid VG350-SPE150/K9 sn FOC21322K90
+license accept end user agreement
+license boot module vg350 technology-package uck9
+hw-module pvdm 0/0
+!
+hw-module sm 2
+!
+hw-module sm 4
+!
+archive
+ log config
+  hidekeys
+ path flash0:cvx_114652
+ maximum 5
+username admin privilege 15 secret 9 $9$OWVDz6vaF1NA8.$oOV26KqBOEfULsyE9qUZGIwcJB6XvPY.2y.0/k7sWZY
+!
+!
+ip tcp path-mtu-discovery
+ip telnet source-interface GigabitEthernet0/0
+!
+!
+!
+!
+interface Embedded-Service-Engine0/0
+ no ip address
+ shutdown
+!
+interface GigabitEthernet0/0
+ ip address 146.34.4.26 255.255.255.192
+ no ip proxy-arp
+ no logging event link-status
+ duplex auto
+ speed auto
+ no snmp trap link-status
+!
+interface GigabitEthernet0/1
+ no ip address
+ no ip proxy-arp
+ no logging event link-status
+ shutdown
+ duplex auto
+ speed auto
+ no snmp trap link-status
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+!
+no ip forward-protocol nd
+no ip forward-protocol udp tftp
+no ip forward-protocol udp nameserver
+no ip forward-protocol udp domain
+no ip forward-protocol udp time
+no ip forward-protocol udp netbios-ns
+no ip forward-protocol udp netbios-dgm
+no ip forward-protocol udp tacacs
+!
+!
+no ip http server
+no ip http secure-server
+ip tftp source-interface GigabitEthernet0/0
+ip route 0.0.0.0 0.0.0.0 146.34.87.225
+ip route 0.0.0.0 0.0.0.0 146.34.4.1
+ip ssh version 2
+ip scp server enable
+!
+ip access-list standard cvx-snmpv3-acl
+ permit 146.22.71.201
+ permit 146.42.69.246
+ permit 146.35.147.59
+ permit 146.40.3.35
+ permit 146.40.2.8
+ permit 146.40.2.11
+ permit 146.40.2.12
+ permit 146.40.2.13
+ permit 146.40.2.7
+ permit 146.40.3.120
+ permit 146.42.255.132
+ permit 146.40.3.119
+ permit 139.65.136.0 0.0.3.255
+ permit 139.65.0.0 0.0.255.255
+ deny   any log
+!
+logging history size 10
+logging source-interface GigabitEthernet0/0
+logging host 146.27.95.122
+logging host 146.36.114.214
+logging host 139.65.140.24
+logging host 139.65.140.25
+!
+!
+snmp-server group CVX v3 priv 
+snmp-server group CVX-NMS v3 priv read V3Read write V3Write notify V3Notify access cvx-snmpv3-acl
+snmp-server group cvx2021 v3 priv 
+snmp-server view V3Read iso included
+snmp-server view V3Write iso included
+snmp-server view V3Notify iso included
+snmp-server ifindex persist
+snmp-server trap link ietf
+snmp-server trap-source GigabitEthernet0/0
+snmp-server location HOU150 / 1500 LOUISIANA ST,  Houston,TX / USA / Americas /US-NA-Utility-Telephony/Criticality-Medium
+snmp-server enable traps snmp linkdown linkup coldstart warmstart
+snmp-server enable traps eigrp
+snmp-server enable traps xgcp
+snmp-server enable traps envmon
+snmp-server enable traps flash insertion
+snmp-server enable traps flash removal
+snmp-server enable traps config-copy
+snmp-server enable traps config
+snmp-server enable traps entity
+snmp-server enable traps cpu threshold
+snmp-server enable traps rsvp
+snmp-server enable traps ipsla
+snmp-server enable traps dial
+snmp-server enable traps dsp card-status
+snmp-server enable traps voice fallback poor-qov
+snmp-server enable traps dnis
+snmp-server host 139.65.136.12 version 3 priv cvx2021  config
+snmp-server host 139.65.136.12 version 3 priv cvx2022  config
+snmp-server host 139.65.136.11 version 3 priv cvx2023 
+snmp-server host 139.65.136.12 version 3 priv cvx2023 
+snmp-server host 139.65.136.13 version 3 priv cvx2023 
+snmp ifmib ifalias long
+tacacs server HOU_ACS
+ address ipv4 139.65.136.58
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+tacacs server LON_ACS
+ address ipv4 139.65.138.26
+ key 7 06031D344F4B1A1606041B08
+ timeout 10
+access-list 20 permit 139.65.136.0 0.0.3.255
+access-list 20 permit 139.65.140.0 0.0.3.255
+access-list 20 permit 139.65.192.0 0.0.15.255
+access-list 20 deny   any log
+access-list 30 permit 146.34.7.179
+access-list 30 permit 146.34.6.179
+access-list 30 permit 146.34.5.179
+access-list 30 permit 146.34.4.179
+access-list 30 permit 146.22.71.201
+access-list 30 permit 146.27.82.194
+access-list 30 permit 146.23.102.220
+access-list 30 permit 146.24.240.56
+access-list 30 permit 146.22.9.201
+access-list 30 permit 146.36.80.131
+access-list 30 permit 146.36.80.142
+access-list 30 permit 146.36.80.139
+access-list 30 permit 146.36.80.149
+access-list 30 permit 146.36.92.124
+access-list 30 permit 146.36.80.124
+access-list 30 permit 146.36.80.81
+access-list 30 permit 146.24.112.45
+access-list 30 permit 146.27.124.21
+access-list 30 permit 146.27.124.18
+access-list 30 permit 146.36.112.50
+access-list 30 permit 146.27.26.0 0.0.1.255
+access-list 30 permit 146.36.193.0 0.0.0.255
+access-list 30 permit 146.27.145.0 0.0.0.255
+access-list 30 deny   any log
+access-list 40 permit 146.22.70.251
+access-list 40 permit 146.38.37.9
+access-list 40 permit 146.40.10.21
+access-list 40 deny   any log
+access-list 1330 permit 146.22.71.201
+access-list 1330 permit 146.22.9.201
+access-list 1330 permit 146.22.8.0 0.0.0.255
+access-list 1330 permit 146.38.92.0 0.0.0.255
+access-list 1330 permit 146.24.136.0 0.0.0.255
+access-list 1330 permit 146.24.146.0 0.0.0.255
+access-list 1330 permit 146.24.250.0 0.0.0.255
+access-list 1330 permit 146.27.26.0 0.0.1.255
+access-list 1330 permit 146.36.145.0 0.0.0.255
+access-list 1330 permit 146.36.10.0 0.0.0.255
+access-list 1330 permit 146.40.185.0 0.0.0.255
+access-list 1330 permit 139.65.136.0 0.0.3.255
+access-list 1330 permit 146.36.126.128 0.0.0.63
+access-list 1330 permit 146.27.84.128 0.0.0.63
+access-list 1330 permit 146.36.130.224 0.0.0.31
+access-list 1330 deny   any log
+access-list 1331 permit 146.27.70.218 log
+access-list 1331 deny   any log
+access-list 1490 permit 146.40.185.0 0.0.0.255
+access-list 1490 deny   any log
+!
+!
+!
+control-plane
+!
+!
+voice-port 2/0/0
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/1
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/2
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/3
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/4
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/5
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/6
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/7
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/8
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/9
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/10
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/11
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/12
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/13
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/14
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/15
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/16
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/17
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/18
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/19
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/20
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/21
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/22
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/23
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/24
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/25
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/26
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/27
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/28
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/29
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/30
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/31
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/32
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/33
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/34
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/35
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/36
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/37
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/38
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/39
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/40
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/41
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/42
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/43
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/44
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/45
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/46
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/47
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/48
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/49
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/50
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/51
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/52
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/53
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/54
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/55
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/56
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/57
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/58
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/59
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/60
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/61
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/62
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/63
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/64
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/65
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/66
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/67
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/68
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/69
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/70
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 2/0/71
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/0
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/1
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/2
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/3
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/4
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/5
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/6
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/7
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/8
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/9
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/10
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/11
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/12
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/13
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/14
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/15
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/16
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/17
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/18
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/19
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/20
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/21
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/22
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/23
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/24
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/25
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/26
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/27
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/28
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/29
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/30
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/31
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/32
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/33
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/34
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/35
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/36
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/37
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/38
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/39
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/40
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/41
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/42
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/43
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/44
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/45
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/46
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/47
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/48
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/49
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/50
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/51
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/52
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/53
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/54
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/55
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/56
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/57
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/58
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/59
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/60
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/61
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/62
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/63
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/64
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/65
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/66
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/67
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/68
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/69
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/70
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+voice-port 4/0/71
+ timeouts initial 60
+ timeouts interdigit 60
+ timeouts ringing infinity
+ caller-id enable
+!
+mgcp behavior rsip-range tgcp-only
+mgcp behavior comedia-role none
+mgcp behavior comedia-check-media-src disable
+mgcp behavior comedia-sdp-force disable
+!
+mgcp profile default
+!
+sccp local GigabitEthernet0/0
+sccp ccm 146.34.4.163 identifier 1 version 7.0 
+sccp ccm 146.34.5.163 identifier 2 version 7.0 
+sccp
+!
+sccp ccm group 1
+ associate ccm 1 priority 1
+ associate ccm 2 priority 2
+!
+!
+ccm-manager config server 146.34.4.164 146.34.5.164 
+ccm-manager config
+ccm-manager sccp local GigabitEthernet0/0
+!
+dial-peer voice 200 pots
+ service stcapp
+ port 2/0/0
+!
+dial-peer voice 201 pots
+ service stcapp
+ port 2/0/1
+!
+dial-peer voice 202 pots
+ service stcapp
+ port 2/0/2
+!
+dial-peer voice 203 pots
+ service stcapp
+ port 2/0/3
+!
+dial-peer voice 204 pots
+ service stcapp
+ port 2/0/4
+!
+dial-peer voice 205 pots
+ service stcapp
+ port 2/0/5
+!
+dial-peer voice 206 pots
+ service stcapp
+ port 2/0/6
+!
+dial-peer voice 207 pots
+ service stcapp
+ port 2/0/7
+!
+dial-peer voice 208 pots
+ service stcapp
+ port 2/0/8
+!
+dial-peer voice 209 pots
+ service stcapp
+ port 2/0/9
+!
+dial-peer voice 2010 pots
+ service stcapp
+ port 2/0/10
+!
+dial-peer voice 2011 pots
+ service stcapp
+ port 2/0/11
+!
+dial-peer voice 2012 pots
+ service stcapp
+ port 2/0/12
+!
+dial-peer voice 2013 pots
+ service stcapp
+ port 2/0/13
+!
+dial-peer voice 2014 pots
+ service stcapp
+ port 2/0/14
+!
+dial-peer voice 2015 pots
+ service stcapp
+ port 2/0/15
+!
+dial-peer voice 2016 pots
+ service stcapp
+ port 2/0/16
+!
+dial-peer voice 2017 pots
+ service stcapp
+ port 2/0/17
+!
+dial-peer voice 2018 pots
+ service stcapp
+ port 2/0/18
+!
+dial-peer voice 2019 pots
+ service stcapp
+ port 2/0/19
+!
+dial-peer voice 2020 pots
+ service stcapp
+ port 2/0/20
+!
+dial-peer voice 2021 pots
+ service stcapp
+ port 2/0/21
+!
+dial-peer voice 2022 pots
+ service stcapp
+ port 2/0/22
+!
+dial-peer voice 2023 pots
+ service stcapp
+ port 2/0/23
+!
+dial-peer voice 2024 pots
+ service stcapp
+ port 2/0/24
+!
+dial-peer voice 2025 pots
+ service stcapp
+ port 2/0/25
+!
+dial-peer voice 2026 pots
+ service stcapp
+ port 2/0/26
+!
+dial-peer voice 2027 pots
+ service stcapp
+ port 2/0/27
+!
+dial-peer voice 2028 pots
+ service stcapp
+ port 2/0/28
+!
+dial-peer voice 2029 pots
+ service stcapp
+ port 2/0/29
+!
+dial-peer voice 2030 pots
+ service stcapp
+ port 2/0/30
+!
+dial-peer voice 2031 pots
+ service stcapp
+ port 2/0/31
+!
+dial-peer voice 2032 pots
+ service stcapp
+ port 2/0/32
+!
+dial-peer voice 2033 pots
+ service stcapp
+ port 2/0/33
+!
+dial-peer voice 2034 pots
+ service stcapp
+ port 2/0/34
+!
+dial-peer voice 2035 pots
+ service stcapp
+ port 2/0/35
+!
+dial-peer voice 2036 pots
+ service stcapp
+ port 2/0/36
+!
+dial-peer voice 2037 pots
+ service stcapp
+ port 2/0/37
+!
+dial-peer voice 2038 pots
+ service stcapp
+ port 2/0/38
+!
+dial-peer voice 2039 pots
+ service stcapp
+ port 2/0/39
+!
+dial-peer voice 2040 pots
+ service stcapp
+ port 2/0/40
+!
+dial-peer voice 2041 pots
+ service stcapp
+ port 2/0/41
+!
+dial-peer voice 2042 pots
+ service stcapp
+ port 2/0/42
+!
+dial-peer voice 2043 pots
+ service stcapp
+ port 2/0/43
+!
+dial-peer voice 2044 pots
+ service stcapp
+ port 2/0/44
+!
+dial-peer voice 2045 pots
+ service stcapp
+ port 2/0/45
+!
+dial-peer voice 2046 pots
+ service stcapp
+ port 2/0/46
+!
+dial-peer voice 2047 pots
+ service stcapp
+ port 2/0/47
+!
+dial-peer voice 2048 pots
+ service stcapp
+ port 2/0/48
+!
+dial-peer voice 2049 pots
+ service stcapp
+ port 2/0/49
+!
+dial-peer voice 2050 pots
+ service stcapp
+ port 2/0/50
+!
+dial-peer voice 2051 pots
+ service stcapp
+ port 2/0/51
+!
+dial-peer voice 2052 pots
+ service stcapp
+ port 2/0/52
+!
+dial-peer voice 2053 pots
+ service stcapp
+ port 2/0/53
+!
+dial-peer voice 2054 pots
+ service stcapp
+ port 2/0/54
+!
+dial-peer voice 2055 pots
+ service stcapp
+ port 2/0/55
+!
+dial-peer voice 2056 pots
+ service stcapp
+ port 2/0/56
+!
+dial-peer voice 2057 pots
+ service stcapp
+ port 2/0/57
+!
+dial-peer voice 2058 pots
+ service stcapp
+ port 2/0/58
+!
+dial-peer voice 2059 pots
+ service stcapp
+ port 2/0/59
+!
+dial-peer voice 2060 pots
+ service stcapp
+ port 2/0/60
+!
+dial-peer voice 2061 pots
+ service stcapp
+ port 2/0/61
+!
+dial-peer voice 2062 pots
+ service stcapp
+ port 2/0/62
+!
+dial-peer voice 2063 pots
+ service stcapp
+ port 2/0/63
+!
+dial-peer voice 2064 pots
+ service stcapp
+ port 2/0/64
+!
+dial-peer voice 2065 pots
+ service stcapp
+ port 2/0/65
+!
+dial-peer voice 2066 pots
+ service stcapp
+ port 2/0/66
+!
+dial-peer voice 2067 pots
+ service stcapp
+ port 2/0/67
+!
+dial-peer voice 2068 pots
+ service stcapp
+ port 2/0/68
+!
+dial-peer voice 2069 pots
+ service stcapp
+ port 2/0/69
+!
+dial-peer voice 2070 pots
+ service stcapp
+ port 2/0/70
+!
+dial-peer voice 2071 pots
+ service stcapp
+ port 2/0/71
+!
+dial-peer voice 400 pots
+ service stcapp
+ port 4/0/0
+!
+dial-peer voice 401 pots
+ service stcapp
+ port 4/0/1
+!
+dial-peer voice 402 pots
+ service stcapp
+ port 4/0/2
+!
+dial-peer voice 403 pots
+ service stcapp
+ port 4/0/3
+!
+dial-peer voice 404 pots
+ service stcapp
+ port 4/0/4
+!
+dial-peer voice 405 pots
+ service stcapp
+ port 4/0/5
+!
+dial-peer voice 406 pots
+ service stcapp
+ port 4/0/6
+!
+dial-peer voice 407 pots
+ service stcapp
+ port 4/0/7
+!
+dial-peer voice 408 pots
+ service stcapp
+ port 4/0/8
+!
+dial-peer voice 409 pots
+ service stcapp
+ port 4/0/9
+!
+dial-peer voice 4010 pots
+ service stcapp
+ port 4/0/10
+!
+dial-peer voice 4011 pots
+ service stcapp
+ port 4/0/11
+!
+dial-peer voice 4012 pots
+ service stcapp
+ port 4/0/12
+!
+dial-peer voice 4013 pots
+ service stcapp
+ port 4/0/13
+!
+dial-peer voice 4014 pots
+ service stcapp
+ port 4/0/14
+!
+dial-peer voice 4015 pots
+ service stcapp
+ port 4/0/15
+!
+dial-peer voice 4016 pots
+ service stcapp
+ port 4/0/16
+!
+dial-peer voice 4017 pots
+ service stcapp
+ port 4/0/17
+!
+dial-peer voice 4018 pots
+ service stcapp
+ port 4/0/18
+!
+dial-peer voice 4019 pots
+ service stcapp
+ port 4/0/19
+!
+dial-peer voice 4020 pots
+ service stcapp
+ port 4/0/20
+!
+dial-peer voice 4021 pots
+ service stcapp
+ port 4/0/21
+!
+dial-peer voice 4022 pots
+ service stcapp
+ port 4/0/22
+!
+dial-peer voice 4023 pots
+ service stcapp
+ port 4/0/23
+!
+dial-peer voice 4024 pots
+ service stcapp
+ port 4/0/24
+!
+dial-peer voice 4025 pots
+ service stcapp
+ port 4/0/25
+!
+dial-peer voice 4026 pots
+ service stcapp
+ port 4/0/26
+!
+dial-peer voice 4027 pots
+ service stcapp
+ port 4/0/27
+!
+dial-peer voice 4028 pots
+ service stcapp
+ port 4/0/28
+!
+dial-peer voice 4029 pots
+ service stcapp
+ port 4/0/29
+!
+dial-peer voice 4030 pots
+ service stcapp
+ port 4/0/30
+!
+dial-peer voice 4031 pots
+ service stcapp
+ port 4/0/31
+!
+dial-peer voice 4032 pots
+ service stcapp
+ port 4/0/32
+!
+dial-peer voice 4033 pots
+ service stcapp
+ port 4/0/33
+!
+dial-peer voice 4034 pots
+ service stcapp
+ port 4/0/34
+!
+dial-peer voice 4035 pots
+ service stcapp
+ port 4/0/35
+!
+dial-peer voice 4036 pots
+ service stcapp
+ port 4/0/36
+!
+dial-peer voice 4037 pots
+ service stcapp
+ port 4/0/37
+!
+dial-peer voice 4038 pots
+ service stcapp
+ port 4/0/38
+!
+dial-peer voice 4039 pots
+ service stcapp
+ port 4/0/39
+!
+dial-peer voice 4040 pots
+ service stcapp
+ port 4/0/40
+!
+dial-peer voice 4041 pots
+ service stcapp
+ port 4/0/41
+!
+dial-peer voice 4042 pots
+ service stcapp
+ port 4/0/42
+!
+dial-peer voice 4043 pots
+ service stcapp
+ port 4/0/43
+!
+dial-peer voice 4044 pots
+ service stcapp
+ port 4/0/44
+!
+dial-peer voice 4045 pots
+ service stcapp
+ port 4/0/45
+!
+dial-peer voice 4046 pots
+ service stcapp
+ port 4/0/46
+!
+dial-peer voice 4047 pots
+ service stcapp
+ port 4/0/47
+!
+dial-peer voice 4048 pots
+ service stcapp
+ port 4/0/48
+!
+dial-peer voice 4049 pots
+ service stcapp
+ port 4/0/49
+!
+dial-peer voice 4050 pots
+ service stcapp
+ port 4/0/50
+!
+dial-peer voice 4051 pots
+ service stcapp
+ port 4/0/51
+!
+dial-peer voice 4052 pots
+ service stcapp
+ port 4/0/52
+!
+dial-peer voice 4053 pots
+ service stcapp
+ port 4/0/53
+!
+dial-peer voice 4054 pots
+ service stcapp
+ port 4/0/54
+!
+dial-peer voice 4055 pots
+ service stcapp
+ port 4/0/55
+!
+dial-peer voice 4056 pots
+ service stcapp
+ port 4/0/56
+!
+dial-peer voice 4057 pots
+ service stcapp
+ port 4/0/57
+!
+dial-peer voice 4058 pots
+ service stcapp
+ port 4/0/58
+!
+dial-peer voice 4059 pots
+ service stcapp
+ port 4/0/59
+!
+dial-peer voice 4060 pots
+ service stcapp
+ port 4/0/60
+!
+dial-peer voice 4061 pots
+ service stcapp
+ port 4/0/61
+!
+dial-peer voice 4062 pots
+ service stcapp
+ port 4/0/62
+!
+dial-peer voice 4063 pots
+ service stcapp
+ port 4/0/63
+!
+dial-peer voice 4064 pots
+ service stcapp
+ port 4/0/64
+!
+dial-peer voice 4065 pots
+ service stcapp
+ port 4/0/65
+!
+dial-peer voice 4066 pots
+ service stcapp
+ port 4/0/66
+!
+dial-peer voice 4067 pots
+ service stcapp
+ port 4/0/67
+!
+dial-peer voice 4068 pots
+ service stcapp
+ port 4/0/68
+!
+dial-peer voice 4069 pots
+ service stcapp
+ port 4/0/69
+!
+dial-peer voice 4070 pots
+ service stcapp
+ port 4/0/70
+!
+dial-peer voice 4071 pots
+ service stcapp
+ port 4/0/71
+!
+!
+!
+!
+no vstack
+banner login ^C
+****************************************************
+WARNING TO UNAUTHORIZED USERS:
+This system is for use by authorized users only.
+Any individual using this system, by such use,
+acknowledges and consents to the right of the
+company to monitor, access, use, and disclose any
+information generated, received, or stored on the
+systems, and waives any right of privacy or
+expectation of privacy on the part of that
+individual in connection with his or her use of
+this system. Unauthorized and/or improper use of
+this system, as delineated by corporate policies,
+is not tolerated and the company may take formal
+action against such individuals.
+****************************************************
+^C
+!
+line con 0
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport output all
+line aux 0
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ no exec
+ transport preferred none
+ transport output all
+line 2
+ no activation-character
+ no exec
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ logging synchronous
+ transport preferred none
+ transport input ssh
+ transport output all
+line vty 5 15
+ session-timeout 10 
+ access-class 20 in
+ timeout login response 15
+ password 7 03314F1E5402194271252D283356221A0A230E
+ transport preferred ssh
+ transport input ssh
+!
+scheduler allocate 20000 1000
+ntp source GigabitEthernet0/0
+ntp access-group peer 40
+ntp server 146.38.37.9
+ntp server 146.22.70.251
+ntp server 146.40.10.21
+!
+end
